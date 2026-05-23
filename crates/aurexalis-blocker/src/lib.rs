@@ -1,15 +1,25 @@
-use aurexalis_core::NetworkRequest;
-use thiserror::Error;
+use aurexalis_core::{NetworkRequest, ResourceKind};
+use std::fmt;
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum BlockerError {
-    #[error("filter list is empty")]
     EmptyFilterList,
 }
+
+impl fmt::Display for BlockerError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BlockerError::EmptyFilterList => formatter.write_str("filter list is empty"),
+        }
+    }
+}
+
+impl std::error::Error for BlockerError {}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BlockDecision {
     Allow,
+    AllowByException { rule: String },
     Block { rule: String },
 }
 
@@ -36,13 +46,15 @@ impl BlockerEngine {
     }
 
     pub fn check(&self, request: &NetworkRequest) -> BlockDecision {
-        // This placeholder keeps the policy API stable before wiring adblock-rust.
         for rule in &self.rules {
-            if rule.starts_with("||") {
-                let needle = rule.trim_start_matches("||").trim_end_matches('^');
-                if request.url.domain().is_some_and(|domain| domain.contains(needle)) {
-                    return BlockDecision::Block { rule: rule.clone() };
-                }
+            if rule.starts_with("@@") && matches_rule(&rule[2..], request) {
+                return BlockDecision::AllowByException { rule: rule.clone() };
+            }
+        }
+
+        for rule in &self.rules {
+            if matches_rule(rule, request) {
+                return BlockDecision::Block { rule: rule.clone() };
             }
         }
 
@@ -50,3 +62,129 @@ impl BlockerEngine {
     }
 }
 
+fn matches_rule(rule: &str, request: &NetworkRequest) -> bool {
+    let (pattern, options) = split_options(rule);
+
+    if !options_match(options, request) {
+        return false;
+    }
+
+    if pattern.starts_with("||") {
+        let needle = pattern
+            .trim_start_matches("||")
+            .trim_end_matches('^')
+            .trim_end_matches('/');
+
+        return request
+            .host()
+            .is_some_and(|domain| domain == needle || domain.ends_with(&format!(".{needle}")));
+    }
+
+    request.url.contains(pattern)
+}
+
+fn split_options(rule: &str) -> (&str, Option<&str>) {
+    match rule.split_once('$') {
+        Some((pattern, options)) => (pattern, Some(options)),
+        None => (rule, None),
+    }
+}
+
+fn options_match(options: Option<&str>, request: &NetworkRequest) -> bool {
+    let Some(options) = options else {
+        return true;
+    };
+
+    for option in options.split(',').map(str::trim) {
+        match option {
+            "script" if request.kind != ResourceKind::Script => return false,
+            "image" if request.kind != ResourceKind::Image => return false,
+            "stylesheet" if request.kind != ResourceKind::Stylesheet => return false,
+            "third-party" if !request.is_third_party() => return false,
+            _ => {}
+        }
+    }
+
+    true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use aurexalis_core::ResourceKind;
+
+    fn request(url: &str, source: Option<&str>, kind: ResourceKind) -> NetworkRequest {
+        NetworkRequest::parse(url, source, kind).expect("test request should parse")
+    }
+
+    #[test]
+    fn blocks_domain_rule() {
+        let engine = BlockerEngine::from_filter_lists(&["||ads.example.com^".to_owned()])
+            .expect("rules should load");
+        let decision = engine.check(&request(
+            "https://ads.example.com/banner.js",
+            Some("https://site.test"),
+            ResourceKind::Script,
+        ));
+
+        assert_eq!(
+            decision,
+            BlockDecision::Block {
+                rule: "||ads.example.com^".to_owned()
+            }
+        );
+    }
+
+    #[test]
+    fn honors_exception_before_block() {
+        let engine = BlockerEngine::from_filter_lists(&[
+            "||ads.example.com^".to_owned(),
+            "@@||ads.example.com^".to_owned(),
+        ])
+        .expect("rules should load");
+
+        assert_eq!(
+            engine.check(&request(
+                "https://ads.example.com/allowed.js",
+                Some("https://site.test"),
+                ResourceKind::Script,
+            )),
+            BlockDecision::AllowByException {
+                rule: "@@||ads.example.com^".to_owned()
+            }
+        );
+    }
+
+    #[test]
+    fn applies_resource_type_option() {
+        let engine =
+            BlockerEngine::from_filter_lists(&["tracker.js$script,third-party".to_owned()])
+                .expect("rules should load");
+
+        assert!(matches!(
+            engine.check(&request(
+                "https://cdn.test/tracker.js",
+                Some("https://site.test"),
+                ResourceKind::Script,
+            )),
+            BlockDecision::Block { .. }
+        ));
+
+        assert_eq!(
+            engine.check(&request(
+                "https://site.test/tracker.js",
+                Some("https://site.test"),
+                ResourceKind::Script,
+            )),
+            BlockDecision::Allow
+        );
+    }
+
+    #[test]
+    fn rejects_empty_lists() {
+        let error = BlockerEngine::from_filter_lists(&["! only a comment".to_owned()])
+            .expect_err("empty rules should fail");
+
+        assert!(matches!(error, BlockerError::EmptyFilterList));
+    }
+}

@@ -8,5 +8,3 @@ authors.workspace = true
 
 [dependencies]
 aurexalis-core = { path = "../aurexalis-core" }
-thiserror.workspace = true
-

@@ -1,17 +1,28 @@
 use std::fmt;
-use thiserror::Error;
-use url::Url;
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum AurexalisError {
-    #[error("invalid url: {0}")]
     InvalidUrl(String),
-
-    #[error("unsupported operation: {0}")]
     Unsupported(&'static str),
+    Io(std::io::Error),
+}
 
-    #[error("io error: {0}")]
-    Io(#[from] std::io::Error),
+impl fmt::Display for AurexalisError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AurexalisError::InvalidUrl(value) => write!(formatter, "invalid url: {value}"),
+            AurexalisError::Unsupported(value) => write!(formatter, "unsupported operation: {value}"),
+            AurexalisError::Io(error) => write!(formatter, "io error: {error}"),
+        }
+    }
+}
+
+impl std::error::Error for AurexalisError {}
+
+impl From<std::io::Error> for AurexalisError {
+    fn from(error: std::io::Error) -> Self {
+        Self::Io(error)
+    }
 }
 
 pub type Result<T> = std::result::Result<T, AurexalisError>;
@@ -44,28 +55,105 @@ impl fmt::Display for ResourceKind {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NetworkRequest {
-    pub url: Url,
-    pub source_url: Option<Url>,
+    pub url: String,
+    pub host: String,
+    pub source_url: Option<String>,
+    pub source_host: Option<String>,
     pub kind: ResourceKind,
 }
 
 impl NetworkRequest {
     pub fn parse(url: &str, source_url: Option<&str>, kind: ResourceKind) -> Result<Self> {
-        let parsed_url = Url::parse(url).map_err(|_| AurexalisError::InvalidUrl(url.to_owned()))?;
+        let host = extract_host(url).ok_or_else(|| AurexalisError::InvalidUrl(url.to_owned()))?;
         let parsed_source = match source_url {
-            Some(value) => Some(
-                Url::parse(value).map_err(|_| AurexalisError::InvalidUrl(value.to_owned()))?,
-            ),
+            Some(value) => Some(value.to_owned()),
+            None => None,
+        };
+        let source_host = match source_url {
+            Some(value) => {
+                Some(extract_host(value).ok_or_else(|| AurexalisError::InvalidUrl(value.to_owned()))?)
+            }
             None => None,
         };
 
         Ok(Self {
-            url: parsed_url,
+            url: url.to_owned(),
+            host,
             source_url: parsed_source,
+            source_host,
             kind,
         })
     }
+
+    pub fn is_third_party(&self) -> bool {
+        let Some(source_host) = &self.source_host else {
+            return false;
+        };
+
+        self.host != *source_host
+    }
+
+    pub fn host(&self) -> Option<&str> {
+        Some(&self.host)
+    }
 }
 
+fn extract_host(value: &str) -> Option<String> {
+    let (_, rest) = value.split_once("://")?;
+    let authority = rest.split('/').next()?.split('?').next()?.split('#').next()?;
+    let host_port = authority.rsplit('@').next()?;
+    let host = host_port.split(':').next()?.trim().to_ascii_lowercase();
+
+    if host.is_empty() || host.contains(' ') {
+        return None;
+    }
+
+    Some(host)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_network_request_with_source() {
+        let request = NetworkRequest::parse(
+            "https://cdn.example.net/app.js",
+            Some("https://example.com"),
+            ResourceKind::Script,
+        )
+        .expect("request should parse");
+
+        assert_eq!(request.host(), Some("cdn.example.net"));
+        assert_eq!(request.kind, ResourceKind::Script);
+        assert!(request.is_third_party());
+    }
+
+    #[test]
+    fn rejects_invalid_url() {
+        let error = NetworkRequest::parse("not a url", None, ResourceKind::Other)
+            .expect_err("invalid URL should fail");
+
+        assert!(matches!(error, AurexalisError::InvalidUrl(_)));
+    }
+
+    #[test]
+    fn displays_resource_kind() {
+        assert_eq!(ResourceKind::Stylesheet.to_string(), "stylesheet");
+        assert_eq!(ResourceKind::Xhr.to_string(), "xhr");
+    }
+
+    #[test]
+    fn extracts_lowercase_host() {
+        let request = NetworkRequest::parse(
+            "https://User:Pass@CDN.Example.NET:443/app.js",
+            None,
+            ResourceKind::Script,
+        )
+        .expect("request should parse");
+
+        assert_eq!(request.host(), Some("cdn.example.net"));
+    }
+}

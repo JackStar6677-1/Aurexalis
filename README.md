@@ -14,6 +14,7 @@
 [![Engine](https://img.shields.io/badge/engine-Gecko%20%2F%20Floorp-7C3AED?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](#arquitectura)
 [![Rust](https://img.shields.io/badge/rust-core%20modules-CE412B?style=for-the-badge&logo=rust&logoColor=white)](#stack)
 [![Privacy](https://img.shields.io/badge/privacy-local%20first-101018?style=for-the-badge)](#principios)
+[![Rust](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml/badge.svg)](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml)
 
 </div>
 
@@ -202,12 +203,18 @@ gantt
 - [x] Crear repo base.
 - [x] Definir identidad visual Aurexalis.
 - [x] Documentar arquitectura modular.
-- [ ] Crear `userChrome.css` inicial.
-- [ ] Crear `aurexalis-sound` PoC.
-- [ ] Crear `aurexalis-importer` Rust para cookies Brave.
+- [x] Crear `userChrome.css` inicial.
+- [x] Crear `aurexalis-sound` PoC.
+- [x] Crear workspace Rust modular.
+- [x] Disenar `aurexalis-remotefs` para SFTP/FTP.
+- [x] Agregar tests unitarios y CI.
+- [ ] Crear `aurexalis-importer` Rust para leer cookies Brave reales.
 - [ ] Probar `adblock-rust` fuera del navegador.
-- [ ] Disenar `aurexalis-remotefs` para SFTP/FTP.
 - [ ] Estudiar parches de Floorp para Chrome Web Store.
+
+## Pruebas
+
+La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows.
 
 ## Licencia Y Uso
 
