@@ -11,8 +11,6 @@ use std::io::{copy, BufReader};
 use std::path::Path;
 use zip::ZipArchive;
 
-pub use github::{aurexalis_runtime_url, download_file, floorp_installer_url};
-
 const RUNTIME_ZIP: &str = "aurexalis-runtime.zip";
 const FLOORP_INSTALLER: &str = "floorp-installer.exe";
 

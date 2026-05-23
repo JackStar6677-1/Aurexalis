@@ -6,7 +6,7 @@ mod theme;
 
 use eframe::egui::{self, CentralPanel, ProgressBar, RichText, ScrollArea, Vec2};
 use std::path::PathBuf;
-use std::sync::mpsc::Receiver;
+use std::sync::mpsc::{self, Receiver};
 use std::thread;
 
 const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
