@@ -18,7 +18,9 @@ impl fmt::Display for AurexalisError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AurexalisError::InvalidUrl(value) => write!(formatter, "invalid url: {value}"),
-            AurexalisError::Unsupported(value) => write!(formatter, "unsupported operation: {value}"),
+            AurexalisError::Unsupported(value) => {
+                write!(formatter, "unsupported operation: {value}")
+            }
             AurexalisError::Io(error) => write!(formatter, "io error: {error}"),
         }
     }
@@ -79,9 +81,9 @@ impl NetworkRequest {
             None => None,
         };
         let source_host = match source_url {
-            Some(value) => {
-                Some(extract_host(value).ok_or_else(|| AurexalisError::InvalidUrl(value.to_owned()))?)
-            }
+            Some(value) => Some(
+                extract_host(value).ok_or_else(|| AurexalisError::InvalidUrl(value.to_owned()))?,
+            ),
             None => None,
         };
 
@@ -109,7 +111,13 @@ impl NetworkRequest {
 
 fn extract_host(value: &str) -> Option<String> {
     let (_, rest) = value.split_once("://")?;
-    let authority = rest.split('/').next()?.split('?').next()?.split('#').next()?;
+    let authority = rest
+        .split('/')
+        .next()?
+        .split('?')
+        .next()?
+        .split('#')
+        .next()?;
     let host_port = authority.rsplit('@').next()?;
     let host = host_port.split(':').next()?.trim().to_ascii_lowercase();
 

@@ -5,8 +5,8 @@
 
 #![forbid(unsafe_code)]
 
-use std::fs;
 use std::fmt;
+use std::fs;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -156,11 +156,7 @@ pub fn build_default_profile_candidate(
         ChromiumBrowser::Brave | ChromiumBrowser::Chrome => root.join("Default"),
     };
 
-    Ok(build_candidate(
-        browser,
-        "Default".to_owned(),
-        profile_root,
-    ))
+    Ok(build_candidate(browser, "Default".to_owned(), profile_root))
 }
 
 pub fn discover_profiles(
@@ -280,8 +276,14 @@ mod tests {
         assert!(profiles[0].artifacts.login_db.ends_with("Login Data"));
         assert!(profiles[0].artifacts.bookmarks_json.ends_with("Bookmarks"));
         assert!(profiles[0].artifacts.favicons_db.ends_with("Favicons"));
-        assert!(profiles[0].artifacts.preferences_json.ends_with("Preferences"));
-        assert!(profiles[0].artifacts.local_state_json.ends_with("Local State"));
+        assert!(profiles[0]
+            .artifacts
+            .preferences_json
+            .ends_with("Preferences"));
+        assert!(profiles[0]
+            .artifacts
+            .local_state_json
+            .ends_with("Local State"));
 
         fs::remove_dir_all(root).expect("cleanup");
     }
@@ -316,7 +318,8 @@ mod tests {
         fs::write(profile_root.join("Bookmarks"), "{}").expect("write bookmarks");
         fs::write(profile_root.join("History"), "").expect("write history");
 
-        let candidate = build_candidate(ChromiumBrowser::Chrome, "Default".to_owned(), profile_root);
+        let candidate =
+            build_candidate(ChromiumBrowser::Chrome, "Default".to_owned(), profile_root);
         let surfaces = candidate.existing_surfaces();
 
         assert!(surfaces.contains(&ImportSurface::Bookmarks));
