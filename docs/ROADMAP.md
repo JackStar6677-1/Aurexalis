@@ -20,15 +20,16 @@ Este roadmap reemplaza la idea de MVP suelto por fases de producto.
 ## Fase 2: Importador Local
 
 - Deteccion robusta de Chrome, Brave y Opera.
-- Lectura de Bookmarks, History, Favicons y Preferences.
-- Lectura de Cookies y Login Data con SQLite.
+- Lectura de Bookmarks, Preferences, Secure Preferences y Local State.
+- Lectura de Cookies, Login Data, History y Favicons con SQLite.
 - Descifrado Windows DPAPI.
+- Descifrado AES-GCM Chromium con llave local.
 - Descifrado Linux Secret Service/KWallet cuando este disponible.
 - Exportacion hacia formato intermedio auditable.
 
 ## Fase 3: Bloqueador Nativo
 
-- Integracion real de `adblock-rust`.
+- Integracion real de `adblock-rust` en crate aislado.
 - Benchmarks de matching.
 - Listas configurables.
 - Politica de bloqueo antes del render.

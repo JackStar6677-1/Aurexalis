@@ -13,6 +13,7 @@ flowchart TB
   Services --> Blocker["aurexalis-blocker"]
   Services --> Importer["aurexalis-importer"]
   Services --> RemoteFS["aurexalis-remotefs"]
+  Services --> Shell["aurexalis-shell"]
   Services --> Core["aurexalis-core"]
 
   Blocker --> AdblockRust["adblock-rust"]
@@ -37,8 +38,9 @@ Esto evita mezclar pruebas de UI, red, perfiles y motor al mismo tiempo.
 |---|---|---|
 | `aurexalis-core` | Tipos compartidos, errores, politicas base | Scaffold |
 | `aurexalis-blocker` | Motor de decision para bloqueo de requests | Scaffold |
-| `aurexalis-importer` | Deteccion y migracion local de perfiles Chromium | Scaffold |
-| `aurexalis-remotefs` | Navegador de archivos remoto SFTP/FTP integrado | Planificado |
+| `aurexalis-importer` | Deteccion y lectura local de perfiles Chromium | SQLite/JSON inicial |
+| `aurexalis-remotefs` | Navegador de archivos remoto SFTP/FTP integrado | Cola y backend local |
+| `aurexalis-shell` | CLI arrancable para perfiles, Floorp y launch externo | Inicial |
 | `browser/chrome` | Tema, userChrome y sonido reactivo | Scaffold |
 
 ## Decisiones Iniciales

@@ -1,7 +1,7 @@
 //! Network blocking policy facade for Aurexalis.
 //!
-//! The current matcher is deliberately small and deterministic. It preserves
-//! the public policy shape that will later wrap `adblock-rust`.
+//! Brave's `adblock-rust` is the primary backend. A small deterministic matcher
+//! remains available for tests and bootstrapping.
 
 #![forbid(unsafe_code)]
 
@@ -11,12 +11,14 @@ use std::fmt;
 #[derive(Debug)]
 pub enum BlockerError {
     EmptyFilterList,
+    InvalidRequest(String),
 }
 
 impl fmt::Display for BlockerError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BlockerError::EmptyFilterList => formatter.write_str("filter list is empty"),
+            BlockerError::InvalidRequest(error) => write!(formatter, "invalid request: {error}"),
         }
     }
 }
@@ -28,15 +30,30 @@ pub enum BlockDecision {
     Allow,
     AllowByException { rule: String },
     Block { rule: String },
+    Redirect { rule: String },
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlockerBackend {
+    AdblockRust,
+    Simple,
+}
+
 pub struct BlockerEngine {
     rules: Vec<String>,
+    backend: BlockerBackend,
+    adblock: adblock::Engine,
 }
 
 impl BlockerEngine {
     pub fn from_filter_lists(lists: &[String]) -> Result<Self, BlockerError> {
+        Self::from_filter_lists_with_backend(lists, BlockerBackend::AdblockRust)
+    }
+
+    pub fn from_filter_lists_with_backend(
+        lists: &[String],
+        backend: BlockerBackend,
+    ) -> Result<Self, BlockerError> {
         let rules = lists
             .iter()
             .flat_map(|list| list.lines())
@@ -49,10 +66,59 @@ impl BlockerEngine {
             return Err(BlockerError::EmptyFilterList);
         }
 
-        Ok(Self { rules })
+        let adblock = adblock::Engine::from_rules(
+            rules.iter().map(String::as_str),
+            adblock::lists::ParseOptions::default(),
+        );
+
+        Ok(Self {
+            rules,
+            backend,
+            adblock,
+        })
     }
 
-    pub fn check(&self, request: &NetworkRequest) -> BlockDecision {
+    pub fn backend(&self) -> BlockerBackend {
+        self.backend
+    }
+
+    pub fn check(&self, request: &NetworkRequest) -> Result<BlockDecision, BlockerError> {
+        match self.backend {
+            BlockerBackend::AdblockRust => self.check_with_adblock_rust(request),
+            BlockerBackend::Simple => Ok(self.check_with_simple_matcher(request)),
+        }
+    }
+
+    fn check_with_adblock_rust(
+        &self,
+        request: &NetworkRequest,
+    ) -> Result<BlockDecision, BlockerError> {
+        let source = request.source_url.as_deref().unwrap_or(&request.url);
+        let request = adblock::request::Request::new(
+            &request.url,
+            source,
+            resource_kind_to_adblock(request.kind),
+        )
+        .map_err(|error| BlockerError::InvalidRequest(error.to_string()))?;
+        let result = self.adblock.check_network_request(&request);
+
+        if let Some(exception) = result.exception {
+            return Ok(BlockDecision::AllowByException { rule: exception });
+        }
+        if let Some(redirect) = result.redirect {
+            return Ok(BlockDecision::Redirect { rule: redirect });
+        }
+        if result.matched {
+            return Ok(BlockDecision::Block {
+                rule: result
+                    .filter
+                    .unwrap_or_else(|| "adblock-rust network filter".to_owned()),
+            });
+        }
+        Ok(BlockDecision::Allow)
+    }
+
+    fn check_with_simple_matcher(&self, request: &NetworkRequest) -> BlockDecision {
         for rule in &self.rules {
             if rule.starts_with("@@") && matches_rule(&rule[2..], request) {
                 return BlockDecision::AllowByException { rule: rule.clone() };
@@ -66,6 +132,19 @@ impl BlockerEngine {
         }
 
         BlockDecision::Allow
+    }
+}
+
+fn resource_kind_to_adblock(kind: ResourceKind) -> &'static str {
+    match kind {
+        ResourceKind::Document => "document",
+        ResourceKind::Script => "script",
+        ResourceKind::Stylesheet => "stylesheet",
+        ResourceKind::Image => "image",
+        ResourceKind::Media => "media",
+        ResourceKind::Font => "font",
+        ResourceKind::Xhr => "xmlhttprequest",
+        ResourceKind::Other => "other",
     }
 }
 
@@ -126,8 +205,11 @@ mod tests {
 
     #[test]
     fn blocks_domain_rule() {
-        let engine = BlockerEngine::from_filter_lists(&["||ads.example.com^".to_owned()])
-            .expect("rules should load");
+        let engine = BlockerEngine::from_filter_lists_with_backend(
+            &["||ads.example.com^".to_owned()],
+            BlockerBackend::Simple,
+        )
+        .expect("rules should load");
         let decision = engine.check(&request(
             "https://ads.example.com/banner.js",
             Some("https://site.test"),
@@ -135,7 +217,7 @@ mod tests {
         ));
 
         assert_eq!(
-            decision,
+            decision.expect("decision"),
             BlockDecision::Block {
                 rule: "||ads.example.com^".to_owned()
             }
@@ -144,10 +226,13 @@ mod tests {
 
     #[test]
     fn honors_exception_before_block() {
-        let engine = BlockerEngine::from_filter_lists(&[
-            "||ads.example.com^".to_owned(),
-            "@@||ads.example.com^".to_owned(),
-        ])
+        let engine = BlockerEngine::from_filter_lists_with_backend(
+            &[
+                "||ads.example.com^".to_owned(),
+                "@@||ads.example.com^".to_owned(),
+            ],
+            BlockerBackend::Simple,
+        )
         .expect("rules should load");
 
         assert_eq!(
@@ -155,7 +240,7 @@ mod tests {
                 "https://ads.example.com/allowed.js",
                 Some("https://site.test"),
                 ResourceKind::Script,
-            )),
+            )).expect("decision"),
             BlockDecision::AllowByException {
                 rule: "@@||ads.example.com^".to_owned()
             }
@@ -164,16 +249,18 @@ mod tests {
 
     #[test]
     fn applies_resource_type_option() {
-        let engine =
-            BlockerEngine::from_filter_lists(&["tracker.js$script,third-party".to_owned()])
-                .expect("rules should load");
+        let engine = BlockerEngine::from_filter_lists_with_backend(
+            &["tracker.js$script,third-party".to_owned()],
+            BlockerBackend::Simple,
+        )
+        .expect("rules should load");
 
         assert!(matches!(
             engine.check(&request(
                 "https://cdn.test/tracker.js",
                 Some("https://site.test"),
                 ResourceKind::Script,
-            )),
+            )).expect("decision"),
             BlockDecision::Block { .. }
         ));
 
@@ -182,9 +269,27 @@ mod tests {
                 "https://site.test/tracker.js",
                 Some("https://site.test"),
                 ResourceKind::Script,
-            )),
+            )).expect("decision"),
             BlockDecision::Allow
         );
+    }
+
+    #[test]
+    fn blocks_with_adblock_rust_backend() {
+        let engine = BlockerEngine::from_filter_lists(&["||ads.example.com^".to_owned()])
+            .expect("rules should load");
+
+        assert_eq!(engine.backend(), BlockerBackend::AdblockRust);
+        assert!(matches!(
+            engine
+                .check(&request(
+                    "https://ads.example.com/banner.js",
+                    Some("https://site.test"),
+                    ResourceKind::Script,
+                ))
+                .expect("decision"),
+            BlockDecision::Block { .. }
+        ));
     }
 
     #[test]

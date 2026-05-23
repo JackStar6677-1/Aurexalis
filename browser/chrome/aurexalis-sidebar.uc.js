@@ -70,18 +70,26 @@
   function remoteFilesPanel() {
     return {
       title: "Remote Files",
-      body:
-        "SFTP, FTP y FTPS viviran aqui como explorador interno. La primera version evitara indexaciones profundas y pedira confirmacion antes de subir, reemplazar o borrar.",
-      action: "Preparar conexion",
+      rows: [
+        ["Backend", "aurexalis-remotefs"],
+        ["Protocolos", "SFTP / FTP / FTPS"],
+        ["Estado", "cola de transferencias y credenciales seguras en Rust"],
+      ],
+      action: "Abrir descargas",
+      command: openDownloads,
     };
   }
 
   function importerPanel() {
     return {
       title: "Profile Importer",
-      body:
-        "Importacion local de cookies, historial, marcadores, favicons, preferencias y claves cuando el sistema permita descifrado seguro.",
-      action: "Escanear perfiles",
+      rows: [
+        ["SQLite", "Cookies / Login Data / History / Favicons"],
+        ["JSON", "Bookmarks / Preferences / Secure Preferences / Local State"],
+        ["Claves", "DPAPI Windows; Linux Secret Service/KWallet en adaptador"],
+      ],
+      action: "Abrir contrasenas",
+      command: () => openTab("about:logins"),
     };
   }
 
@@ -97,13 +105,29 @@
   function showPanel(item, button) {
     const panel = document.getElementById("ax-sidebar-panel");
     const title = panel.querySelector(".ax-panel-header");
-    const body = panel.querySelector(".ax-panel-body");
+    const rows = panel.querySelector(".ax-panel-rows");
     const action = panel.querySelector(".ax-panel-action");
     const content = item.panel();
 
     title.textContent = content.title;
-    body.firstChild.textContent = content.body;
+    while (rows.firstChild) {
+      rows.firstChild.remove();
+    }
+    for (const row of content.rows) {
+      const line = xul("hbox");
+      line.className = "ax-panel-row";
+      const key = xul("label");
+      key.className = "ax-panel-row-key";
+      key.textContent = row[0];
+      const value = xul("description");
+      value.className = "ax-panel-row-value";
+      value.textContent = row[1];
+      line.appendChild(key);
+      line.appendChild(value);
+      rows.appendChild(line);
+    }
     action.textContent = content.action;
+    action.onclick = () => content.command();
     panel.hidden = false;
     setActive(button);
   }
@@ -118,15 +142,12 @@
 
     const body = xul("vbox");
     body.className = "ax-panel-body";
-    const bodyText = xul("description");
-    bodyText.textContent = "";
+    const rows = xul("vbox");
+    rows.className = "ax-panel-rows";
     const action = xul("button");
     action.className = "ax-panel-action";
-    action.addEventListener("command", () => {
-      console.info("[AurexalisSidebar] Panel action placeholder");
-    });
 
-    body.appendChild(bodyText);
+    body.appendChild(rows);
     body.appendChild(action);
     panel.appendChild(title);
     panel.appendChild(body);

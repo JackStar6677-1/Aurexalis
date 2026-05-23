@@ -227,11 +227,26 @@ gantt
 - [x] Agregar tests unitarios y CI.
 - [x] Clonar Floorp como submodulo auditable.
 - [x] Mapear build system, empaquetado y soporte Chrome Web Store de Floorp.
-- [ ] Crear `aurexalis-importer` Rust para leer cookies Brave reales.
-- [ ] Probar `adblock-rust` fuera del navegador.
+- [x] Crear `aurexalis-importer` Rust para leer SQLite/JSON Chromium.
+- [x] Probar `adblock-rust` fuera del navegador.
+- [x] Agregar shell ejecutable inicial.
+- [x] Agregar cola RemoteFS y backend local testeable.
 - [ ] Portar capa Chrome Web Store de Floorp con branding Aurexalis.
 
 ## Pruebas
+
+## Shell Ejecutable
+
+El primer binario arrancable vive en `aurexalis-shell` y expone:
+
+```powershell
+.\tools\aurexalis-build.ps1 -Mode build
+.\target\debug\aurexalis.exe profiles
+.\target\debug\aurexalis.exe launch "C:\Ruta\A\floorp.exe"
+```
+
+La documentacion de build y empaquetado esta en
+[docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
 
 La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows.
 
