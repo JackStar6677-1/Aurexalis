@@ -544,8 +544,7 @@ pub fn decrypt_chromium_secret(
         let plaintext =
             windows_dpapi::decrypt_data(encrypted_value, windows_dpapi::Scope::User, None)
                 .map_err(|error| ImporterError::Crypto(error.to_string()))?;
-        return String::from_utf8(plaintext)
-            .map_err(|error| ImporterError::Crypto(error.to_string()));
+        String::from_utf8(plaintext).map_err(|error| ImporterError::Crypto(error.to_string()))
     }
 
     #[cfg(not(windows))]
