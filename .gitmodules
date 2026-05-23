@@ -1,0 +1,3 @@
+[submodule "vendor/floorp"]
+	path = vendor/floorp
+	url = https://github.com/Floorp-Projects/Floorp.git

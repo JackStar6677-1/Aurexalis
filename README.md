@@ -28,9 +28,9 @@ No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y
 
 ## Estado
 
-> Fase actual: **base profesional de ingenieria y arquitectura modular**.
+> Fase actual: **base profesional de ingenieria, Floorp auditado y arquitectura modular**.
 
-Este repositorio comienza como base publica del proyecto: documentacion, roadmap, identidad visual, diagramas y decisiones tecnicas. El codigo duro se integrara por modulos para mantener control, pruebas y rollback.
+Este repositorio comienza como base publica del proyecto: documentacion, roadmap, identidad visual, diagramas, decisiones tecnicas y modulos Rust aislados. Floorp ya queda enlazado como submodulo para estudiar parches, build system, empaquetado y soporte de Chrome Web Store con una revision fija.
 
 ## Principios
 
@@ -158,6 +158,19 @@ Aurexalis tambien tendra un modulo de navegador de archivos remoto: conexiones S
 
 El modulo se documenta en [docs/REMOTE_FS.md](./docs/REMOTE_FS.md) y queda separado para implementarlo despues sin mezclarlo con el motor web.
 
+## Base Floorp
+
+Floorp esta integrado como submodulo Git en `vendor/floorp` para mantener una
+referencia auditable al nucleo Gecko elegido.
+
+```powershell
+git submodule update --init --depth 1 vendor/floorp
+.\tools\floorp-status.ps1
+```
+
+El analisis de parches, build system, empaquetado y soporte Chrome Web Store se
+mantiene en [docs/FLOORP_INTEGRATION.md](./docs/FLOORP_INTEGRATION.md).
+
 ## UI Aurexalis
 
 Paleta inicial:
@@ -184,7 +197,7 @@ gantt
 
   section Base
   Repo, README e identidad       :done,    r1, 2026-05-23, 1d
-  Analisis Floorp/Firefox        :active,  r2, 2026-05-24, 5d
+  Submodulo y analisis Floorp    :done,    r2, 2026-05-23, 1d
 
   section UI
   userChrome.css Aurexalis       :         u1, 2026-05-25, 3d
@@ -212,9 +225,11 @@ gantt
 - [x] Crear workspace Rust modular.
 - [x] Disenar `aurexalis-remotefs` para SFTP/FTP.
 - [x] Agregar tests unitarios y CI.
+- [x] Clonar Floorp como submodulo auditable.
+- [x] Mapear build system, empaquetado y soporte Chrome Web Store de Floorp.
 - [ ] Crear `aurexalis-importer` Rust para leer cookies Brave reales.
 - [ ] Probar `adblock-rust` fuera del navegador.
-- [ ] Estudiar parches de Floorp para Chrome Web Store.
+- [ ] Portar capa Chrome Web Store de Floorp con branding Aurexalis.
 
 ## Pruebas
 

@@ -44,12 +44,20 @@ Esto evita mezclar pruebas de UI, red, perfiles y motor al mismo tiempo.
 ## Decisiones Iniciales
 
 - La base pesada sera Floorp/Firefox, no un motor propio.
+- Floorp queda integrado como submodulo auditable en `vendor/floorp`.
 - El repositorio empieza como monorepo de integracion para mantener orden.
 - Los datos sensibles no se versionan y todo flujo de importacion debe ser local, explicito y auditable.
 - El explorador SFTP/FTP sera una funcion de navegador de archivos remoto, no una sincronizacion opaca.
+
+## Base Floorp
+
+El analisis vivo de Floorp esta en [FLOORP_INTEGRATION.md](./FLOORP_INTEGRATION.md).
+La revision inicial fijada permite estudiar parches, build system y empaquetado
+sin mezclar codigo externo con modulos Aurexalis.
 
 ## ADRs
 
 - [ADR 0001: Base Gecko/Floorp](./adr/0001-floorp-gecko-base.md)
 - [ADR 0002: Importacion local de perfiles](./adr/0002-local-first-profile-import.md)
 - [ADR 0003: RemoteFS sin montaje del sistema](./adr/0003-remotefs-without-os-mount.md)
+- [ADR 0004: Floorp como submodulo auditado](./adr/0004-floorp-as-submodule.md)

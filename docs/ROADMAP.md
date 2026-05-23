@@ -45,8 +45,10 @@ Este roadmap reemplaza la idea de MVP suelto por fases de producto.
 
 ## Fase 5: Gecko/Floorp Core
 
-- Analisis de parches Floorp.
-- Integracion de soporte Chrome Web Store.
+- Submodulo Floorp fijado en `vendor/floorp`.
+- Analisis de parches Floorp documentado.
+- Mapa inicial de soporte Chrome Web Store.
+- Mapa inicial de build system y empaquetado.
+- Port Aurexalis de soporte Chrome Web Store.
 - Empaquetado reproducible.
 - Canal de builds propio.
-
