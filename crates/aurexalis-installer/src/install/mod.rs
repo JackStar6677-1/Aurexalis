@@ -3,7 +3,7 @@
 mod floorp;
 mod github;
 mod profile;
-mod windows;
+pub mod windows;
 
 use serde::Serialize;
 use std::fs::{self, File};

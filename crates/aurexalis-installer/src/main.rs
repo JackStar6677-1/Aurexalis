@@ -9,7 +9,7 @@ mod theme;
 use eframe::egui::{self, CentralPanel, ProgressBar, RichText, ScrollArea, Vec2};
 use i18n::{strings, Lang};
 use std::path::PathBuf;
-use std::sync::mpsc::{self, Receiver};
+use std::sync::{mpsc, Arc};
 use std::thread;
 
 const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -39,7 +39,7 @@ struct InstallerApp {
     status: String,
     error: String,
     result: Option<install::InstallConfig>,
-    worker_rx: Option<Receiver<WorkerMsg>>,
+    worker_rx: Option<mpsc::Receiver<WorkerMsg>>,
 }
 
 impl Default for InstallerApp {
@@ -389,14 +389,19 @@ impl InstallerApp {
 
 fn main() -> eframe::Result<()> {
     let t = strings(Lang::Es);
-    let icon = egui::include_image!("../../../assets/branding/aurexalis-icon.png");
+    let icon = Arc::new(
+        eframe::icon_data::from_png_bytes(include_bytes!(
+            "../../../assets/branding/aurexalis-icon.png"
+        ))
+        .expect("icono PNG de marca invalido"),
+    );
 
     let native = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size(Vec2::new(540.0, 660.0))
             .with_min_inner_size(Vec2::new(500.0, 600.0))
             .with_title(format!("{} v{APP_VERSION}", t.window_title))
-            .with_icon(icon.into()),
+            .with_icon(icon),
         ..Default::default()
     };
 

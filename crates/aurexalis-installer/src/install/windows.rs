@@ -8,7 +8,7 @@ const MINIMUM_FREE_MB: u64 = 500;
 /// Espacio libre en megabytes para la unidad que contiene `path`.
 pub fn free_disk_space_mb(path: &Path) -> Result<u64, String> {
     let drive = drive_root(path)?;
-    let drive = drive.to_string_lossy().replace('\'', "''");
+    let drive = drive.replace('\'', "''");
 
     let script = format!(
         r#"
