@@ -88,7 +88,9 @@
   function isInteractiveElement(target) {
     try {
       return Boolean(
-        target.closest("toolbarbutton, button, .tabbrowser-tab, #urlbar, menuitem, richlistitem")
+        target.closest(
+          "toolbarbutton, button, .tabbrowser-tab, #urlbar, menuitem, richlistitem, .ax-sidebar-button, .ax-panel-action"
+        )
       );
     } catch (_error) {
       return false;
@@ -145,4 +147,3 @@
     });
   });
 })();
-

@@ -6,9 +6,9 @@
 
 # Aurexalis
 
-**Gecko/Floorp core · Brave-grade blocking · Opera GX-inspired UX · gold reactive identity**
+**Gecko/Floorp core · Brave-grade blocking · Opera GX-inspired UX · purple/red/gold identity**
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FFD166&center=true&vCenter=true&width=940&height=86&lines=Aurexalis%3A+navegacion+modular+y+afilada.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+dorado+reactivo%2C+control+local." alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FF1F55&center=true&vCenter=true&width=940&height=86&lines=Aurexalis%3A+navegacion+modular+y+afilada.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+rojo+neon+y+dorado+reactivo." alt="Typing SVG" />
 
 [![Status](https://img.shields.io/badge/status-arquitectura%20inicial-FFD166?style=for-the-badge)](#estado)
 [![Engine](https://img.shields.io/badge/engine-Gecko%20%2F%20Floorp-7C3AED?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](#arquitectura)
@@ -37,7 +37,7 @@ Este repositorio comienza como base publica del proyecto: documentacion, roadmap
 - **Gecko primero:** compatibilidad moderna sin convertir Aurexalis en otro Chromium.
 - **Rust donde duela:** modulos de alto rendimiento para red, migracion, parsing y filtros.
 - **Privacidad local:** datos de perfiles, cookies y claves se procesan localmente con consentimiento explicito.
-- **UI reactiva:** estetica Aurexalis en morado profundo y dorado brillante, con animaciones y sonido local.
+- **UI reactiva:** estetica Aurexalis en morado profundo, rojo neon y dorado brillante, con animaciones, barra lateral y sonido local.
 - **Modularidad real:** cada pieza debe poder probarse aislada antes de entrar al navegador.
 - **Rendimiento visible:** bloquear antes de renderizar, cachear donde corresponda y evitar trabajo inutil.
 
@@ -78,7 +78,7 @@ flowchart TB
 
 | Modulo | Objetivo | Base tecnica |
 |---|---|---|
-| `aurexalis-ui` | Interfaz morado/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
+| `aurexalis-ui` | Interfaz morado/rojo/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
 | `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
 | `aurexalis-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
 | `aurexalis-importer` | Migracion local de cookies, historial, marcadores, favicons, preferencias, claves y contrasenas | Rust, SQLite, JSON, DPAPI, Secret Service/KWallet |
@@ -164,13 +164,15 @@ Paleta inicial:
 
 | Token | Color | Uso |
 |---|---:|---|
-| `--js-bg` | `#090512` | fondo raiz |
-| `--js-surface` | `#140A24` | barras, sidebar, paneles |
-| `--js-surface-2` | `#211034` | tabs y controles |
-| `--js-purple` | `#7C3AED` | energia principal |
-| `--js-gold` | `#FFD166` | acento reactivo |
-| `--js-gold-hot` | `#FFE29A` | hover, glow, foco |
-| `--js-text` | `#F7F2FF` | texto principal |
+| `--ax-bg` | `#08050F` | fondo raiz |
+| `--ax-surface` | `#120A1E` | barras, sidebar, paneles |
+| `--ax-surface-2` | `#1E102D` | tabs y controles |
+| `--ax-purple` | `#6F38FF` | profundidad y energia secundaria |
+| `--ax-red` | `#FF1F55` | acento principal tipo GX |
+| `--ax-gold` | `#FFD166` | foco, premium y acciones destacadas |
+| `--ax-text` | `#F7F2FF` | texto principal |
+
+La barra lateral y los archivos de UI estan documentados en [docs/UI.md](./docs/UI.md).
 
 ## Roadmap
 
@@ -206,6 +208,7 @@ gantt
 - [x] Documentar arquitectura modular.
 - [x] Crear `userChrome.css` inicial.
 - [x] Crear `aurexalis-sound` PoC.
+- [x] Integrar barra lateral vertical tipo GX.
 - [x] Crear workspace Rust modular.
 - [x] Disenar `aurexalis-remotefs` para SFTP/FTP.
 - [x] Agregar tests unitarios y CI.
@@ -225,5 +228,5 @@ Proyecto personal en etapa temprana. La base publica documenta arquitectura e id
 
 <p align="center">
   <strong>Aurexalis</strong><br />
-  Morado profundo. Dorado reactivo. Control local.
+  Morado profundo. Rojo neon. Dorado reactivo. Control local.
 </p>

@@ -2,21 +2,27 @@
    Copy into a Firefox/Floorp profile chrome/userChrome.css for early UI testing. */
 
 :root {
-  --ax-bg: #090512;
-  --ax-surface: #140a24;
-  --ax-surface-2: #211034;
-  --ax-purple: #7c3aed;
-  --ax-purple-soft: #a78bfa;
+  --ax-bg: #08050f;
+  --ax-surface: #120a1e;
+  --ax-surface-2: #1e102d;
+  --ax-purple: #6f38ff;
+  --ax-purple-soft: #9b7cff;
+  --ax-red: #ff1f55;
+  --ax-red-hot: #ff3b6b;
   --ax-gold: #ffd166;
   --ax-gold-hot: #ffe29a;
   --ax-text: #f7f2ff;
   --ax-muted: #b8a9cc;
-  --ax-border: rgba(255, 209, 102, 0.34);
-  --ax-shadow: 0 0 18px rgba(255, 209, 102, 0.26);
+  --ax-border: rgba(255, 31, 85, 0.36);
+  --ax-gold-border: rgba(255, 209, 102, 0.34);
+  --ax-red-shadow: 0 0 18px rgba(255, 31, 85, 0.32);
+  --ax-gold-shadow: 0 0 18px rgba(255, 209, 102, 0.24);
 }
 
 #navigator-toolbox {
-  background: linear-gradient(180deg, var(--ax-surface), var(--ax-bg)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 31, 85, 0.05), transparent 42%),
+    linear-gradient(180deg, var(--ax-surface), var(--ax-bg)) !important;
   border-bottom: 1px solid var(--ax-border) !important;
 }
 
@@ -34,32 +40,32 @@
 .tab-background {
   border-radius: 8px 8px 0 0 !important;
   background: var(--ax-surface-2) !important;
-  border: 1px solid rgba(124, 58, 237, 0.32) !important;
+  border: 1px solid rgba(111, 56, 255, 0.32) !important;
   transition: background-color 120ms ease, box-shadow 120ms ease, border-color 120ms ease !important;
 }
 
 .tabbrowser-tab:hover .tab-background {
-  border-color: var(--ax-gold) !important;
-  box-shadow: var(--ax-shadow) !important;
+  border-color: var(--ax-red) !important;
+  box-shadow: var(--ax-red-shadow) !important;
 }
 
 .tabbrowser-tab[selected="true"] .tab-background {
-  background: linear-gradient(180deg, #2a1244, #170925) !important;
-  border-color: var(--ax-gold) !important;
-  box-shadow: inset 0 2px 0 var(--ax-gold), var(--ax-shadow) !important;
+  background: linear-gradient(180deg, #351335, #17091f) !important;
+  border-color: var(--ax-red) !important;
+  box-shadow: inset 0 2px 0 var(--ax-red), var(--ax-red-shadow) !important;
 }
 
 #urlbar-background,
 #searchbar {
   background: #0d0718 !important;
-  border: 1px solid rgba(255, 209, 102, 0.42) !important;
+  border: 1px solid rgba(255, 31, 85, 0.42) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
 }
 
 #urlbar[focused="true"] #urlbar-background {
   border-color: var(--ax-gold-hot) !important;
-  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.12), var(--ax-shadow) !important;
+  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.12), var(--ax-gold-shadow) !important;
 }
 
 toolbarbutton {
@@ -68,8 +74,8 @@ toolbarbutton {
 }
 
 toolbarbutton:hover {
-  background: rgba(255, 209, 102, 0.12) !important;
-  box-shadow: 0 0 12px rgba(255, 209, 102, 0.18) !important;
+  background: rgba(255, 31, 85, 0.12) !important;
+  box-shadow: 0 0 12px rgba(255, 31, 85, 0.18) !important;
 }
 
 toolbarbutton:active {
@@ -78,6 +84,102 @@ toolbarbutton:active {
 
 #sidebar-box {
   background: var(--ax-bg) !important;
-  border-right: 1px solid rgba(255, 209, 102, 0.22) !important;
+  border-right: 1px solid rgba(255, 31, 85, 0.22) !important;
 }
 
+#browser {
+  background: var(--ax-bg) !important;
+}
+
+#ax-sidebar {
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  padding: 12px 10px !important;
+  background:
+    linear-gradient(180deg, rgba(111, 56, 255, 0.12), transparent 40%),
+    #090611 !important;
+  border-right: 1px solid rgba(255, 31, 85, 0.28) !important;
+  box-shadow: inset -1px 0 0 rgba(255, 209, 102, 0.08) !important;
+}
+
+.ax-sidebar-section {
+  gap: 8px !important;
+}
+
+.ax-sidebar-spacer {
+  min-height: 22px !important;
+}
+
+.ax-sidebar-button {
+  appearance: none !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  color: var(--ax-red) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  font: 700 11px "Segoe UI", sans-serif !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease, transform 90ms ease !important;
+}
+
+.ax-sidebar-button:hover {
+  color: var(--ax-gold-hot) !important;
+  background: rgba(255, 31, 85, 0.12) !important;
+  border-color: rgba(255, 31, 85, 0.54) !important;
+  box-shadow: var(--ax-red-shadow) !important;
+}
+
+.ax-sidebar-button[checked="true"],
+.ax-sidebar-button.ax-active {
+  color: var(--ax-gold) !important;
+  background: linear-gradient(180deg, rgba(255, 31, 85, 0.26), rgba(111, 56, 255, 0.16)) !important;
+  border-color: var(--ax-gold-border) !important;
+  box-shadow: inset 2px 0 0 var(--ax-red), var(--ax-gold-shadow) !important;
+}
+
+.ax-sidebar-button:active {
+  transform: translateY(1px) !important;
+}
+
+#ax-sidebar-panel {
+  min-width: 340px !important;
+  max-width: 420px !important;
+  background: #0b0713 !important;
+  border-right: 1px solid rgba(255, 31, 85, 0.34) !important;
+  color: var(--ax-text) !important;
+}
+
+#ax-sidebar-panel[hidden="true"] {
+  display: none !important;
+}
+
+.ax-panel-header {
+  padding: 18px 18px 8px !important;
+  color: var(--ax-red) !important;
+  font: 800 14px "Segoe UI", sans-serif !important;
+  text-transform: uppercase !important;
+}
+
+.ax-panel-body {
+  padding: 8px 18px 18px !important;
+  color: var(--ax-muted) !important;
+  font: 500 13px "Segoe UI", sans-serif !important;
+  line-height: 1.45 !important;
+}
+
+.ax-panel-action {
+  margin-top: 14px !important;
+  padding: 10px 12px !important;
+  color: #120512 !important;
+  background: linear-gradient(90deg, var(--ax-red), var(--ax-gold)) !important;
+  border-radius: 7px !important;
+  border: 0 !important;
+  font-weight: 800 !important;
+}
