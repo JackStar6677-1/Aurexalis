@@ -24,7 +24,7 @@ fn run() -> Result<(), String> {
         Some("launch") => launch(args.next().map(PathBuf::from), None),
         Some("--launch-installed") => launch_installed(),
         Some("profiles") => list_profiles(),
-        Some("import") => run_import(&mut args),
+        Some("import") => run_import(args),
         Some("floorp") => print_floorp_hint(),
         Some("help") | None => {
             print_help();
@@ -90,7 +90,7 @@ fn launch(binary: Option<PathBuf>, profile: Option<PathBuf>) -> Result<(), Strin
     }
 }
 
-fn run_import(args: &mut std::env::Args) -> Result<(), String> {
+fn run_import(mut args: impl Iterator<Item = String>) -> Result<(), String> {
     match args.next().as_deref() {
         Some("list") => import_cmd::list_profiles(),
         Some("audit") => {
