@@ -195,10 +195,12 @@ fn create_shortcut(
     let working_dir = working_dir.to_string_lossy().replace('\'', "''");
     let shortcut = shortcut.to_string_lossy().replace('\'', "''");
     let args = arguments.unwrap_or("").replace('\'', "''");
-    let icon_line = icon.map(|path| {
-        let icon = path.to_string_lossy().replace('\'', "''");
-        format!("$Shortcut.IconLocation = '{icon}'")
-    }).unwrap_or_default();
+    let icon_line = icon
+        .map(|path| {
+            let icon = path.to_string_lossy().replace('\'', "''");
+            format!("$Shortcut.IconLocation = '{icon}'")
+        })
+        .unwrap_or_default();
 
     let script = format!(
         r#"

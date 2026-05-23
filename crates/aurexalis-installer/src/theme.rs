@@ -41,14 +41,9 @@ pub fn apply(ctx: &egui::Context) {
 /// Boton principal con acento rojo/morado.
 pub fn primary_button(ui: &mut egui::Ui, label: &str) -> egui::Response {
     ui.add(
-        egui::Button::new(
-            egui::RichText::new(label)
-                .color(TEXT)
-                .size(16.0)
-                .strong(),
-        )
-        .fill(RED)
-        .stroke(Stroke::new(1.0, GOLD))
-        .corner_radius(CornerRadius::same(10)),
+        egui::Button::new(egui::RichText::new(label).color(TEXT).size(16.0).strong())
+            .fill(RED)
+            .stroke(Stroke::new(1.0, GOLD))
+            .corner_radius(CornerRadius::same(10)),
     )
 }

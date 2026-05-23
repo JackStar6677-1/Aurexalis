@@ -49,7 +49,8 @@ impl Default for InstallerApp {
             .map(|p| p.join("Aurexalis"))
             .unwrap_or_else(|| PathBuf::from(r"C:\Aurexalis"));
         let install_path = default_path.to_string_lossy().into_owned();
-        let free_disk_mb = install::windows::free_disk_space_mb(PathBuf::from(&install_path).as_path()).ok();
+        let free_disk_mb =
+            install::windows::free_disk_space_mb(PathBuf::from(&install_path).as_path()).ok();
 
         Self {
             lang: Lang::Es,
@@ -184,11 +185,7 @@ impl InstallerApp {
                     ui.label(
                         RichText::new(format!("{}: {mb} MB", t.disk_space))
                             .small()
-                            .color(if mb >= 500 {
-                                theme::MUTED
-                            } else {
-                                theme::RED
-                            }),
+                            .color(if mb >= 500 { theme::MUTED } else { theme::RED }),
                     );
                 }
                 ui.add_space(6.0);
@@ -256,7 +253,10 @@ impl InstallerApp {
 
         ui.add_space(12.0);
         ui.horizontal(|ui| {
-            if ui.button(RichText::new(t.back).color(theme::MUTED)).clicked() {
+            if ui
+                .button(RichText::new(t.back).color(theme::MUTED))
+                .clicked()
+            {
                 self.screen = Screen::Welcome;
             }
             if theme::primary_button(ui, t.install_btn).clicked() {
@@ -320,7 +320,11 @@ impl InstallerApp {
                 }
                 ui.add_space(8.0);
                 ui.label(RichText::new(t.done_shortcut).color(theme::MUTED));
-                ui.label(RichText::new(t.apps_and_features).small().color(theme::MUTED));
+                ui.label(
+                    RichText::new(t.apps_and_features)
+                        .small()
+                        .color(theme::MUTED),
+                );
                 if let Some(config) = &self.result {
                     if let Some(audit) = &config.chromium_audit {
                         ui.add_space(6.0);
@@ -345,7 +349,10 @@ impl InstallerApp {
                         .spawn();
                 }
             }
-            if ui.button(RichText::new(t.close).color(theme::TEXT)).clicked() {
+            if ui
+                .button(RichText::new(t.close).color(theme::TEXT))
+                .clicked()
+            {
                 ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
             }
         });

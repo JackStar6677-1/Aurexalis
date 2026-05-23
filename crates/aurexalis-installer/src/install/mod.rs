@@ -47,12 +47,9 @@ pub fn run_full_install(
     let runtime_zip = temp.join(RUNTIME_ZIP);
     let runtime_url = github::aurexalis_runtime_url(version);
     progress(0.05, "Descargando runtime Aurexalis...");
-    github::download_file(
-        &client,
-        &runtime_url,
-        &runtime_zip,
-        &|ratio, msg| progress(0.05 + ratio * 0.35, msg),
-    )?;
+    github::download_file(&client, &runtime_url, &runtime_zip, &|ratio, msg| {
+        progress(0.05 + ratio * 0.35, msg)
+    })?;
 
     progress(0.42, "Extrayendo componentes...");
     extract_zip(&runtime_zip, install_root)?;
@@ -67,12 +64,9 @@ pub fn run_full_install(
         progress(0.48, "Descargando motor Floorp...");
         let floorp_url = github::floorp_installer_url(&client)?;
         let floorp_path = temp.join(FLOORP_INSTALLER);
-        github::download_file(
-            &client,
-            &floorp_url,
-            &floorp_path,
-            &|ratio, msg| progress(0.48 + ratio * 0.28, msg),
-        )?;
+        github::download_file(&client, &floorp_url, &floorp_path, &|ratio, msg| {
+            progress(0.48 + ratio * 0.28, msg)
+        })?;
 
         progress(0.78, "Instalando motor Gecko (Floorp)...");
         floorp::run_floorp_installer(&floorp_path, &engine_dir)?;

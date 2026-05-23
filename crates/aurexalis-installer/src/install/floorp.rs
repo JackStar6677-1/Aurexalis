@@ -72,9 +72,7 @@ pub fn resolve_floorp_binary(engine_dir: &Path) -> Option<PathBuf> {
     }
 
     if let Ok(pf) = std::env::var("ProgramFiles") {
-        let path = PathBuf::from(pf)
-            .join("Ablaze Floorp")
-            .join("floorp.exe");
+        let path = PathBuf::from(pf).join("Ablaze Floorp").join("floorp.exe");
         if path.is_file() {
             return Some(path);
         }

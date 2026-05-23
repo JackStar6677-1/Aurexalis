@@ -1,8 +1,8 @@
 //! Comandos `aurexalis import` para inventario y exportacion local.
 
 use aurexalis_importer::{
-    default_profile_roots, discover_profiles, export_audit_snapshot,
-    find_first_chromium_profile, AuditExportOptions, ChromiumBrowser,
+    default_profile_roots, discover_profiles, export_audit_snapshot, find_first_chromium_profile,
+    AuditExportOptions, ChromiumBrowser,
 };
 use std::env;
 use std::path::PathBuf;
@@ -58,9 +58,7 @@ pub fn export_audit(output: Option<PathBuf>, include_passwords: bool) -> Result<
     let snapshot = export_audit_snapshot(
         &candidate,
         &destination,
-        AuditExportOptions {
-            include_passwords,
-        },
+        AuditExportOptions { include_passwords },
     )
     .map_err(|e| e.to_string())?;
 

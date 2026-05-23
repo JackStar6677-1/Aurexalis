@@ -683,8 +683,7 @@ pub fn export_audit_snapshot(
     destination: &Path,
     options: AuditExportOptions,
 ) -> Result<ProfileSnapshot, ImporterError> {
-    let decryption =
-        decryption_context_from_local_state(&candidate.artifacts.local_state_json)?;
+    let decryption = decryption_context_from_local_state(&candidate.artifacts.local_state_json)?;
     let mut snapshot = read_profile_snapshot(candidate, decryption.as_ref())?;
     if !options.include_passwords {
         snapshot.logins.clear();

@@ -65,8 +65,7 @@ pub fn download_file(
         .map_err(|e| format!("HTTP descarga: {e}"))?;
 
     let total = response.content_length().unwrap_or(0);
-    let mut file =
-        std::fs::File::create(destination).map_err(|e| format!("crear archivo: {e}"))?;
+    let mut file = std::fs::File::create(destination).map_err(|e| format!("crear archivo: {e}"))?;
     let mut reader = response;
     let mut downloaded: u64 = 0;
     let mut buffer = [0_u8; 64 * 1024];
