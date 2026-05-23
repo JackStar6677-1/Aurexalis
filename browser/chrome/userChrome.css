@@ -1,0 +1,83 @@
+/* Aurexalis chrome theme scaffold.
+   Copy into a Firefox/Floorp profile chrome/userChrome.css for early UI testing. */
+
+:root {
+  --ax-bg: #090512;
+  --ax-surface: #140a24;
+  --ax-surface-2: #211034;
+  --ax-purple: #7c3aed;
+  --ax-purple-soft: #a78bfa;
+  --ax-gold: #ffd166;
+  --ax-gold-hot: #ffe29a;
+  --ax-text: #f7f2ff;
+  --ax-muted: #b8a9cc;
+  --ax-border: rgba(255, 209, 102, 0.34);
+  --ax-shadow: 0 0 18px rgba(255, 209, 102, 0.26);
+}
+
+#navigator-toolbox {
+  background: linear-gradient(180deg, var(--ax-surface), var(--ax-bg)) !important;
+  border-bottom: 1px solid var(--ax-border) !important;
+}
+
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar {
+  background: transparent !important;
+  color: var(--ax-text) !important;
+}
+
+.tabbrowser-tab {
+  color: var(--ax-muted) !important;
+}
+
+.tab-background {
+  border-radius: 8px 8px 0 0 !important;
+  background: var(--ax-surface-2) !important;
+  border: 1px solid rgba(124, 58, 237, 0.32) !important;
+  transition: background-color 120ms ease, box-shadow 120ms ease, border-color 120ms ease !important;
+}
+
+.tabbrowser-tab:hover .tab-background {
+  border-color: var(--ax-gold) !important;
+  box-shadow: var(--ax-shadow) !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-background {
+  background: linear-gradient(180deg, #2a1244, #170925) !important;
+  border-color: var(--ax-gold) !important;
+  box-shadow: inset 0 2px 0 var(--ax-gold), var(--ax-shadow) !important;
+}
+
+#urlbar-background,
+#searchbar {
+  background: #0d0718 !important;
+  border: 1px solid rgba(255, 209, 102, 0.42) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+#urlbar[focused="true"] #urlbar-background {
+  border-color: var(--ax-gold-hot) !important;
+  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.12), var(--ax-shadow) !important;
+}
+
+toolbarbutton {
+  border-radius: 7px !important;
+  transition: background-color 110ms ease, box-shadow 110ms ease, transform 90ms ease !important;
+}
+
+toolbarbutton:hover {
+  background: rgba(255, 209, 102, 0.12) !important;
+  box-shadow: 0 0 12px rgba(255, 209, 102, 0.18) !important;
+}
+
+toolbarbutton:active {
+  transform: translateY(1px) !important;
+}
+
+#sidebar-box {
+  background: var(--ax-bg) !important;
+  border-right: 1px solid rgba(255, 209, 102, 0.22) !important;
+}
+

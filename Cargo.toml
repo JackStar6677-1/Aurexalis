@@ -1,0 +1,19 @@
+[workspace]
+members = [
+  "crates/aurexalis-core",
+  "crates/aurexalis-blocker",
+  "crates/aurexalis-importer",
+  "crates/aurexalis-remotefs",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/JackStar6677-1/Aurexalis"
+authors = ["Pablo Elias Avendano Miranda"]
+
+[workspace.dependencies]
+thiserror = "1"
+url = "2"
+

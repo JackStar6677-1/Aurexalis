@@ -67,6 +67,10 @@ flowchart TB
   Importer --> Chrome["Chrome"]
   Importer --> Brave["Brave"]
   Importer --> Opera["Opera"]
+
+  UI --> RemoteFiles["Remote Files"]
+  RemoteFiles --> SFTP["SFTP"]
+  RemoteFiles --> FTP["FTP / FTPS"]
 ```
 
 ## Modulos
@@ -77,6 +81,7 @@ flowchart TB
 | `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
 | `aurexalis-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
 | `aurexalis-importer` | Migracion local de cookies, historial, bookmarks, claves y contrasenas | Rust, SQLite, DPAPI, Secret Service/KWallet |
+| `aurexalis-remotefs` | Explorador integrado para SFTP, FTP y FTPS estilo gestor de archivos | Rust, credenciales del SO, UI interna |
 | `aurexalis-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
 | `aurexalis-profile` | Perfil local endurecido, preferencias y defaults | Firefox prefs, policies, profile templates |
 
@@ -94,6 +99,7 @@ flowchart TB
 ![SQLite](https://img.shields.io/badge/SQLite-profile%20data-003B57?style=flat-square&logo=sqlite)
 ![DPAPI](https://img.shields.io/badge/Windows-DPAPI-0078D4?style=flat-square&logo=windows)
 ![Secret Service](https://img.shields.io/badge/Linux-Secret%20Service-FCC624?style=flat-square&logo=linux&logoColor=111111)
+![SFTP](https://img.shields.io/badge/SFTP%20%2F%20FTP-remote%20files-FFD166?style=flat-square)
 
 </div>
 
@@ -144,6 +150,12 @@ Alcance previsto:
 - Claves y contrasenas guardadas cuando el sistema permita descifrado local.
 - Importacion controlada hacia el perfil Aurexalis.
 
+## Archivos Remotos
+
+Aurexalis tambien tendra un modulo de navegador de archivos remoto: conexiones SFTP, FTP y FTPS dentro del propio navegador, pensado como una alternativa integrada a montar unidades tipo RaiDrive.
+
+El modulo se documenta en [docs/REMOTE_FS.md](./docs/REMOTE_FS.md) y queda separado para implementarlo despues sin mezclarlo con el motor web.
+
 ## UI Aurexalis
 
 Paleta inicial:
@@ -178,6 +190,7 @@ gantt
   Importador Brave cookies       :         m1, 2026-05-27, 4d
   Importador claves/login data   :         m2, after m1, 5d
   Integracion adblock-rust PoC   :         b1, 2026-06-03, 7d
+  RemoteFS SFTP/FTP PoC          :         f1, 2026-06-08, 5d
 
   section Gecko
   Capa CWS de Floorp             :         e1, 2026-06-08, 7d
@@ -193,6 +206,7 @@ gantt
 - [ ] Crear `aurexalis-sound` PoC.
 - [ ] Crear `aurexalis-importer` Rust para cookies Brave.
 - [ ] Probar `adblock-rust` fuera del navegador.
+- [ ] Disenar `aurexalis-remotefs` para SFTP/FTP.
 - [ ] Estudiar parches de Floorp para Chrome Web Store.
 
 ## Licencia Y Uso

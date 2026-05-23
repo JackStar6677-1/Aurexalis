@@ -27,6 +27,12 @@ Desktop.ini
 __pycache__/
 *.pyc
 
+# Local audio assets can be licensed or personal.
+browser/chrome/sounds/*.ogg
+browser/chrome/sounds/*.wav
+browser/chrome/sounds/*.mp3
+!browser/chrome/sounds/README.md
+
 # Browser profile data must never be committed
 profiles/
 profile-staging/
