@@ -169,31 +169,21 @@ fn write_config(install_root: &Path, config: &InstallConfig) -> Result<(), Strin
 }
 
 fn copy_branding_icon(install_root: &Path) -> Result<(), String> {
-    let manifest =
-        std::env::var("CARGO_MANIFEST_DIR").map_err(|e| format!("CARGO_MANIFEST_DIR: {e}"))?;
-    let icon = std::path::Path::new(&manifest)
-        .join("..")
-        .join("..")
-        .join("assets")
-        .join("branding")
-        .join("aurexalis.ico");
-    if icon.is_file() {
-        std::fs::copy(&icon, install_root.join("aurexalis.ico"))
-            .map_err(|e| format!("copiar icono: {e}"))?;
+    let dest = install_root.join("aurexalis.ico");
+    if dest.is_file() {
+        return Ok(());
     }
-    Ok(())
+
+    const ICON: &[u8] = include_bytes!("../../../../assets/branding/aurexalis.ico");
+    fs::write(&dest, ICON).map_err(|e| format!("copiar icono: {e}"))
 }
 
 fn copy_license(install_root: &Path) -> Result<(), String> {
-    let manifest =
-        std::env::var("CARGO_MANIFEST_DIR").map_err(|e| format!("CARGO_MANIFEST_DIR: {e}"))?;
-    let license = std::path::Path::new(&manifest)
-        .join("..")
-        .join("..")
-        .join("LICENSE");
-    if license.is_file() {
-        fs::copy(&license, install_root.join("LICENSE"))
-            .map_err(|e| format!("copiar LICENSE: {e}"))?;
+    let dest = install_root.join("LICENSE");
+    if dest.is_file() {
+        return Ok(());
     }
-    Ok(())
+
+    const LICENSE: &[u8] = include_bytes!("../../../../LICENSE");
+    fs::write(&dest, LICENSE).map_err(|e| format!("copiar LICENSE: {e}"))
 }
