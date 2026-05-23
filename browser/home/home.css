@@ -1,0 +1,342 @@
+:root {
+  --ax-bg: #08050f;
+  --ax-purple: #6f38ff;
+  --ax-red: #ff1f55;
+  --ax-gold: #ffd166;
+  --ax-text: #f7f2ff;
+  --ax-muted: #b8a9cc;
+  --ax-glass: rgba(12, 8, 22, 0.55);
+  --ax-glass-border: rgba(255, 255, 255, 0.12);
+  --ax-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ax-text);
+  background: var(--ax-bg);
+}
+
+body {
+  overflow: hidden;
+}
+
+.ax-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 5, 15, 0.15) 0%, rgba(8, 5, 15, 0.55) 55%, rgba(8, 5, 15, 0.88) 100%),
+    radial-gradient(ellipse 120% 80% at 50% 100%, rgba(255, 31, 85, 0.18), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 80% 20%, rgba(111, 56, 255, 0.22), transparent 55%),
+    url("background.svg") center / cover no-repeat;
+}
+
+.clock {
+  position: fixed;
+  top: 28px;
+  right: 36px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--ax-glass);
+  border: 1px solid var(--ax-glass-border);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--ax-shadow);
+}
+
+#ax-time {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+#ax-date {
+  font-size: 0.85rem;
+  color: var(--ax-muted);
+  text-transform: lowercase;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 24px 80px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(111, 56, 255, 0.9), rgba(255, 31, 85, 0.85));
+  box-shadow:
+    0 0 0 1px rgba(255, 209, 102, 0.35),
+    0 12px 40px rgba(255, 31, 85, 0.35);
+}
+
+.logo-mark {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--ax-text);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.brand {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, var(--ax-text), var(--ax-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.search {
+  width: min(680px, 92vw);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 20px;
+  border-radius: 999px;
+  background: var(--ax-glass);
+  border: 1px solid var(--ax-glass-border);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--ax-shadow);
+}
+
+.search:focus-within {
+  border-color: rgba(255, 209, 102, 0.45);
+  box-shadow:
+    0 0 0 3px rgba(255, 209, 102, 0.12),
+    var(--ax-shadow);
+}
+
+.search input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ax-text);
+  font-size: 1.05rem;
+  padding: 12px 0;
+}
+
+.search input::placeholder {
+  color: var(--ax-muted);
+}
+
+.search button {
+  appearance: none;
+  border: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--ax-gold);
+  background: rgba(255, 31, 85, 0.18);
+  cursor: pointer;
+  transition: background 120ms ease, transform 90ms ease;
+}
+
+.search button:hover {
+  background: rgba(255, 31, 85, 0.32);
+}
+
+.search button:active {
+  transform: scale(0.96);
+}
+
+.shortcuts {
+  width: min(920px, 96vw);
+  padding: 18px 22px 22px;
+  border-radius: 22px;
+  background: var(--ax-glass);
+  border: 1px solid var(--ax-glass-border);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--ax-shadow);
+}
+
+.shortcut-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 16px 12px;
+}
+
+.shortcut-grid a,
+.shortcut-grid button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 12px;
+  transition: background 120ms ease, transform 90ms ease;
+}
+
+.shortcut-grid a:hover,
+.shortcut-grid button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shortcut-grid a:active,
+.shortcut-grid button:active {
+  transform: translateY(1px);
+}
+
+.tile-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--ax-text);
+  background: linear-gradient(145deg, rgba(111, 56, 255, 0.55), rgba(255, 31, 85, 0.45));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.tile-icon img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.tile-label {
+  max-width: 88px;
+  font-size: 0.78rem;
+  color: var(--ax-muted);
+  text-align: center;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile-add .tile-icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ax-muted);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.dialog {
+  border: 1px solid var(--ax-glass-border);
+  border-radius: 16px;
+  padding: 0;
+  color: var(--ax-text);
+  background: #120a1e;
+  box-shadow: var(--ax-shadow);
+  max-width: 420px;
+  width: calc(100% - 32px);
+}
+
+.dialog::backdrop {
+  background: rgba(8, 5, 15, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+}
+
+.dialog h2 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  color: var(--ax-gold);
+}
+
+.dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--ax-muted);
+}
+
+.dialog input {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0d0718;
+  color: var(--ax-text);
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.dialog-actions button {
+  border-radius: 10px;
+  border: 0;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dialog-actions button[type="reset"] {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ax-muted);
+}
+
+.dialog-actions button[type="submit"] {
+  background: linear-gradient(90deg, var(--ax-red), var(--ax-gold));
+  color: #120512;
+}
+
+@media (max-width: 640px) {
+  .clock {
+    top: 16px;
+    right: 16px;
+  }
+
+  .shortcuts {
+    padding: 14px;
+  }
+}

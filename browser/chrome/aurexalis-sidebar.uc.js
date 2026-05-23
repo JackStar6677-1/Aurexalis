@@ -10,7 +10,7 @@
   window.__aurexalisSidebarLoaded = true;
 
   const items = [
-    { id: "home", label: "AX", title: "Aurexalis Home", action: () => openTab("about:home") },
+    { id: "home", label: "AX", title: "Aurexalis Home", action: openAurexalisHome },
     { id: "gx", label: "GX", title: "GX Corner", action: () => openTab("https://gxcorner.games/") },
     { id: "remote", label: "RF", title: "Remote Files", panel: remoteFilesPanel },
     { id: "bookmarks", label: "BM", title: "Bookmarks", action: toggleBookmarks },
@@ -41,6 +41,19 @@
     } catch (error) {
       console.warn("[AurexalisSidebar] Cannot open tab", url, error);
     }
+  }
+
+  function openAurexalisHome() {
+    try {
+      const home = Services.prefs.getStringPref("browser.newtab.url", "");
+      if (home) {
+        openTab(home);
+        return;
+      }
+    } catch (_error) {
+      // fallback below
+    }
+    openTab("about:home");
   }
 
   function toggleBookmarks() {
