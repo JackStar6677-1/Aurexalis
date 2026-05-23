@@ -81,7 +81,7 @@ flowchart TB
 | `aurexalis-ui` | Interfaz morado/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
 | `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
 | `aurexalis-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
-| `aurexalis-importer` | Migracion local de cookies, historial, bookmarks, claves y contrasenas | Rust, SQLite, DPAPI, Secret Service/KWallet |
+| `aurexalis-importer` | Migracion local de cookies, historial, marcadores, favicons, preferencias, claves y contrasenas | Rust, SQLite, JSON, DPAPI, Secret Service/KWallet |
 | `aurexalis-remotefs` | Explorador integrado para SFTP, FTP y FTPS estilo gestor de archivos | Rust, credenciales del SO, UI interna |
 | `aurexalis-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
 | `aurexalis-profile` | Perfil local endurecido, preferencias y defaults | Firefox prefs, policies, profile templates |
@@ -147,7 +147,8 @@ flowchart LR
 Alcance previsto:
 
 - Cookies de Chrome, Brave y Opera.
-- Historial y bookmarks.
+- Historial, marcadores/bookmarks y favicons.
+- Preferencias basicas del perfil cuando sea seguro migrarlas.
 - Claves y contrasenas guardadas cuando el sistema permita descifrado local.
 - Importacion controlada hacia el perfil Aurexalis.
 

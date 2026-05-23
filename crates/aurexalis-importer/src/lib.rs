@@ -43,9 +43,56 @@ pub struct ProfileCandidate {
     pub browser: ChromiumBrowser,
     pub profile_name: String,
     pub root: PathBuf,
+    pub artifacts: ProfileArtifacts,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProfileArtifacts {
     pub cookies_db: PathBuf,
     pub login_db: PathBuf,
     pub history_db: PathBuf,
+    pub bookmarks_json: PathBuf,
+    pub favicons_db: PathBuf,
+    pub preferences_json: PathBuf,
+    pub secure_preferences_json: PathBuf,
+    pub local_state_json: PathBuf,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImportSurface {
+    Cookies,
+    Passwords,
+    History,
+    Bookmarks,
+    Favicons,
+    Preferences,
+}
+
+impl ProfileCandidate {
+    pub fn path_for(&self, surface: ImportSurface) -> &Path {
+        match surface {
+            ImportSurface::Cookies => &self.artifacts.cookies_db,
+            ImportSurface::Passwords => &self.artifacts.login_db,
+            ImportSurface::History => &self.artifacts.history_db,
+            ImportSurface::Bookmarks => &self.artifacts.bookmarks_json,
+            ImportSurface::Favicons => &self.artifacts.favicons_db,
+            ImportSurface::Preferences => &self.artifacts.preferences_json,
+        }
+    }
+
+    pub fn existing_surfaces(&self) -> Vec<ImportSurface> {
+        [
+            ImportSurface::Cookies,
+            ImportSurface::Passwords,
+            ImportSurface::History,
+            ImportSurface::Bookmarks,
+            ImportSurface::Favicons,
+            ImportSurface::Preferences,
+        ]
+        .into_iter()
+        .filter(|surface| self.path_for(*surface).exists())
+        .collect()
+    }
 }
 
 pub fn default_profile_roots(browser: ChromiumBrowser) -> Vec<PathBuf> {
@@ -102,14 +149,11 @@ pub fn build_default_profile_candidate(
         ChromiumBrowser::Brave | ChromiumBrowser::Chrome => root.join("Default"),
     };
 
-    Ok(ProfileCandidate {
+    Ok(build_candidate(
         browser,
-        profile_name: "Default".to_owned(),
-        cookies_db: profile_root.join("Network/Cookies"),
-        login_db: profile_root.join("Login Data"),
-        history_db: profile_root.join("History"),
-        root: profile_root,
-    })
+        "Default".to_owned(),
+        profile_root,
+    ))
 }
 
 pub fn discover_profiles(
@@ -154,13 +198,49 @@ fn build_candidate(
     profile_name: String,
     profile_root: PathBuf,
 ) -> ProfileCandidate {
+    let user_data_root = match browser {
+        ChromiumBrowser::Opera => profile_root.clone(),
+        ChromiumBrowser::Brave | ChromiumBrowser::Chrome => profile_root
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_else(|| profile_root.clone()),
+    };
+
     ProfileCandidate {
         browser,
         profile_name,
+        artifacts: build_artifacts(&profile_root, browser != ChromiumBrowser::Opera)
+            .with_local_state(user_data_root.join("Local State")),
+        root: profile_root,
+    }
+}
+
+fn build_artifacts(profile_root: &Path, has_parent_local_state: bool) -> ProfileArtifacts {
+    let local_state = if has_parent_local_state {
+        profile_root
+            .parent()
+            .map(|parent| parent.join("Local State"))
+            .unwrap_or_else(|| profile_root.join("Local State"))
+    } else {
+        profile_root.join("Local State")
+    };
+
+    ProfileArtifacts {
         cookies_db: profile_root.join("Network/Cookies"),
         login_db: profile_root.join("Login Data"),
         history_db: profile_root.join("History"),
-        root: profile_root,
+        bookmarks_json: profile_root.join("Bookmarks"),
+        favicons_db: profile_root.join("Favicons"),
+        preferences_json: profile_root.join("Preferences"),
+        secure_preferences_json: profile_root.join("Secure Preferences"),
+        local_state_json: local_state,
+    }
+}
+
+impl ProfileArtifacts {
+    fn with_local_state(mut self, local_state_json: PathBuf) -> Self {
+        self.local_state_json = local_state_json;
+        self
     }
 }
 
@@ -189,8 +269,12 @@ mod tests {
 
         assert_eq!(profiles.len(), 2);
         assert_eq!(profiles[0].profile_name, "Default");
-        assert!(profiles[0].cookies_db.ends_with("Network/Cookies"));
-        assert!(profiles[0].login_db.ends_with("Login Data"));
+        assert!(profiles[0].artifacts.cookies_db.ends_with("Network/Cookies"));
+        assert!(profiles[0].artifacts.login_db.ends_with("Login Data"));
+        assert!(profiles[0].artifacts.bookmarks_json.ends_with("Bookmarks"));
+        assert!(profiles[0].artifacts.favicons_db.ends_with("Favicons"));
+        assert!(profiles[0].artifacts.preferences_json.ends_with("Preferences"));
+        assert!(profiles[0].artifacts.local_state_json.ends_with("Local State"));
 
         fs::remove_dir_all(root).expect("cleanup");
     }
@@ -215,5 +299,47 @@ mod tests {
             .expect_err("missing root should fail");
 
         assert!(matches!(error, ImporterError::ProfileRootMissing));
+    }
+
+    #[test]
+    fn reports_existing_import_surfaces() {
+        let root = temp_root();
+        let profile_root = root.join("Default");
+        fs::create_dir_all(profile_root.join("Network")).expect("create profile directories");
+        fs::write(profile_root.join("Bookmarks"), "{}").expect("write bookmarks");
+        fs::write(profile_root.join("History"), "").expect("write history");
+
+        let candidate = build_candidate(ChromiumBrowser::Chrome, "Default".to_owned(), profile_root);
+        let surfaces = candidate.existing_surfaces();
+
+        assert!(surfaces.contains(&ImportSurface::Bookmarks));
+        assert!(surfaces.contains(&ImportSurface::History));
+        assert!(!surfaces.contains(&ImportSurface::Cookies));
+
+        fs::remove_dir_all(root).expect("cleanup");
+    }
+
+    #[test]
+    fn maps_surface_paths() {
+        let root = temp_root();
+        fs::create_dir_all(root.join("Default/Network")).expect("create profile");
+        let candidate = build_candidate(
+            ChromiumBrowser::Brave,
+            "Default".to_owned(),
+            root.join("Default"),
+        );
+
+        assert!(candidate
+            .path_for(ImportSurface::Bookmarks)
+            .ends_with("Bookmarks"));
+        assert!(candidate
+            .path_for(ImportSurface::Preferences)
+            .ends_with("Preferences"));
+        assert!(candidate
+            .artifacts
+            .secure_preferences_json
+            .ends_with("Secure Preferences"));
+
+        fs::remove_dir_all(root).expect("cleanup");
     }
 }

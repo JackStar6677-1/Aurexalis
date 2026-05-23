@@ -19,7 +19,7 @@ En Windows con toolchain `msvc`, `cargo test` requiere `link.exe` de Visual Stud
 |---|---|
 | `aurexalis-core` | parsing de requests, hosts, third-party, errores de URL |
 | `aurexalis-blocker` | reglas de dominio, excepciones, opciones por recurso |
-| `aurexalis-importer` | descubrimiento de perfiles Chromium y Opera |
+| `aurexalis-importer` | descubrimiento de perfiles Chromium/Opera y artefactos importables: cookies, passwords, history, bookmarks, favicons, preferences |
 | `aurexalis-remotefs` | puertos por protocolo, normalizacion de rutas, bloqueo de traversal |
 
 ## CI
