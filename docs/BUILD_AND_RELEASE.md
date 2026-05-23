@@ -46,5 +46,30 @@ El pipeline profesional queda dividido en cuatro artefactos:
 3. Floorp/Gecko: binario base compilado.
 4. Paquete final: instalador Windows o bundle Linux.
 
-Los builds no deben firmarse ni publicarse hasta tener certificados y canal de
-release propios.
+Los builds del navegador completo no deben firmarse hasta tener certificados
+propios. El **shell Rust** (`aurexalis.exe`) si se publica en GitHub Releases.
+
+## GitHub Releases (shell Windows)
+
+Cada tag `v*` dispara [`.github/workflows/release.yml`](../.github/workflows/release.yml),
+que compila `aurexalis-shell` en `windows-latest` y adjunta
+`aurexalis-windows-x86_64.exe`.
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Tras el workflow, el binario aparece en
+[Releases](https://github.com/JackStar6677-1/Aurexalis/releases).
+
+Uso del artefacto:
+
+```powershell
+.\aurexalis-windows-x86_64.exe profiles
+$env:AUREXALIS_BROWSER="C:\Ruta\A\floorp.exe"
+.\aurexalis-windows-x86_64.exe launch
+```
+
+> Pre-release: solo CLI/servicios Rust. Necesitas Firefox o Floorp aparte; no
+> incluye el motor Gecko empaquetado.

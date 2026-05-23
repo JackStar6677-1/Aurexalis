@@ -15,6 +15,7 @@
 [![Rust](https://img.shields.io/badge/rust-core%20modules-CE412B?style=for-the-badge&logo=rust&logoColor=white)](#stack)
 [![Privacy](https://img.shields.io/badge/privacy-local%20first-101018?style=for-the-badge)](#principios)
 [![Rust](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml/badge.svg)](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml)
+[![Release](https://img.shields.io/github/v/release/JackStar6677-1/Aurexalis?include_prereleases&label=release&style=for-the-badge)](https://github.com/JackStar6677-1/Aurexalis/releases)
 
 </div>
 
@@ -244,6 +245,9 @@ El primer binario arrancable vive en `aurexalis-shell` y expone:
 .\target\debug\aurexalis.exe profiles
 .\target\debug\aurexalis.exe launch "C:\Ruta\A\floorp.exe"
 ```
+
+Descarga pre-release del shell Windows en
+[GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases) (`aurexalis-windows-x86_64.exe`).
 
 La documentacion de build y empaquetado esta en
 [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
