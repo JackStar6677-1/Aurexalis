@@ -44,18 +44,22 @@ jobs:
 
       - name: Build release binaries
         run: |
-          cargo build --release -p aurexalis-shell --target ${{ matrix.target }}
-          cargo build --release -p aurexalis-installer --target ${{ matrix.target }}
+          cargo build --release -p aurexalis-shell -p aurexalis-installer --target ${{ matrix.target }}
+          if (-not (Test-Path "target/${{ matrix.target }}/release/aurexalis.exe")) {
+            throw "aurexalis.exe no se genero"
+          }
+        shell: pwsh
 
       - name: Package runtime zip
         shell: pwsh
         run: |
           $dist = "dist"
+          $target = "target/${{ matrix.target }}/release"
           New-Item -ItemType Directory -Force -Path $dist | Out-Null
           $stage = Join-Path $env:RUNNER_TEMP "aurexalis-runtime"
           if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $stage | Out-Null
-          Copy-Item "target/${{ matrix.target }}/release/aurexalis.exe" (Join-Path $stage "aurexalis.exe")
+          Copy-Item "$target/aurexalis.exe" (Join-Path $stage "aurexalis.exe")
           Copy-Item "browser" (Join-Path $stage "browser") -Recurse
           Copy-Item "LICENSE" (Join-Path $stage "LICENSE")
           Copy-Item "assets\branding\aurexalis.ico" (Join-Path $stage "aurexalis.ico")
