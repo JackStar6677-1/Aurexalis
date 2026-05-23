@@ -162,7 +162,7 @@ pub struct DecryptionContext {
     pub platform_key: Option<Vec<u8>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProfileSnapshot {
     pub cookies: Vec<CookieRecord>,
     pub logins: Vec<LoginRecord>,
