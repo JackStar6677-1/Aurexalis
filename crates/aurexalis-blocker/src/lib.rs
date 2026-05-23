@@ -300,9 +300,8 @@ mod tests {
 
     #[test]
     fn rejects_empty_lists() {
-        let error = BlockerEngine::from_filter_lists(&["! only a comment".to_owned()])
-            .expect_err("empty rules should fail");
+        let result = BlockerEngine::from_filter_lists(&["! only a comment".to_owned()]);
 
-        assert!(matches!(error, BlockerError::EmptyFilterList));
+        assert!(matches!(result, Err(BlockerError::EmptyFilterList)));
     }
 }
