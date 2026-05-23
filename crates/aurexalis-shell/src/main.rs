@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 mod config;
+mod import_cmd;
 
 use aurexalis_importer::{default_profile_roots, discover_profiles, ChromiumBrowser};
 use std::env;
@@ -23,6 +24,7 @@ fn run() -> Result<(), String> {
         Some("launch") => launch(args.next().map(PathBuf::from), None),
         Some("--launch-installed") => launch_installed(),
         Some("profiles") => list_profiles(),
+        Some("import") => run_import(&mut args),
         Some("floorp") => print_floorp_hint(),
         Some("help") | None => {
             print_help();
@@ -88,6 +90,21 @@ fn launch(binary: Option<PathBuf>, profile: Option<PathBuf>) -> Result<(), Strin
     }
 }
 
+fn run_import(args: &mut std::env::Args) -> Result<(), String> {
+    match args.next().as_deref() {
+        Some("list") => import_cmd::list_profiles(),
+        Some("audit") => {
+            let include_passwords = args.any(|arg| arg == "--passwords");
+            import_cmd::export_audit(None, include_passwords)
+        }
+        Some("help") | None => {
+            print_import_help();
+            Ok(())
+        }
+        Some(other) => Err(format!("subcomando import desconocido: {other}")),
+    }
+}
+
 fn list_profiles() -> Result<(), String> {
     for browser in [
         ChromiumBrowser::Brave,
@@ -127,5 +144,12 @@ fn print_help() {
     println!("  aurexalis launch [ruta-firefox-floorp]");
     println!("  aurexalis --launch-installed");
     println!("  aurexalis profiles");
+    println!("  aurexalis import list|audit [--passwords]");
     println!("  aurexalis floorp");
+}
+
+fn print_import_help() {
+    println!("Aurexalis import");
+    println!("  import list              inventario Chromium local");
+    println!("  import audit [--passwords] exporta JSON auditable");
 }

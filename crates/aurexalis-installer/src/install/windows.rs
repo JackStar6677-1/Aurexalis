@@ -57,15 +57,52 @@ pub fn browse_install_folder() -> Option<PathBuf> {
         .pick_folder()
 }
 
+/// Registra Aurexalis en Configuracion > Aplicaciones de Windows.
+pub fn register_uninstall_entry(install_root: &Path, version: &str) -> Result<(), String> {
+    let root = install_root.to_string_lossy().replace('\'', "''");
+    let version = version.replace('\'', "''");
+    let uninstall_script = install_root.join("uninstall.ps1");
+    let uninstall_script = uninstall_script.to_string_lossy().replace('\'', "''");
+    let icon = install_root
+        .join("aurexalis.ico")
+        .to_string_lossy()
+        .replace('\'', "''");
+
+    let script = format!(
+        r#"
+$ErrorActionPreference = 'Stop'
+$key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Aurexalis'
+New-Item -Path $key -Force | Out-Null
+Set-ItemProperty -Path $key -Name DisplayName -Value 'Aurexalis'
+Set-ItemProperty -Path $key -Name DisplayVersion -Value '{version}'
+Set-ItemProperty -Path $key -Name Publisher -Value 'Aurexalis Project'
+Set-ItemProperty -Path $key -Name InstallLocation -Value '{root}'
+Set-ItemProperty -Path $key -Name UninstallString -Value "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"{uninstall_script}`""
+Set-ItemProperty -Path $key -Name DisplayIcon -Value '{icon}'
+New-ItemProperty -Path $key -Name NoModify -Value 1 -PropertyType DWord -Force | Out-Null
+New-ItemProperty -Path $key -Name NoRepair -Value 1 -PropertyType DWord -Force | Out-Null
+"#
+    );
+
+    run_powershell(&script, "registro de desinstalacion")
+}
+
 /// Crea acceso directo en el escritorio.
 pub fn create_desktop_shortcut(
     name: &str,
     target: &Path,
     working_dir: &Path,
     arguments: Option<&str>,
+    icon: Option<&Path>,
 ) -> Result<(), String> {
     let desktop = dirs::desktop_dir().ok_or("no se pudo resolver el escritorio")?;
-    create_shortcut(&desktop.join(format!("{name}.lnk")), target, working_dir, arguments)
+    create_shortcut(
+        &desktop.join(format!("{name}.lnk")),
+        target,
+        working_dir,
+        arguments,
+        icon,
+    )
 }
 
 /// Crea acceso directo en el menu Inicio (Programs).
@@ -74,6 +111,7 @@ pub fn create_start_menu_shortcut(
     target: &Path,
     working_dir: &Path,
     arguments: Option<&str>,
+    icon: Option<&Path>,
 ) -> Result<(), String> {
     let start_menu = dirs::data_dir()
         .ok_or("no se pudo resolver AppData")?
@@ -88,18 +126,23 @@ pub fn create_start_menu_shortcut(
         target,
         working_dir,
         arguments,
+        icon,
     )
 }
 
-/// Escribe `uninstall.ps1` y un acceso directo de desinstalacion.
-pub fn write_uninstaller(install_root: &Path) -> Result<(), String> {
+/// Escribe `uninstall.ps1` y accesos directos de desinstalacion.
+pub fn write_uninstaller(
+    install_root: &Path,
+    version: &str,
+    icon: Option<&Path>,
+) -> Result<(), String> {
     let script_path = install_root.join("uninstall.ps1");
     let root = install_root.to_string_lossy().replace('\'', "''");
     let script = format!(
         r#"# Aurexalis uninstaller — generado automaticamente
 $ErrorActionPreference = 'Stop'
 $root = '{root}'
-if (-not (Test-Path $root)) {{
+if (-not (Test-Path -LiteralPath $root)) {{
     Write-Host "Aurexalis no esta instalado en $root"
     exit 1
 }}
@@ -115,10 +158,13 @@ foreach ($name in @('Aurexalis.lnk','Desinstalar Aurexalis.lnk')) {{
     if (Test-Path $p2) {{ Remove-Item $p2 -Force }}
 }}
 if (Test-Path $start) {{ Remove-Item $start -Force -Recurse -ErrorAction SilentlyContinue }}
+Remove-Item -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Aurexalis' -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "Aurexalis desinstalado."
 "#
     );
     std::fs::write(&script_path, script).map_err(|e| format!("escribir uninstall.ps1: {e}"))?;
+
+    register_uninstall_entry(install_root, version)?;
 
     let desktop = dirs::desktop_dir().ok_or("escritorio no disponible")?;
     create_shortcut(
@@ -126,8 +172,15 @@ Write-Host "Aurexalis desinstalado."
         &script_path,
         install_root,
         None,
+        icon,
     )?;
-    create_start_menu_shortcut("Desinstalar Aurexalis", &script_path, install_root, None)?;
+    create_start_menu_shortcut(
+        "Desinstalar Aurexalis",
+        &script_path,
+        install_root,
+        None,
+        icon,
+    )?;
     Ok(())
 }
 
@@ -136,11 +189,16 @@ fn create_shortcut(
     target: &Path,
     working_dir: &Path,
     arguments: Option<&str>,
+    icon: Option<&Path>,
 ) -> Result<(), String> {
     let target = target.to_string_lossy().replace('\'', "''");
     let working_dir = working_dir.to_string_lossy().replace('\'', "''");
     let shortcut = shortcut.to_string_lossy().replace('\'', "''");
     let args = arguments.unwrap_or("").replace('\'', "''");
+    let icon_line = icon.map(|path| {
+        let icon = path.to_string_lossy().replace('\'', "''");
+        format!("$Shortcut.IconLocation = '{icon}'")
+    }).unwrap_or_default();
 
     let script = format!(
         r#"
@@ -151,10 +209,15 @@ $Shortcut.TargetPath = '{target}'
 $Shortcut.WorkingDirectory = '{working_dir}'
 $Shortcut.Arguments = '{args}'
 $Shortcut.Description = 'Aurexalis Browser'
+{icon_line}
 $Shortcut.Save()
 "#
     );
 
+    run_powershell(&script, "acceso directo")
+}
+
+fn run_powershell(script: &str, context: &str) -> Result<(), String> {
     let status = Command::new("powershell.exe")
         .args([
             "-NoProfile",
@@ -162,16 +225,16 @@ $Shortcut.Save()
             "-ExecutionPolicy",
             "Bypass",
             "-Command",
-            &script,
+            script,
         ])
         .status()
-        .map_err(|e| format!("acceso directo: {e}"))?;
+        .map_err(|e| format!("{context}: {e}"))?;
 
     if status.success() {
         Ok(())
     } else {
         Err(format!(
-            "PowerShell no pudo crear el acceso directo (codigo {:?})",
+            "PowerShell fallo en {context} (codigo {:?})",
             status.code()
         ))
     }

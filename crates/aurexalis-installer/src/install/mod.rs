@@ -1,5 +1,6 @@
 //! Orquestacion de la instalacion completa de Aurexalis.
 
+mod chromium;
 mod floorp;
 mod github;
 mod profile;
@@ -20,6 +21,7 @@ pub struct InstallConfig {
     pub install_root: String,
     pub browser: String,
     pub profile: String,
+    pub chromium_audit: Option<String>,
 }
 
 /// Ejecuta todos los pasos de instalacion; reporta progreso global 0..1.
@@ -27,6 +29,7 @@ pub fn run_full_install(
     install_root: &Path,
     version: &str,
     download_floorp: bool,
+    import_chromium: bool,
     progress: &dyn Fn(f32, &str),
 ) -> Result<InstallConfig, String> {
     let client = reqwest::blocking::Client::builder()
@@ -83,24 +86,48 @@ pub fn run_full_install(
         )?
     };
 
-    progress(0.88, "Guardando configuracion...");
+    progress(0.86, "Guardando configuracion...");
+    let mut chromium_audit = None;
+    if import_chromium {
+        progress(0.88, "Exportando snapshot Chromium local...");
+        chromium_audit = Some(
+            chromium::export_staging_snapshot(&profile_dir)
+                .unwrap_or_else(|error| format!("AVISO: {error}")),
+        );
+    }
+
     let config = InstallConfig {
         version: version.to_string(),
         install_root: install_root.to_string_lossy().into_owned(),
         browser: browser.to_string_lossy().into_owned(),
         profile: profile_dir.to_string_lossy().into_owned(),
+        chromium_audit,
     };
     write_config(install_root, &config)?;
 
-    progress(0.90, "Copiando licencia...");
+    progress(0.90, "Copiando licencia e icono...");
     copy_license(install_root)?;
+    copy_branding_icon(install_root)?;
 
-    progress(0.92, "Creando accesos directos...");
+    progress(0.92, "Creando accesos directos y registro Windows...");
     let launcher = install_root.join("aurexalis.exe");
+    let icon = install_root.join("aurexalis.ico");
     let launch_args = Some("--launch-installed");
-    windows::create_desktop_shortcut("Aurexalis", &launcher, install_root, launch_args)?;
-    windows::create_start_menu_shortcut("Aurexalis", &launcher, install_root, launch_args)?;
-    windows::write_uninstaller(install_root)?;
+    windows::write_uninstaller(install_root, version, Some(&icon))?;
+    windows::create_desktop_shortcut(
+        "Aurexalis",
+        &launcher,
+        install_root,
+        launch_args,
+        Some(&icon),
+    )?;
+    windows::create_start_menu_shortcut(
+        "Aurexalis",
+        &launcher,
+        install_root,
+        launch_args,
+        Some(&icon),
+    )?;
 
     let _ = fs::remove_dir_all(&temp);
     progress(1.0, "Instalacion completa");
@@ -139,6 +166,22 @@ fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), String> {
 fn write_config(install_root: &Path, config: &InstallConfig) -> Result<(), String> {
     let json = serde_json::to_string_pretty(config).map_err(|e| e.to_string())?;
     fs::write(install_root.join("config.json"), json).map_err(|e| e.to_string())
+}
+
+fn copy_branding_icon(install_root: &Path) -> Result<(), String> {
+    let manifest =
+        std::env::var("CARGO_MANIFEST_DIR").map_err(|e| format!("CARGO_MANIFEST_DIR: {e}"))?;
+    let icon = std::path::Path::new(&manifest)
+        .join("..")
+        .join("..")
+        .join("assets")
+        .join("branding")
+        .join("aurexalis.ico");
+    if icon.is_file() {
+        std::fs::copy(&icon, install_root.join("aurexalis.ico"))
+            .map_err(|e| format!("copiar icono: {e}"))?;
+    }
+    Ok(())
 }
 
 fn copy_license(install_root: &Path) -> Result<(), String> {

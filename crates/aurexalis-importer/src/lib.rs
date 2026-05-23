@@ -649,6 +649,56 @@ impl ProfileArtifacts {
     }
 }
 
+/// Opciones para exportacion local auditada (sin red).
+#[derive(Debug, Clone, Copy, Default)]
+pub struct AuditExportOptions {
+    /// Incluir contrasenas descifradas en el JSON (solo uso local explicito).
+    pub include_passwords: bool,
+}
+
+/// Localiza el primer perfil Chromium disponible (Chrome, luego Brave, luego Opera).
+pub fn find_first_chromium_profile() -> Option<ProfileCandidate> {
+    for browser in [
+        ChromiumBrowser::Chrome,
+        ChromiumBrowser::Brave,
+        ChromiumBrowser::Opera,
+    ] {
+        for root in default_profile_roots(browser) {
+            if !root.exists() {
+                continue;
+            }
+            if let Ok(profiles) = discover_profiles(browser, &root) {
+                if let Some(candidate) = profiles.into_iter().next() {
+                    return Some(candidate);
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Exporta un snapshot auditable a JSON (staging previo a migracion al perfil Gecko).
+pub fn export_audit_snapshot(
+    candidate: &ProfileCandidate,
+    destination: &Path,
+    options: AuditExportOptions,
+) -> Result<ProfileSnapshot, ImporterError> {
+    let decryption =
+        decryption_context_from_local_state(&candidate.artifacts.local_state_json)?;
+    let mut snapshot = read_profile_snapshot(candidate, decryption.as_ref())?;
+    if !options.include_passwords {
+        snapshot.logins.clear();
+    }
+
+    if let Some(parent) = destination.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let json = serde_json::to_string_pretty(&snapshot)?;
+    fs::write(destination, json)?;
+    Ok(snapshot)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

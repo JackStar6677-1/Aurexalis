@@ -8,8 +8,10 @@ Orquesta la instalacion de:
 1. **Runtime Aurexalis** (shell, `browser/chrome`, prefs, `LICENSE`) desde GitHub Releases.
 2. **Floorp** (motor Gecko) desde el release oficial de Floorp-Projects.
 3. **Perfil** `profiles\default` con tema morado/rojo/dorado.
-4. **Accesos directos** en escritorio y menu Inicio.
-5. **Desinstalador** `uninstall.ps1` + acceso directo "Desinstalar Aurexalis".
+4. **Accesos directos** con icono en escritorio y menu Inicio.
+5. **Registro en Configuracion > Aplicaciones** (desinstalar desde Windows).
+6. **Desinstalador** `uninstall.ps1` + acceso directo.
+7. **Importacion opcional** Chromium → `profiles\default\import\chromium-audit.json` (sin contrasenas).
 
 ## Flujo de pantallas
 
@@ -30,6 +32,14 @@ flowchart LR
 python tools/gen_installer_icon.py
 cargo build --release -p aurexalis-installer
 .\target\release\Aurexalis-Setup.exe
+```
+
+## Comandos shell
+
+```powershell
+aurexalis import list
+aurexalis import audit
+aurexalis import audit --passwords   # solo si aceptas riesgo local
 ```
 
 ## Desinstalar

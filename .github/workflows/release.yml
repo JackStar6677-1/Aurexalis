@@ -58,6 +58,7 @@ jobs:
           Copy-Item "target/${{ matrix.target }}/release/aurexalis.exe" (Join-Path $stage "aurexalis.exe")
           Copy-Item "browser" (Join-Path $stage "browser") -Recurse
           Copy-Item "LICENSE" (Join-Path $stage "LICENSE")
+          Copy-Item "assets\branding\aurexalis.ico" (Join-Path $stage "aurexalis.ico")
           New-Item -ItemType Directory -Force -Path (Join-Path $stage "profiles\default") | Out-Null
           Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "$dist/aurexalis-runtime-windows-x86_64.zip" -Force
 

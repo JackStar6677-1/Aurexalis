@@ -33,6 +33,7 @@ struct InstallerApp {
     screen: Screen,
     install_path: String,
     download_floorp: bool,
+    import_chromium: bool,
     license_accepted: bool,
     free_disk_mb: Option<u64>,
     progress: f32,
@@ -55,6 +56,7 @@ impl Default for InstallerApp {
             screen: Screen::Welcome,
             install_path,
             download_floorp: true,
+            import_chromium: true,
             license_accepted: false,
             free_disk_mb,
             progress: 0.0,
@@ -192,6 +194,13 @@ impl InstallerApp {
                 ui.add_space(6.0);
                 ui.checkbox(&mut self.download_floorp, t.download_floorp);
                 ui.label(RichText::new(t.floorp_hint).small().color(theme::MUTED));
+                ui.add_space(6.0);
+                ui.checkbox(&mut self.import_chromium, t.import_chromium);
+                ui.label(
+                    RichText::new(t.import_chromium_hint)
+                        .small()
+                        .color(theme::MUTED),
+                );
             });
 
         ui.add_space(14.0);
@@ -311,6 +320,17 @@ impl InstallerApp {
                 }
                 ui.add_space(8.0);
                 ui.label(RichText::new(t.done_shortcut).color(theme::MUTED));
+                ui.label(RichText::new(t.apps_and_features).small().color(theme::MUTED));
+                if let Some(config) = &self.result {
+                    if let Some(audit) = &config.chromium_audit {
+                        ui.add_space(6.0);
+                        ui.label(
+                            RichText::new(format!("{}:\n{audit}", t.done_import))
+                                .small()
+                                .color(theme::GOLD),
+                        );
+                    }
+                }
             });
 
         ui.add_space(14.0);
@@ -368,6 +388,7 @@ impl InstallerApp {
         self.result = None;
 
         let download_floorp = self.download_floorp;
+        let import_chromium = self.import_chromium;
         let version = APP_VERSION.to_string();
 
         thread::spawn(move || {
@@ -375,7 +396,13 @@ impl InstallerApp {
                 let _ = tx.send(WorkerMsg::Progress(value, status.to_string()));
             };
 
-            match install::run_full_install(&install_root, &version, download_floorp, &progress) {
+            match install::run_full_install(
+                &install_root,
+                &version,
+                download_floorp,
+                import_chromium,
+                &progress,
+            ) {
                 Ok(config) => {
                     let _ = tx.send(WorkerMsg::Done(config));
                 }

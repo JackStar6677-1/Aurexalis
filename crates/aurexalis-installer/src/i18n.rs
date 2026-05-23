@@ -53,6 +53,10 @@ pub struct Strings {
     pub err_empty_path: &'static str,
     pub err_low_disk: &'static str,
     pub err_license: &'static str,
+    pub import_chromium: &'static str,
+    pub import_chromium_hint: &'static str,
+    pub done_import: &'static str,
+    pub apps_and_features: &'static str,
 }
 
 /// Devuelve las cadenas para el idioma pedido.
@@ -87,6 +91,10 @@ instala el motor Floorp (Gecko) y deja el navegador listo con tema y perfil prop
             err_empty_path: "Indica una carpeta de instalacion valida.",
             err_low_disk: "Se requieren al menos 500 MB libres en la unidad de destino.",
             err_license: "Debes aceptar la licencia para continuar.",
+            import_chromium: "Exportar snapshot local desde Chrome/Brave/Opera (sin contrasenas)",
+            import_chromium_hint: "Genera profiles\\default\\import\\chromium-audit.json en tu PC. No sube datos a Internet.",
+            done_import: "Datos Chromium exportados",
+            apps_and_features: "Tambien aparece en Configuracion > Aplicaciones de Windows.",
         },
         Lang::En => Strings {
             window_title: "Aurexalis Setup",
@@ -117,6 +125,10 @@ installs the Floorp engine (Gecko), and prepares your themed browser profile.",
             err_empty_path: "Choose a valid install folder.",
             err_low_disk: "At least 500 MB of free disk space is required on the target drive.",
             err_license: "You must accept the license to continue.",
+            import_chromium: "Export local snapshot from Chrome/Brave/Opera (no passwords)",
+            import_chromium_hint: "Creates profiles\\default\\import\\chromium-audit.json locally. Nothing is uploaded.",
+            done_import: "Chromium data exported",
+            apps_and_features: "Also listed under Settings > Apps on Windows.",
         },
     }
 }
