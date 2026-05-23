@@ -76,10 +76,7 @@ pub struct NetworkRequest {
 impl NetworkRequest {
     pub fn parse(url: &str, source_url: Option<&str>, kind: ResourceKind) -> Result<Self> {
         let host = extract_host(url).ok_or_else(|| AurexalisError::InvalidUrl(url.to_owned()))?;
-        let parsed_source = match source_url {
-            Some(value) => Some(value.to_owned()),
-            None => None,
-        };
+        let parsed_source = source_url.map(str::to_owned);
         let source_host = match source_url {
             Some(value) => Some(
                 extract_host(value).ok_or_else(|| AurexalisError::InvalidUrl(value.to_owned()))?,
