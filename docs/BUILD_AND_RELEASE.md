@@ -61,21 +61,22 @@ y publica tres artefactos:
 | `aurexalis-windows-x86_64.exe` | CLI portable para desarrolladores |
 
 ```powershell
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.1
+git push origin v0.2.1
 ```
 
 ### Instalador grafico
 
-`Aurexalis-Setup-x86_64.exe` muestra un asistente con la identidad visual
-(morado / rojo / dorado) y:
+`Aurexalis-Setup-x86_64.exe` incluye pantallas de bienvenida, licencia MIT,
+idioma ES/EN, selector de carpeta, barra de progreso e icono de marca.
 
 1. Descarga `aurexalis-runtime-*.zip` del mismo release en GitHub.
-2. Descarga e instala **Floorp** (motor Gecko) en `{instalacion}\Engine`.
-3. Aplica `userChrome.css`, scripts UC y `user.js` al perfil `profiles\default`.
-4. Escribe `config.json` y crea un acceso directo **Aurexalis** en el escritorio.
+2. Descarga e instala **Floorp** en `{instalacion}\Engine`.
+3. Aplica chrome/prefs al perfil `profiles\default`.
+4. Escribe `config.json`, `LICENSE` y `uninstall.ps1`.
+5. Crea accesos directos en **escritorio** y **menu Inicio**.
 
-Ruta por defecto: `%LOCALAPPDATA%\Aurexalis`.
+Ruta por defecto: `%LOCALAPPDATA%\Aurexalis`. Ver [INSTALLER.md](./INSTALLER.md).
 
 ### CLI portable (desarrollo)
 

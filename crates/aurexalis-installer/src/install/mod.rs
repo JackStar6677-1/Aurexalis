@@ -35,6 +35,7 @@ pub fn run_full_install(
         .map_err(|e| e.to_string())?;
 
     fs::create_dir_all(install_root).map_err(|e| e.to_string())?;
+    windows::ensure_disk_space(install_root)?;
     let temp = install_root.join(".install-temp");
     fs::create_dir_all(&temp).map_err(|e| e.to_string())?;
 
@@ -91,14 +92,15 @@ pub fn run_full_install(
     };
     write_config(install_root, &config)?;
 
-    progress(0.92, "Creando acceso directo...");
+    progress(0.90, "Copiando licencia...");
+    copy_license(install_root)?;
+
+    progress(0.92, "Creando accesos directos...");
     let launcher = install_root.join("aurexalis.exe");
-    windows::create_desktop_shortcut(
-        "Aurexalis",
-        &launcher,
-        install_root,
-        Some("--launch-installed"),
-    )?;
+    let launch_args = Some("--launch-installed");
+    windows::create_desktop_shortcut("Aurexalis", &launcher, install_root, launch_args)?;
+    windows::create_start_menu_shortcut("Aurexalis", &launcher, install_root, launch_args)?;
+    windows::write_uninstaller(install_root)?;
 
     let _ = fs::remove_dir_all(&temp);
     progress(1.0, "Instalacion completa");
@@ -137,4 +139,18 @@ fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), String> {
 fn write_config(install_root: &Path, config: &InstallConfig) -> Result<(), String> {
     let json = serde_json::to_string_pretty(config).map_err(|e| e.to_string())?;
     fs::write(install_root.join("config.json"), json).map_err(|e| e.to_string())
+}
+
+fn copy_license(install_root: &Path) -> Result<(), String> {
+    let manifest =
+        std::env::var("CARGO_MANIFEST_DIR").map_err(|e| format!("CARGO_MANIFEST_DIR: {e}"))?;
+    let license = std::path::Path::new(&manifest)
+        .join("..")
+        .join("..")
+        .join("LICENSE");
+    if license.is_file() {
+        fs::copy(&license, install_root.join("LICENSE"))
+            .map_err(|e| format!("copiar LICENSE: {e}"))?;
+    }
+    Ok(())
 }

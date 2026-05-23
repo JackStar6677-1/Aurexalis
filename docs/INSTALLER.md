@@ -3,44 +3,47 @@
 ## Que hace
 
 `Aurexalis-Setup-x86_64.exe` es el punto de entrada recomendado para usuarios finales.
-No sustituye todavia un build Gecko propio: **orquesta** la instalacion de:
+Orquesta la instalacion de:
 
-1. **Runtime Aurexalis** (shell, `browser/chrome`, prefs) desde el release de GitHub.
+1. **Runtime Aurexalis** (shell, `browser/chrome`, prefs, `LICENSE`) desde GitHub Releases.
 2. **Floorp** (motor Gecko) desde el release oficial de Floorp-Projects.
-3. **Perfil** `profiles\default` con tema morado/rojo/dorado aplicado.
-4. **Acceso directo** en el escritorio que ejecuta `aurexalis.exe --launch-installed`.
+3. **Perfil** `profiles\default` con tema morado/rojo/dorado.
+4. **Accesos directos** en escritorio y menu Inicio.
+5. **Desinstalador** `uninstall.ps1` + acceso directo "Desinstalar Aurexalis".
 
-## Flujo tecnico
+## Flujo de pantallas
 
 ```mermaid
 flowchart LR
-  Setup["Aurexalis-Setup.exe"] --> Runtime["Descarga runtime.zip"]
-  Setup --> Floorp["Descarga floorp installer"]
-  Runtime --> Dir["%LOCALAPPDATA%\\Aurexalis"]
-  Floorp --> Engine["Engine\\floorp.exe"]
-  Dir --> Config["config.json"]
-  Engine --> Config
-  Config --> Shortcut["Escritorio"]
+  Welcome["Bienvenida\nruta + Floorp"] --> License["Licencia MIT\n+ aviso Floorp"]
+  License --> Install["Descarga e instala"]
+  Install --> Done["Abrir / Cerrar"]
 ```
+
+- Idioma **ES / EN** (esquina superior derecha).
+- Comprobacion de **500 MB** libres en la unidad destino.
+- Icono de marca en ventana y en el `.exe` (`assets/branding/aurexalis.ico`).
 
 ## Desarrollo
 
-El crate vive en `crates/aurexalis-installer` (eframe/egui).
-
 ```powershell
+python tools/gen_installer_icon.py
 cargo build --release -p aurexalis-installer
 .\target\release\Aurexalis-Setup.exe
 ```
 
-Empaquetar runtime manualmente:
+## Desinstalar
+
+Ejecuta **Desinstalar Aurexalis** en el escritorio o:
 
 ```powershell
-.\tools\package-runtime.ps1
+& "$env:LOCALAPPDATA\Aurexalis\uninstall.ps1"
 ```
 
-## Limitaciones actuales
+Elimina la carpeta Aurexalis y los accesos directos. **No** desinstala Floorp si quedo en otra ruta global.
 
-- Solo Windows x64.
-- Requiere Internet durante la instalacion.
-- Floorp se instala con el instalador oficial (`/S /CURRENTUSER`); la firma y EULA son las de Floorp.
-- El navegador Aurexalis completo empaquetado (sin depender del instalador de Floorp) es trabajo de la Fase 5 del roadmap.
+## Limitaciones
+
+- Solo Windows x64; requiere Internet durante la instalacion.
+- Floorp conserva su propia licencia y actualizaciones.
+- Build Gecko/Aurexalis empaquetado propio: Fase 5 del roadmap.

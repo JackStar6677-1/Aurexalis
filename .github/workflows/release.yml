@@ -35,6 +35,13 @@ jobs:
         with:
           workspaces: .
 
+      - name: Verify branding assets
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "assets/branding/aurexalis.ico")) {
+            python tools/gen_installer_icon.py
+          }
+
       - name: Build release binaries
         run: |
           cargo build --release -p aurexalis-shell --target ${{ matrix.target }}
@@ -50,6 +57,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $stage | Out-Null
           Copy-Item "target/${{ matrix.target }}/release/aurexalis.exe" (Join-Path $stage "aurexalis.exe")
           Copy-Item "browser" (Join-Path $stage "browser") -Recurse
+          Copy-Item "LICENSE" (Join-Path $stage "LICENSE")
           New-Item -ItemType Directory -Force -Path (Join-Path $stage "profiles\default") | Out-Null
           Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "$dist/aurexalis-runtime-windows-x86_64.zip" -Force
 

@@ -1,9 +1,63 @@
-//! Utilidades Windows: accesos directos y comprobaciones basicas.
+//! Utilidades Windows: accesos directos, espacio en disco y desinstalacion.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// Crea un acceso directo en el escritorio del usuario actual.
+const MINIMUM_FREE_MB: u64 = 500;
+
+/// Espacio libre en megabytes para la unidad que contiene `path`.
+pub fn free_disk_space_mb(path: &Path) -> Result<u64, String> {
+    let drive = drive_root(path)?;
+    let drive = drive.to_string_lossy().replace('\'', "''");
+
+    let script = format!(
+        r#"
+$ErrorActionPreference = 'Stop'
+$disk = Get-PSDrive -Name '{drive}' -ErrorAction Stop
+[uint64]([math]::Floor($disk.Free / 1MB))
+"#
+    );
+
+    let output = Command::new("powershell.exe")
+        .args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            &script,
+        ])
+        .output()
+        .map_err(|e| format!("espacio en disco: {e}"))?;
+
+    if !output.status.success() {
+        return Err("no se pudo consultar espacio libre en disco".to_string());
+    }
+
+    let text = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    text.parse::<u64>()
+        .map_err(|_| format!("respuesta de disco invalida: {text}"))
+}
+
+/// Comprueba que hay espacio suficiente para instalar.
+pub fn ensure_disk_space(path: &Path) -> Result<(), String> {
+    let free = free_disk_space_mb(path)?;
+    if free < MINIMUM_FREE_MB {
+        return Err(format!(
+            "espacio insuficiente: {free} MB libres (minimo {MINIMUM_FREE_MB} MB)"
+        ));
+    }
+    Ok(())
+}
+
+/// Abre un dialogo nativo para elegir carpeta de instalacion.
+pub fn browse_install_folder() -> Option<PathBuf> {
+    rfd::FileDialog::new()
+        .set_title("Aurexalis — carpeta de instalacion")
+        .pick_folder()
+}
+
+/// Crea acceso directo en el escritorio.
 pub fn create_desktop_shortcut(
     name: &str,
     target: &Path,
@@ -11,8 +65,78 @@ pub fn create_desktop_shortcut(
     arguments: Option<&str>,
 ) -> Result<(), String> {
     let desktop = dirs::desktop_dir().ok_or("no se pudo resolver el escritorio")?;
-    let shortcut = desktop.join(format!("{name}.lnk"));
+    create_shortcut(&desktop.join(format!("{name}.lnk")), target, working_dir, arguments)
+}
 
+/// Crea acceso directo en el menu Inicio (Programs).
+pub fn create_start_menu_shortcut(
+    name: &str,
+    target: &Path,
+    working_dir: &Path,
+    arguments: Option<&str>,
+) -> Result<(), String> {
+    let start_menu = dirs::data_dir()
+        .ok_or("no se pudo resolver AppData")?
+        .join("Microsoft")
+        .join("Windows")
+        .join("Start Menu")
+        .join("Programs")
+        .join("Aurexalis");
+    std::fs::create_dir_all(&start_menu).map_err(|e| e.to_string())?;
+    create_shortcut(
+        &start_menu.join(format!("{name}.lnk")),
+        target,
+        working_dir,
+        arguments,
+    )
+}
+
+/// Escribe `uninstall.ps1` y un acceso directo de desinstalacion.
+pub fn write_uninstaller(install_root: &Path) -> Result<(), String> {
+    let script_path = install_root.join("uninstall.ps1");
+    let root = install_root.to_string_lossy().replace('\'', "''");
+    let script = format!(
+        r#"# Aurexalis uninstaller — generado automaticamente
+$ErrorActionPreference = 'Stop'
+$root = '{root}'
+if (-not (Test-Path $root)) {{
+    Write-Host "Aurexalis no esta instalado en $root"
+    exit 1
+}}
+$reply = Read-Host "Se eliminara Aurexalis en $root (no desinstala Floorp global). Continuar? [s/N]"
+if ($reply -notin @('s','S','y','Y')) {{ exit 0 }}
+Remove-Item -LiteralPath $root -Recurse -Force
+$desktop = [Environment]::GetFolderPath('Desktop')
+$start = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Aurexalis'
+foreach ($name in @('Aurexalis.lnk','Desinstalar Aurexalis.lnk')) {{
+    $p = Join-Path $desktop $name
+    if (Test-Path $p) {{ Remove-Item $p -Force }}
+    $p2 = Join-Path $start $name
+    if (Test-Path $p2) {{ Remove-Item $p2 -Force }}
+}}
+if (Test-Path $start) {{ Remove-Item $start -Force -Recurse -ErrorAction SilentlyContinue }}
+Write-Host "Aurexalis desinstalado."
+"#
+    );
+    std::fs::write(&script_path, script).map_err(|e| format!("escribir uninstall.ps1: {e}"))?;
+
+    let desktop = dirs::desktop_dir().ok_or("escritorio no disponible")?;
+    create_shortcut(
+        &desktop.join("Desinstalar Aurexalis.lnk"),
+        &script_path,
+        install_root,
+        None,
+    )?;
+    create_start_menu_shortcut("Desinstalar Aurexalis", &script_path, install_root, None)?;
+    Ok(())
+}
+
+fn create_shortcut(
+    shortcut: &Path,
+    target: &Path,
+    working_dir: &Path,
+    arguments: Option<&str>,
+) -> Result<(), String> {
     let target = target.to_string_lossy().replace('\'', "''");
     let working_dir = working_dir.to_string_lossy().replace('\'', "''");
     let shortcut = shortcut.to_string_lossy().replace('\'', "''");
@@ -20,6 +144,7 @@ pub fn create_desktop_shortcut(
 
     let script = format!(
         r#"
+$ErrorActionPreference = 'Stop'
 $WshShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut('{shortcut}')
 $Shortcut.TargetPath = '{target}'
@@ -50,4 +175,13 @@ $Shortcut.Save()
             status.code()
         ))
     }
+}
+
+fn drive_root(path: &Path) -> Result<String, String> {
+    if let Some(prefix) = path.to_str() {
+        if prefix.len() >= 2 && prefix.as_bytes()[1] == b':' {
+            return Ok(prefix[..1].to_uppercase());
+        }
+    }
+    Ok("C".to_string())
 }
