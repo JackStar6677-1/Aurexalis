@@ -1,0 +1,77 @@
+<svg width="1400" height="520" viewBox="0 0 1400 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">JackStar Browser banner</title>
+  <desc id="desc">A dark purple and gold browser-themed banner with orbital geometry and modular architecture nodes.</desc>
+  <defs>
+    <radialGradient id="goldPulse" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#FFE29A" stop-opacity="1"/>
+      <stop offset="42%" stop-color="#FFD166" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#FFD166" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="panel" x1="132" y1="42" x2="1272" y2="484" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12051F"/>
+      <stop offset="0.54" stop-color="#18082E"/>
+      <stop offset="1" stop-color="#090512"/>
+    </linearGradient>
+    <linearGradient id="goldStroke" x1="177" y1="98" x2="1188" y2="444" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD166"/>
+      <stop offset="0.5" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#FFE29A"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="277" y1="128" x2="1121" y2="406" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#211034" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#12051F" stop-opacity="0.86"/>
+    </linearGradient>
+    <filter id="glow" x="-80" y="-80" width="1560" height="680" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1 0 1 0 0 0.78 0 0 1 0 0.31 0 0 0 0.82 0"/>
+      <feBlend mode="screen" in2="SourceGraphic"/>
+    </filter>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M42 0H0V42" stroke="#7C3AED" stroke-opacity="0.12" stroke-width="1"/>
+    </pattern>
+    <clipPath id="browserClip">
+      <rect x="234" y="112" width="932" height="296" rx="26"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1400" height="520" fill="#090512"/>
+  <rect width="1400" height="520" fill="url(#grid)"/>
+  <ellipse cx="703" cy="262" rx="512" ry="198" fill="url(#goldPulse)" opacity="0.24"/>
+  <path d="M122 462C277 312 334 124 533 107C763 88 798 418 1033 390C1167 374 1214 268 1298 120" stroke="#FFD166" stroke-opacity="0.18" stroke-width="2"/>
+  <path d="M71 168C207 211 291 249 408 219C558 180 613 71 785 88C966 106 1022 267 1204 259C1264 256 1312 237 1362 209" stroke="#7C3AED" stroke-opacity="0.2" stroke-width="2"/>
+
+  <g filter="url(#glow)">
+    <rect x="118" y="54" width="1164" height="412" rx="38" fill="url(#panel)" stroke="url(#goldStroke)" stroke-width="2"/>
+  </g>
+
+  <g clip-path="url(#browserClip)">
+    <rect x="234" y="112" width="932" height="296" rx="26" fill="url(#glass)" stroke="#FFD166" stroke-opacity="0.55" stroke-width="2"/>
+    <rect x="234" y="112" width="932" height="54" fill="#140A24"/>
+    <circle cx="274" cy="139" r="7" fill="#FFD166"/>
+    <circle cx="302" cy="139" r="7" fill="#7C3AED"/>
+    <circle cx="330" cy="139" r="7" fill="#FFE29A"/>
+    <rect x="376" y="126" width="318" height="26" rx="13" fill="#090512" stroke="#7C3AED" stroke-opacity="0.5"/>
+    <rect x="724" y="126" width="178" height="26" rx="13" fill="#211034" stroke="#FFD166" stroke-opacity="0.34"/>
+    <rect x="252" y="186" width="116" height="188" rx="18" fill="#090512" stroke="#7C3AED" stroke-opacity="0.38"/>
+    <rect x="394" y="190" width="326" height="76" rx="20" fill="#12051F" stroke="#FFD166" stroke-opacity="0.32"/>
+    <rect x="394" y="288" width="214" height="64" rx="18" fill="#211034" stroke="#7C3AED" stroke-opacity="0.44"/>
+    <rect x="636" y="288" width="222" height="64" rx="18" fill="#211034" stroke="#FFD166" stroke-opacity="0.28"/>
+    <rect x="892" y="190" width="236" height="162" rx="20" fill="#090512" stroke="#7C3AED" stroke-opacity="0.36"/>
+
+    <path d="M313 223L326 251L357 255L334 276L340 307L313 292L286 307L292 276L269 255L300 251L313 223Z" fill="#FFD166"/>
+    <path d="M1007 221C1038 221 1063 246 1063 277C1063 308 1038 333 1007 333C976 333 951 308 951 277C951 246 976 221 1007 221Z" stroke="#FFD166" stroke-width="8"/>
+    <path d="M1007 244C1025 244 1040 259 1040 277C1040 295 1025 310 1007 310C989 310 974 295 974 277C974 259 989 244 1007 244Z" fill="#7C3AED"/>
+    <path d="M469 229H646" stroke="#F7F2FF" stroke-opacity="0.9" stroke-width="12" stroke-linecap="round"/>
+    <path d="M469 324H548" stroke="#FFD166" stroke-opacity="0.92" stroke-width="10" stroke-linecap="round"/>
+    <path d="M681 324H815" stroke="#F7F2FF" stroke-opacity="0.76" stroke-width="10" stroke-linecap="round"/>
+  </g>
+
+  <path d="M214 418C390 306 516 249 704 249C891 249 1019 305 1187 418" stroke="#FFD166" stroke-width="2" stroke-opacity="0.44"/>
+  <path d="M214 102C390 214 516 271 704 271C891 271 1019 215 1187 102" stroke="#7C3AED" stroke-width="2" stroke-opacity="0.54"/>
+  <circle cx="704" cy="260" r="12" fill="#FFD166"/>
+  <circle cx="704" cy="260" r="28" stroke="#FFD166" stroke-opacity="0.36" stroke-width="2"/>
+
+  <text x="700" y="463" text-anchor="middle" fill="#F7F2FF" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="0">JackStar Browser</text>
+  <text x="700" y="496" text-anchor="middle" fill="#FFD166" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="0">GECKO CORE · RUST MODULES · GOLD REACTIVE UI · LOCAL-FIRST PROFILE MIGRATION</text>
+</svg>
+

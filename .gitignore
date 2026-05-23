@@ -1,0 +1,39 @@
+# Build artifacts
+target/
+dist/
+build/
+out/
+
+# Local environments
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Editor and OS noise
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.pytest_cache/
+__pycache__/
+*.pyc
+
+# Browser profile data must never be committed
+profiles/
+profile-staging/
+cookies.sqlite
+Cookies
+Login Data
+History
+Local State
+key4.db
+logins.json
