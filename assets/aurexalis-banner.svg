@@ -1,6 +1,6 @@
 <svg width="1400" height="520" viewBox="0 0 1400 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">JackStar Browser banner</title>
-  <desc id="desc">A dark purple and gold browser-themed banner with orbital geometry and modular architecture nodes.</desc>
+  <title id="title">Aurexalis browser banner</title>
+  <desc id="desc">A dark purple and gold browser-themed banner for Aurexalis with orbital geometry and modular architecture nodes.</desc>
   <defs>
     <radialGradient id="goldPulse" cx="50%" cy="45%" r="55%">
       <stop offset="0%" stop-color="#FFE29A" stop-opacity="1"/>
@@ -71,7 +71,6 @@
   <circle cx="704" cy="260" r="12" fill="#FFD166"/>
   <circle cx="704" cy="260" r="28" stroke="#FFD166" stroke-opacity="0.36" stroke-width="2"/>
 
-  <text x="700" y="463" text-anchor="middle" fill="#F7F2FF" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="0">JackStar Browser</text>
+  <text x="700" y="463" text-anchor="middle" fill="#F7F2FF" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="54" font-weight="800" letter-spacing="0">Aurexalis</text>
   <text x="700" y="496" text-anchor="middle" fill="#FFD166" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="0">GECKO CORE · RUST MODULES · GOLD REACTIVE UI · LOCAL-FIRST PROFILE MIGRATION</text>
 </svg>
-

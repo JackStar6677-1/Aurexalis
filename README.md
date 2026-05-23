@@ -1,14 +1,14 @@
 <p align="center">
-  <img src="./assets/jackstar-browser-banner.svg" width="100%" alt="JackStar Browser banner" />
+  <img src="./assets/aurexalis-banner.svg" width="100%" alt="Aurexalis browser banner" />
 </p>
 
 <div align="center">
 
-# JackStar Browser
+# Aurexalis
 
-**Gecko/Floorp core · Brave-grade blocking · Opera GX-inspired UX · JackStar identity**
+**Gecko/Floorp core · Brave-grade blocking · Opera GX-inspired UX · gold reactive identity**
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FFD166&center=true&vCenter=true&width=940&height=86&lines=Un+navegador+personal%2C+modular+y+afilado.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+dorado+reactivo%2C+control+local." alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FFD166&center=true&vCenter=true&width=940&height=86&lines=Aurexalis%3A+navegacion+modular+y+afilada.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+dorado+reactivo%2C+control+local." alt="Typing SVG" />
 
 [![Status](https://img.shields.io/badge/status-arquitectura%20inicial-FFD166?style=for-the-badge)](#estado)
 [![Engine](https://img.shields.io/badge/engine-Gecko%20%2F%20Floorp-7C3AED?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](#arquitectura)
@@ -19,7 +19,7 @@
 
 ## Vision
 
-**JackStar Browser** es un proyecto personal para construir un navegador propio mediante kitbashing serio: tomar componentes open-source maduros, integrarlos con criterio y evitar cargar con la pesadez de una base Chromium completa.
+**Aurexalis** es un proyecto personal para construir un navegador propio mediante kitbashing serio: tomar componentes open-source maduros, integrarlos con criterio y evitar cargar con la pesadez de una base Chromium completa.
 
 La base prevista es **Floorp/Firefox sobre Gecko**, con una interfaz personalizada tipo gaming, bloqueo nativo de red, compatibilidad fuerte con WebExtensions y herramientas locales de migracion desde navegadores Chromium.
 
@@ -33,18 +33,22 @@ Este repositorio comienza como base publica del proyecto: documentacion, roadmap
 
 ## Principios
 
-- **Gecko primero:** compatibilidad moderna sin convertir JackStar en otro Chromium.
+- **Gecko primero:** compatibilidad moderna sin convertir Aurexalis en otro Chromium.
 - **Rust donde duela:** modulos de alto rendimiento para red, migracion, parsing y filtros.
 - **Privacidad local:** datos de perfiles, cookies y claves se procesan localmente con consentimiento explicito.
-- **UI reactiva:** estetica JackStar en morado profundo y dorado brillante, con animaciones y sonido local.
+- **UI reactiva:** estetica Aurexalis en morado profundo y dorado brillante, con animaciones y sonido local.
 - **Modularidad real:** cada pieza debe poder probarse aislada antes de entrar al navegador.
 - **Rendimiento visible:** bloquear antes de renderizar, cachear donde corresponda y evitar trabajo inutil.
+
+## Nombre
+
+**Aurexalis** mezcla la raiz aurea/dorada de `AureonVault` con el cierre astronomico de `Coronalis` y `AuroralisStar`. La intencion es que suene a una pieza del mismo universo de repositorios, pero con identidad propia para un navegador.
 
 ## Arquitectura
 
 ```mermaid
 flowchart TB
-  User["Usuario / Jack"] --> UI["JackStar UI Layer"]
+  User["Usuario"] --> UI["Aurexalis UI Layer"]
   UI --> Theme["Theme Engine<br/>userChrome.css + UI modules"]
   UI --> Sound["Reactive Sound Engine<br/>AudioContext + local assets"]
 
@@ -58,7 +62,7 @@ flowchart TB
   Ext --> FloorpCWS["Floorp Chrome Web Store support"]
   Ext --> FirefoxAPI["Firefox browser.* / chrome.* APIs"]
 
-  Gecko --> Profile["JackStar Profile"]
+  Gecko --> Profile["Aurexalis Profile"]
   Profile --> Importer["Rust Profile Importer"]
   Importer --> Chrome["Chrome"]
   Importer --> Brave["Brave"]
@@ -69,12 +73,12 @@ flowchart TB
 
 | Modulo | Objetivo | Base tecnica |
 |---|---|---|
-| `jackstar-ui` | Interfaz morado/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
-| `jackstar-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
-| `jackstar-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
-| `jackstar-importer` | Migracion local de cookies, historial, bookmarks, claves y contrasenas | Rust, SQLite, DPAPI, Secret Service/KWallet |
-| `jackstar-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
-| `jackstar-profile` | Perfil local endurecido, preferencias y defaults | Firefox prefs, policies, profile templates |
+| `aurexalis-ui` | Interfaz morado/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
+| `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
+| `aurexalis-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
+| `aurexalis-importer` | Migracion local de cookies, historial, bookmarks, claves y contrasenas | Rust, SQLite, DPAPI, Secret Service/KWallet |
+| `aurexalis-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
+| `aurexalis-profile` | Perfil local endurecido, preferencias y defaults | Firefox prefs, policies, profile templates |
 
 ## Stack
 
@@ -99,7 +103,7 @@ flowchart TB
 sequenceDiagram
   participant Page as Page / Document
   participant Gecko as Gecko Request Pipeline
-  participant Policy as JackStar Network Policy
+  participant Policy as Aurexalis Network Policy
   participant Blocker as adblock-rust Engine
   participant Net as Network
 
@@ -126,8 +130,8 @@ flowchart LR
   Detect["Detectar perfiles"] --> Copy["Copiar SQLite a staging seguro"]
   Copy --> Read["Leer Cookies / History / Login Data"]
   Read --> Decrypt["Descifrar con API local del sistema"]
-  Decrypt --> Transform["Normalizar formato JackStar"]
-  Transform --> Write["Escribir en perfil JackStar"]
+  Decrypt --> Transform["Normalizar formato Aurexalis"]
+  Transform --> Write["Escribir en perfil Aurexalis"]
 
   Decrypt --> Win["Windows<br/>DPAPI + Local State"]
   Decrypt --> Linux["Linux<br/>Secret Service / KWallet"]
@@ -138,9 +142,9 @@ Alcance previsto:
 - Cookies de Chrome, Brave y Opera.
 - Historial y bookmarks.
 - Claves y contrasenas guardadas cuando el sistema permita descifrado local.
-- Importacion controlada hacia el perfil JackStar.
+- Importacion controlada hacia el perfil Aurexalis.
 
-## UI JackStar
+## UI Aurexalis
 
 Paleta inicial:
 
@@ -158,7 +162,7 @@ Paleta inicial:
 
 ```mermaid
 gantt
-  title Roadmap inicial JackStar
+  title Roadmap inicial Aurexalis
   dateFormat  YYYY-MM-DD
   axisFormat  %d/%m
 
@@ -167,7 +171,7 @@ gantt
   Analisis Floorp/Firefox        :active,  r2, 2026-05-24, 5d
 
   section UI
-  userChrome.css JackStar        :         u1, 2026-05-25, 3d
+  userChrome.css Aurexalis       :         u1, 2026-05-25, 3d
   Motor de sonido reactivo       :         u2, after u1, 3d
 
   section Rust
@@ -183,11 +187,11 @@ gantt
 ## Primeros Entregables
 
 - [x] Crear repo base.
-- [x] Definir identidad visual JackStar.
+- [x] Definir identidad visual Aurexalis.
 - [x] Documentar arquitectura modular.
 - [ ] Crear `userChrome.css` inicial.
-- [ ] Crear `jackstar-sound` PoC.
-- [ ] Crear `jackstar-importer` Rust para cookies Brave.
+- [ ] Crear `aurexalis-sound` PoC.
+- [ ] Crear `aurexalis-importer` Rust para cookies Brave.
 - [ ] Probar `adblock-rust` fuera del navegador.
 - [ ] Estudiar parches de Floorp para Chrome Web Store.
 
@@ -198,7 +202,6 @@ Proyecto personal en etapa temprana. La base publica documenta arquitectura e id
 ---
 
 <p align="center">
-  <strong>JackStar Browser</strong><br />
+  <strong>Aurexalis</strong><br />
   Morado profundo. Dorado reactivo. Control local.
 </p>
-
