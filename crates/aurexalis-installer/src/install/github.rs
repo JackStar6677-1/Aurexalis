@@ -9,6 +9,7 @@ const FLOORP_INSTALLER: &str = "floorp-windows-x86_64.installer.exe";
 
 #[derive(Debug, Deserialize)]
 struct GhRelease {
+    #[expect(dead_code)]
     tag_name: String,
     assets: Vec<GhAsset>,
 }

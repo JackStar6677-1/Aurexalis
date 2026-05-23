@@ -33,15 +33,35 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  quality:
-    name: quality (${{ matrix.os }})
+  quality-linux:
+    name: quality (linux)
     needs: fmt
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Install stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check workspace (sin instalador GUI)
+        run: cargo check --workspace --exclude aurexalis-installer --all-features
+
+      - name: Run clippy
+        run: cargo clippy --workspace --exclude aurexalis-installer --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --workspace --exclude aurexalis-installer --all-features
+
+  quality-windows:
+    name: quality (windows)
+    needs: fmt
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4

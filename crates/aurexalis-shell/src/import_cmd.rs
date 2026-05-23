@@ -50,7 +50,7 @@ pub fn export_audit(output: Option<PathBuf>, include_passwords: bool) -> Result<
     let candidate = find_first_chromium_profile()
         .ok_or("no se encontro perfil Chrome, Brave u Opera en este equipo")?;
 
-    let destination = output.unwrap_or_else(|| default_audit_path());
+    let destination = output.unwrap_or_else(default_audit_path);
     if let Some(parent) = destination.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
