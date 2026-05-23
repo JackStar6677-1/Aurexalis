@@ -28,7 +28,7 @@ No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y
 
 ## Estado
 
-> Fase actual: **arquitectura, identidad visual y plan tecnico**.
+> Fase actual: **base profesional de ingenieria y arquitectura modular**.
 
 Este repositorio comienza como base publica del proyecto: documentacion, roadmap, identidad visual, diagramas y decisiones tecnicas. El codigo duro se integrara por modulos para mantener control, pruebas y rollback.
 
@@ -219,6 +219,14 @@ gantt
 ## Pruebas
 
 La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows.
+
+## Profesionalizacion
+
+- [docs/QUALITY.md](./docs/QUALITY.md): gates de calidad y reglas de ingenieria.
+- [docs/ROADMAP.md](./docs/ROADMAP.md): fases de producto.
+- [CONTRIBUTING.md](./CONTRIBUTING.md): flujo de cambios.
+- [SECURITY.md](./SECURITY.md): politica de datos sensibles.
+- [docs/adr](./docs/adr): decisiones arquitectonicas.
 
 ## Licencia Y Uso
 

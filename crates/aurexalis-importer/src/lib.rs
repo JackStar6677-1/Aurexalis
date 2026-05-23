@@ -1,3 +1,10 @@
+//! Local browser profile discovery for Aurexalis.
+//!
+//! This crate only maps and inventories local profile artifacts. Decryption and
+//! migration must remain explicit, local and user-controlled.
+
+#![forbid(unsafe_code)]
+
 use std::fs;
 use std::fmt;
 use std::path::{Path, PathBuf};

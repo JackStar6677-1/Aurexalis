@@ -13,3 +13,10 @@ license = "MIT"
 repository = "https://github.com/JackStar6677-1/Aurexalis"
 authors = ["Pablo Elias Avendano Miranda"]
 
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "allow"
+nursery = "allow"

@@ -1,3 +1,10 @@
+//! Remote filesystem abstractions for Aurexalis.
+//!
+//! The module models SFTP/FTP/FTPS connections without mounting remote folders
+//! into the operating system.
+
+#![forbid(unsafe_code)]
+
 use std::fmt;
 use std::path::{Component, Path, PathBuf};
 

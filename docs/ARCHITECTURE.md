@@ -48,3 +48,8 @@ Esto evita mezclar pruebas de UI, red, perfiles y motor al mismo tiempo.
 - Los datos sensibles no se versionan y todo flujo de importacion debe ser local, explicito y auditable.
 - El explorador SFTP/FTP sera una funcion de navegador de archivos remoto, no una sincronizacion opaca.
 
+## ADRs
+
+- [ADR 0001: Base Gecko/Floorp](./adr/0001-floorp-gecko-base.md)
+- [ADR 0002: Importacion local de perfiles](./adr/0002-local-first-profile-import.md)
+- [ADR 0003: RemoteFS sin montaje del sistema](./adr/0003-remotefs-without-os-mount.md)

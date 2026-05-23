@@ -1,3 +1,10 @@
+//! Core shared types for Aurexalis services.
+//!
+//! This crate intentionally stays dependency-light. It defines request metadata
+//! and errors used by higher-level modules before they are wired into Gecko.
+
+#![forbid(unsafe_code)]
+
 use std::fmt;
 
 #[derive(Debug)]

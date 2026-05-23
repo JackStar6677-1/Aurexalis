@@ -1,3 +1,10 @@
+//! Network blocking policy facade for Aurexalis.
+//!
+//! The current matcher is deliberately small and deterministic. It preserves
+//! the public policy shape that will later wrap `adblock-rust`.
+
+#![forbid(unsafe_code)]
+
 use aurexalis_core::{NetworkRequest, ResourceKind};
 use std::fmt;
 

@@ -1,5 +1,9 @@
 name: Rust
 
+env:
+  CARGO_TERM_COLOR: always
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: ["main"]
@@ -7,8 +11,8 @@ on:
     branches: ["main"]
 
 jobs:
-  test:
-    name: cargo test (${{ matrix.os }})
+  quality:
+    name: quality (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -21,9 +25,20 @@ jobs:
 
       - name: Install stable Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Check workspace
+        run: cargo check --workspace --all-features
+
+      - name: Run clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: Run tests
         run: cargo test --workspace --all-features

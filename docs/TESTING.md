@@ -5,11 +5,11 @@ La base Rust de Aurexalis se valida con `cargo test` sobre todo el workspace.
 ## Comandos
 
 ```powershell
+cargo fmt --all -- --check
 cargo check --workspace --all-features
+cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-features
 ```
-
-Si `rustfmt` esta instalado, tambien puedes ejecutar `cargo fmt --all -- --check`.
 
 En Windows con toolchain `msvc`, `cargo test` requiere `link.exe` de Visual Studio Build Tools. Si no esta instalado, `cargo check` sigue validando compilacion de crates sin enlazar binarios de prueba.
 

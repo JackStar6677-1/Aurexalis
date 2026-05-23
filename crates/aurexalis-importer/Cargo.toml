@@ -8,3 +8,6 @@ authors.workspace = true
 
 [dependencies]
 aurexalis-core = { path = "../aurexalis-core" }
+
+[lints]
+workspace = true
