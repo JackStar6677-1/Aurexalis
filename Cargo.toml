@@ -5,6 +5,7 @@ members = [
   "crates/aurexalis-importer",
   "crates/aurexalis-remotefs",
   "crates/aurexalis-shell",
+  "crates/aurexalis-installer",
 ]
 resolver = "2"
 

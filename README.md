@@ -246,8 +246,9 @@ El primer binario arrancable vive en `aurexalis-shell` y expone:
 .\target\debug\aurexalis.exe launch "C:\Ruta\A\floorp.exe"
 ```
 
-Descarga pre-release del shell Windows en
-[GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases) (`aurexalis-windows-x86_64.exe`).
+Descarga el instalador Windows en
+[GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases)
+(`Aurexalis-Setup-x86_64.exe`). Tambien hay CLI portable (`aurexalis-windows-x86_64.exe`).
 
 La documentacion de build y empaquetado esta en
 [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).

@@ -20,7 +20,6 @@ jobs:
       matrix:
         include:
           - target: x86_64-pc-windows-msvc
-            asset: aurexalis-windows-x86_64.exe
 
     steps:
       - name: Checkout
@@ -36,21 +35,38 @@ jobs:
         with:
           workspaces: .
 
-      - name: Build release binary
-        run: cargo build --release -p aurexalis-shell --target ${{ matrix.target }}
+      - name: Build release binaries
+        run: |
+          cargo build --release -p aurexalis-shell --target ${{ matrix.target }}
+          cargo build --release -p aurexalis-installer --target ${{ matrix.target }}
 
-      - name: Stage release asset
+      - name: Package runtime zip
+        shell: pwsh
+        run: |
+          $dist = "dist"
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
+          $stage = Join-Path $env:RUNNER_TEMP "aurexalis-runtime"
+          if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item "target/${{ matrix.target }}/release/aurexalis.exe" (Join-Path $stage "aurexalis.exe")
+          Copy-Item "browser" (Join-Path $stage "browser") -Recurse
+          New-Item -ItemType Directory -Force -Path (Join-Path $stage "profiles\default") | Out-Null
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "$dist/aurexalis-runtime-windows-x86_64.zip" -Force
+
+      - name: Stage release assets
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item `
-            "target/${{ matrix.target }}/release/aurexalis.exe" `
-            "dist/${{ matrix.asset }}"
+          Copy-Item "target/${{ matrix.target }}/release/aurexalis.exe" "dist/aurexalis-windows-x86_64.exe"
+          Copy-Item "target/${{ matrix.target }}/release/Aurexalis-Setup.exe" "dist/Aurexalis-Setup-x86_64.exe"
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/${{ matrix.asset }}
+          files: |
+            dist/aurexalis-windows-x86_64.exe
+            dist/aurexalis-runtime-windows-x86_64.zip
+            dist/Aurexalis-Setup-x86_64.exe
           generate_release_notes: true
           draft: false
           prerelease: true

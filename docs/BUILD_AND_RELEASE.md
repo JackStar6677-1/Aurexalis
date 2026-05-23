@@ -49,21 +49,35 @@ El pipeline profesional queda dividido en cuatro artefactos:
 Los builds del navegador completo no deben firmarse hasta tener certificados
 propios. El **shell Rust** (`aurexalis.exe`) si se publica en GitHub Releases.
 
-## GitHub Releases (shell Windows)
+## GitHub Releases (Windows)
 
-Cada tag `v*` dispara [`.github/workflows/release.yml`](../.github/workflows/release.yml),
-que compila `aurexalis-shell` en `windows-latest` y adjunta
-`aurexalis-windows-x86_64.exe`.
+Cada tag `v*` dispara [`.github/workflows/release.yml`](../.github/workflows/release.yml)
+y publica tres artefactos:
+
+| Archivo | Uso |
+|---|---|
+| `Aurexalis-Setup-x86_64.exe` | **Instalador con GUI** (recomendado) |
+| `aurexalis-runtime-windows-x86_64.zip` | Runtime (shell + chrome + prefs) |
+| `aurexalis-windows-x86_64.exe` | CLI portable para desarrolladores |
 
 ```powershell
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
-Tras el workflow, el binario aparece en
-[Releases](https://github.com/JackStar6677-1/Aurexalis/releases).
+### Instalador grafico
 
-Uso del artefacto:
+`Aurexalis-Setup-x86_64.exe` muestra un asistente con la identidad visual
+(morado / rojo / dorado) y:
+
+1. Descarga `aurexalis-runtime-*.zip` del mismo release en GitHub.
+2. Descarga e instala **Floorp** (motor Gecko) en `{instalacion}\Engine`.
+3. Aplica `userChrome.css`, scripts UC y `user.js` al perfil `profiles\default`.
+4. Escribe `config.json` y crea un acceso directo **Aurexalis** en el escritorio.
+
+Ruta por defecto: `%LOCALAPPDATA%\Aurexalis`.
+
+### CLI portable (desarrollo)
 
 ```powershell
 .\aurexalis-windows-x86_64.exe profiles
@@ -71,5 +85,5 @@ $env:AUREXALIS_BROWSER="C:\Ruta\A\floorp.exe"
 .\aurexalis-windows-x86_64.exe launch
 ```
 
-> Pre-release: solo CLI/servicios Rust. Necesitas Firefox o Floorp aparte; no
-> incluye el motor Gecko empaquetado.
+> Pre-release: el navegador completo empaquetado (Gecko propio) llegara en fases
+> posteriores; hoy el instalador orquesta Floorp oficial + capa Aurexalis.

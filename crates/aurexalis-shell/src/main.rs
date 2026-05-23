@@ -1,8 +1,10 @@
 #![forbid(unsafe_code)]
 
+mod config;
+
 use aurexalis_importer::{default_profile_roots, discover_profiles, ChromiumBrowser};
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 fn main() -> ExitCode {
@@ -18,7 +20,8 @@ fn main() -> ExitCode {
 fn run() -> Result<(), String> {
     let mut args = env::args().skip(1);
     match args.next().as_deref() {
-        Some("launch") => launch(args.next().map(PathBuf::from)),
+        Some("launch") => launch(args.next().map(PathBuf::from), None),
+        Some("--launch-installed") => launch_installed(),
         Some("profiles") => list_profiles(),
         Some("floorp") => print_floorp_hint(),
         Some("help") | None => {
@@ -29,15 +32,46 @@ fn run() -> Result<(), String> {
     }
 }
 
-fn launch(binary: Option<PathBuf>) -> Result<(), String> {
+fn install_root_from_exe() -> Result<PathBuf, String> {
+    env::current_exe()
+        .map_err(|e| e.to_string())?
+        .parent()
+        .map(Path::to_path_buf)
+        .ok_or_else(|| "no se pudo resolver el directorio del ejecutable".to_string())
+}
+
+fn launch_installed() -> Result<(), String> {
+    let root = install_root_from_exe()?;
+    let cfg = config::load(&root)?;
+    launch(Some(cfg.browser), Some(cfg.profile))
+}
+
+fn launch(binary: Option<PathBuf>, profile: Option<PathBuf>) -> Result<(), String> {
+    let install_root = install_root_from_exe().ok();
+
     let browser = binary
         .or_else(|| env::var_os("AUREXALIS_BROWSER").map(PathBuf::from))
-        .ok_or("define AUREXALIS_BROWSER o pasa la ruta al binario Firefox/Floorp")?;
+        .or_else(|| {
+            install_root
+                .as_ref()
+                .and_then(|root| config::load(root).ok())
+                .map(|cfg| cfg.browser)
+        })
+        .ok_or("define AUREXALIS_BROWSER, config.json o pasa la ruta al binario Firefox/Floorp")?;
 
-    let profile = env::current_dir()
-        .map_err(|error| error.to_string())?
-        .join("profiles")
-        .join("aurexalis-dev");
+    let profile = profile.unwrap_or_else(|| {
+        install_root
+            .as_ref()
+            .and_then(|root| config::load(root).ok())
+            .map(|cfg| cfg.profile)
+            .unwrap_or_else(|| {
+                env::current_dir()
+                    .unwrap_or_else(|_| PathBuf::from("."))
+                    .join("profiles")
+                    .join("aurexalis-dev")
+            })
+    });
+
     std::fs::create_dir_all(&profile).map_err(|error| error.to_string())?;
 
     let status = Command::new(&browser)
@@ -91,6 +125,7 @@ fn print_floorp_hint() -> Result<(), String> {
 fn print_help() {
     println!("Aurexalis shell");
     println!("  aurexalis launch [ruta-firefox-floorp]");
+    println!("  aurexalis --launch-installed");
     println!("  aurexalis profiles");
     println!("  aurexalis floorp");
 }
