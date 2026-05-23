@@ -349,7 +349,8 @@ pub fn read_cookies(
         })
     })?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(ImporterError::Sqlite)
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(ImporterError::Sqlite)
 }
 
 pub fn read_logins(
@@ -378,7 +379,8 @@ pub fn read_logins(
         })
     })?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(ImporterError::Sqlite)
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(ImporterError::Sqlite)
 }
 
 pub fn read_history(path: &Path) -> Result<Vec<HistoryEntry>, ImporterError> {
@@ -401,7 +403,8 @@ pub fn read_history(path: &Path) -> Result<Vec<HistoryEntry>, ImporterError> {
         })
     })?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(ImporterError::Sqlite)
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(ImporterError::Sqlite)
 }
 
 pub fn read_favicons(path: &Path) -> Result<Vec<FaviconEntry>, ImporterError> {
@@ -429,7 +432,8 @@ pub fn read_favicons(path: &Path) -> Result<Vec<FaviconEntry>, ImporterError> {
         })
     })?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(ImporterError::Sqlite)
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(ImporterError::Sqlite)
 }
 
 pub fn read_bookmarks(path: &Path) -> Result<Vec<BookmarkEntry>, ImporterError> {
@@ -515,30 +519,33 @@ pub fn decrypt_chromium_secret(
 ) -> Result<String, ImporterError> {
     if encrypted_value.starts_with(b"v10") || encrypted_value.starts_with(b"v11") {
         let Some(key) = &context.platform_key else {
-            return Err(ImporterError::UnsupportedDecryption("missing Chromium AES key"));
+            return Err(ImporterError::UnsupportedDecryption(
+                "missing Chromium AES key",
+            ));
         };
         if encrypted_value.len() < 3 + 12 + 16 {
-            return Err(ImporterError::Crypto("Chromium secret is too short".to_owned()));
+            return Err(ImporterError::Crypto(
+                "Chromium secret is too short".to_owned(),
+            ));
         }
 
-        let cipher =
-            Aes256Gcm::new_from_slice(key).map_err(|error| ImporterError::Crypto(error.to_string()))?;
+        let cipher = Aes256Gcm::new_from_slice(key)
+            .map_err(|error| ImporterError::Crypto(error.to_string()))?;
         let nonce = Nonce::from_slice(&encrypted_value[3..15]);
         let plaintext = cipher
             .decrypt(nonce, &encrypted_value[15..])
             .map_err(|error| ImporterError::Crypto(format!("{error:?}")))?;
-        return String::from_utf8(plaintext).map_err(|error| ImporterError::Crypto(error.to_string()));
+        return String::from_utf8(plaintext)
+            .map_err(|error| ImporterError::Crypto(error.to_string()));
     }
 
     #[cfg(windows)]
     {
-        let plaintext = windows_dpapi::decrypt_data(
-            encrypted_value,
-            windows_dpapi::Scope::User,
-            None,
-        )
-        .map_err(|error| ImporterError::Crypto(error.to_string()))?;
-        return String::from_utf8(plaintext).map_err(|error| ImporterError::Crypto(error.to_string()));
+        let plaintext =
+            windows_dpapi::decrypt_data(encrypted_value, windows_dpapi::Scope::User, None)
+                .map_err(|error| ImporterError::Crypto(error.to_string()))?;
+        return String::from_utf8(plaintext)
+            .map_err(|error| ImporterError::Crypto(error.to_string()));
     }
 
     #[cfg(not(windows))]
@@ -795,7 +802,10 @@ mod tests {
 
         assert_eq!(cookies.len(), 1);
         assert_eq!(cookies[0].name, "sid");
-        assert_eq!(cookies[0].value, SecretValue::PlainText("plain-cookie".to_owned()));
+        assert_eq!(
+            cookies[0].value,
+            SecretValue::PlainText("plain-cookie".to_owned())
+        );
         assert!(cookies[0].is_secure);
 
         fs::remove_dir_all(root).expect("cleanup");
@@ -869,10 +879,16 @@ mod tests {
             )
             .expect("favicon schema");
         connection
-            .execute("INSERT INTO page_url VALUES (1, ?1)", ["https://example.test"])
+            .execute(
+                "INSERT INTO page_url VALUES (1, ?1)",
+                ["https://example.test"],
+            )
             .expect("page");
         connection
-            .execute("INSERT INTO favicons VALUES (1, ?1)", ["https://example.test/favicon.ico"])
+            .execute(
+                "INSERT INTO favicons VALUES (1, ?1)",
+                ["https://example.test/favicon.ico"],
+            )
             .expect("favicon");
         connection
             .execute("INSERT INTO icon_mapping VALUES (1, 1)", [])
@@ -886,7 +902,10 @@ mod tests {
         drop(connection);
 
         assert_eq!(read_logins(&login_db, None).expect("logins").len(), 1);
-        assert_eq!(read_history(&history_db).expect("history")[0].title, "Example");
+        assert_eq!(
+            read_history(&history_db).expect("history")[0].title,
+            "Example"
+        );
         assert_eq!(read_favicons(&favicon_db).expect("favicons")[0].width, 16);
 
         fs::remove_dir_all(root).expect("cleanup");
@@ -913,8 +932,11 @@ mod tests {
             }"#,
         )
         .expect("write bookmarks");
-        fs::write(&preferences, r#"{"browser":{"check_default_browser":false}}"#)
-            .expect("write preferences");
+        fs::write(
+            &preferences,
+            r#"{"browser":{"check_default_browser":false}}"#,
+        )
+        .expect("write preferences");
 
         let parsed = read_bookmarks(&bookmarks).expect("bookmarks");
         let prefs = read_json_artifact(&preferences)

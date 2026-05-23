@@ -236,11 +236,13 @@ mod tests {
         .expect("rules should load");
 
         assert_eq!(
-            engine.check(&request(
-                "https://ads.example.com/allowed.js",
-                Some("https://site.test"),
-                ResourceKind::Script,
-            )).expect("decision"),
+            engine
+                .check(&request(
+                    "https://ads.example.com/allowed.js",
+                    Some("https://site.test"),
+                    ResourceKind::Script,
+                ))
+                .expect("decision"),
             BlockDecision::AllowByException {
                 rule: "@@||ads.example.com^".to_owned()
             }
@@ -256,20 +258,24 @@ mod tests {
         .expect("rules should load");
 
         assert!(matches!(
-            engine.check(&request(
-                "https://cdn.test/tracker.js",
-                Some("https://site.test"),
-                ResourceKind::Script,
-            )).expect("decision"),
+            engine
+                .check(&request(
+                    "https://cdn.test/tracker.js",
+                    Some("https://site.test"),
+                    ResourceKind::Script,
+                ))
+                .expect("decision"),
             BlockDecision::Block { .. }
         ));
 
         assert_eq!(
-            engine.check(&request(
-                "https://site.test/tracker.js",
-                Some("https://site.test"),
-                ResourceKind::Script,
-            )).expect("decision"),
+            engine
+                .check(&request(
+                    "https://site.test/tracker.js",
+                    Some("https://site.test"),
+                    ResourceKind::Script,
+                ))
+                .expect("decision"),
             BlockDecision::Allow
         );
     }
