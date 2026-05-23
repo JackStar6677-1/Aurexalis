@@ -272,7 +272,10 @@ mod tests {
 
         assert_eq!(profiles.len(), 2);
         assert_eq!(profiles[0].profile_name, "Default");
-        assert!(profiles[0].artifacts.cookies_db.ends_with("Network/Cookies"));
+        assert!(profiles[0]
+            .artifacts
+            .cookies_db
+            .ends_with("Network/Cookies"));
         assert!(profiles[0].artifacts.login_db.ends_with("Login Data"));
         assert!(profiles[0].artifacts.bookmarks_json.ends_with("Bookmarks"));
         assert!(profiles[0].artifacts.favicons_db.ends_with("Favicons"));
