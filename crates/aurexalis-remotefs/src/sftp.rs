@@ -68,9 +68,7 @@ impl RemoteFileSystem for SftpFileSystem {
     fn list(&self, path: &str) -> Result<Vec<RemoteEntry>, RemoteFsError> {
         let normalized = normalize_remote_path(path)?;
         let sftp = self.sftp()?;
-        let dir = sftp
-            .readdir(Path::new(&normalized))
-            .map_err(ssh2_error)?;
+        let dir = sftp.readdir(Path::new(&normalized)).map_err(ssh2_error)?;
         let mut entries = Vec::new();
         for (path_buf, stat) in dir {
             let name = path_buf
@@ -96,9 +94,7 @@ impl RemoteFileSystem for SftpFileSystem {
     fn download(&self, remote_path: &str, local_path: &str) -> Result<(), RemoteFsError> {
         let normalized = normalize_remote_path(remote_path)?;
         let sftp = self.sftp()?;
-        let mut remote = sftp
-            .open(Path::new(&normalized))
-            .map_err(ssh2_error)?;
+        let mut remote = sftp.open(Path::new(&normalized)).map_err(ssh2_error)?;
         if let Some(parent) = Path::new(local_path).parent() {
             std::fs::create_dir_all(parent)?;
         }
@@ -120,9 +116,7 @@ impl RemoteFileSystem for SftpFileSystem {
         let normalized = normalize_remote_path(remote_path)?;
         let sftp = self.sftp()?;
         let mut local = std::fs::File::open(local_path)?;
-        let mut remote = sftp
-            .create(Path::new(&normalized))
-            .map_err(ssh2_error)?;
+        let mut remote = sftp.create(Path::new(&normalized)).map_err(ssh2_error)?;
         let mut buffer = [0_u8; 8192];
         loop {
             let read = local.read(&mut buffer).map_err(RemoteFsError::Io)?;
