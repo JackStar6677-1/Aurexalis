@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 concurrency:
   group: release-${{ github.ref }}
@@ -161,7 +162,7 @@ jobs:
       - name: Install packaging deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y ruby ruby-dev build-essential rpm
+          sudo apt-get install -y ruby ruby-dev build-essential rpm libarchive-tools
           sudo gem install --no-document fpm
 
       - name: Package Linux (.deb, .rpm, Arch, tarball)

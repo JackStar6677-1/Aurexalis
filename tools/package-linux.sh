@@ -36,6 +36,10 @@ if ! command -v fpm >/dev/null 2>&1; then
   sudo gem install --no-document fpm
 fi
 
+if ! command -v bsdtar >/dev/null 2>&1; then
+  echo "[WARN] bsdtar no encontrado; paquete Arch puede fallar (instala libarchive-tools)"
+fi
+
 echo "[INFO] Generando .deb (Ubuntu/Debian)..."
 fpm -s dir -t deb -n aurexalis -v "$VERSION" --architecture amd64 \
   --maintainer "Aurexalis <noreply@aurexalis.local>" \
