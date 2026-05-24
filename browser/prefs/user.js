@@ -26,10 +26,11 @@ user_pref("aurexalis.sounds.panel.enabled", true);
 user_pref("aurexalis.sounds.panel.volume", 70);
 user_pref("aurexalis.ui.animations", true);
 
-// Bloqueador Aurexalis (Gecko ETP + panel ST / ajustes).
+// Bloqueador Aurexalis (ETP + hook red UC; listas en ProfD/blocker/aurexalis-filters.txt).
 user_pref("aurexalis.blocker.enabled", true);
 user_pref("aurexalis.blocker.level", "standard");
 user_pref("aurexalis.blocker.cosmetic", true);
+user_pref("aurexalis.blocker.debug", false);
 
 // shell.path y settings.url se escriben al instalar.
 

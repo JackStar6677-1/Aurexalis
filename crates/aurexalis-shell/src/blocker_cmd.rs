@@ -1,6 +1,6 @@
 //! Comandos `aurexalis blocker` — comprobacion adblock-rust y sincronizacion de listas.
 
-use aurexalis_blocker::BlockerEngine;
+use aurexalis_blocker::{BlockerEngine, PROFILE_FILTER_REL_PATH};
 use aurexalis_core::{NetworkRequest, ResourceKind};
 use std::fs;
 use std::path::PathBuf;
@@ -28,9 +28,10 @@ pub fn check_url(url: &str, source: Option<&str>, kind: ResourceKind) -> Result<
 
 /// Escribe listas por defecto en el perfil para uso futuro del hook Gecko.
 pub fn sync_lists(profile_dir: &std::path::Path) -> Result<(), String> {
-    let dest_dir = profile_dir.join("blocker");
-    fs::create_dir_all(&dest_dir).map_err(|e| e.to_string())?;
-    let dest = dest_dir.join("aurexalis-filters.txt");
+    let dest = profile_dir.join(PROFILE_FILTER_REL_PATH);
+    if let Some(parent) = dest.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
     let body = DEFAULT_LISTS.join("\n");
     fs::write(&dest, body).map_err(|e| e.to_string())?;
     println!("[SUCCESS] Listas en {}", dest.display());
@@ -50,14 +51,10 @@ fn default_lists_path() -> PathBuf {
     std::env::current_exe()
         .ok()
         .and_then(|exe| {
-            exe.parent().map(|p| {
-                p.join("profiles")
-                    .join("default")
-                    .join("blocker")
-                    .join("aurexalis-filters.txt")
-            })
+            exe.parent()
+                .map(|p| p.join("profiles").join("default").join(PROFILE_FILTER_REL_PATH))
         })
-        .unwrap_or_else(|| PathBuf::from("aurexalis-filters.txt"))
+        .unwrap_or_else(|| PathBuf::from(PROFILE_FILTER_REL_PATH))
 }
 
 pub fn parse_resource_kind(value: &str) -> Result<ResourceKind, String> {

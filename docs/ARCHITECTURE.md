@@ -38,7 +38,7 @@ Esto evita mezclar pruebas de UI, red, perfiles y motor al mismo tiempo.
 | Modulo | Rol | Estado v0.3 |
 |---|---|---|
 | `aurexalis-core` | Tipos compartidos, errores, politicas base | Estable |
-| `aurexalis-blocker` | `adblock-rust` + prefs ETP/ContentBlocking en UI | Parcial |
+| `aurexalis-blocker` | `adblock-rust` CLI + hook UC `http-on-modify-request` + ETP | Parcial |
 | `aurexalis-importer` | Lectura Chromium + export audit JSON | Parcial |
 | `aurexalis-remotefs` | Cola SFTP/FTP/FTPS | Backend Rust |
 | `aurexalis-shell` | CLI, perfiles, launch, import audit | Release |

@@ -49,6 +49,8 @@ foreach ($rel in $required) {
 
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.sounds.enabled" "user.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.blocker.enabled" "user.js"
+Assert-Contains (Join-Path $RepoRoot "browser/chrome/aurexalis-02-blocker.uc.js") "http-on-modify-request" "aurexalis-02-blocker.uc.js"
+Assert-Contains (Join-Path $RepoRoot "browser/chrome/aurexalis-02-blocker.uc.js") "aurexalis-filters.txt" "aurexalis-02-blocker.uc.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "disableFloorpStart" "user.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "app.feedback.baseURL" "user.js"
 Assert-File (Join-Path $RepoRoot "assets/branding/aurexalis.ico") "assets/branding/aurexalis.ico"
@@ -63,7 +65,8 @@ $expectedOrder = @(
     "aurexalis-03-sound.uc.js",
     "aurexalis-04-settings-panel.uc.js",
     "aurexalis-05-sidebar.uc.js",
-    "aurexalis-06-settings-inject.uc.js"
+    "aurexalis-06-settings-inject.uc.js",
+    "aurexalis-07-cws-brand.uc.js"
 )
 $actual = $ucOrder | ForEach-Object { $_.Name }
 if (($actual -join ",") -ne ($expectedOrder -join ",")) {

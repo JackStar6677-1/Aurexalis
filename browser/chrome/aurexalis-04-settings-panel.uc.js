@@ -207,6 +207,9 @@
         actionButton("Sincronizar listas bloqueador", () => {
           try {
             AurexalisCore.runShell(["blocker", "sync-lists"]);
+            if (window.AurexalisBlocker?.reloadNetworkFilters) {
+              setTimeout(() => AurexalisBlocker.applyBlockerPrefs(), 800);
+            }
           } catch (error) {
             Services.prompt.alert(null, "Aurexalis", String(error));
           }

@@ -45,7 +45,8 @@ Roadmap de producto alineado con **v0.4.0**. Para descargas y estado rapido ver 
 - [x] Integracion UI: Gecko ETP en desktop, ContentBlocking en Android.
 - [x] Niveles standard / strict / off desde ajustes y panel **ST**.
 - [x] CLI `blocker check` y `blocker sync-lists` (adblock-rust + listas embebidas).
-- [ ] Hook al pipeline de requests Gecko antes del render.
+- [x] Hook parcial al pipeline de requests Gecko (`http-on-modify-request` + listas `sync-lists` en UC).
+- [ ] Paridad completa `adblock-rust` en proceso del navegador (native/XPI/núcleo).
 - [ ] Listas uBlock/ABP descargables desde URLs.
 - [ ] Benchmarks de matching en CI.
 

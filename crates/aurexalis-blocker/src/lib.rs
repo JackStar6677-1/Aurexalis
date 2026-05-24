@@ -8,6 +8,9 @@
 use aurexalis_core::{NetworkRequest, ResourceKind};
 use std::fmt;
 
+/// Ruta relativa al directorio del perfil Gecko (`ProfD`) donde `sync-lists` escribe reglas.
+pub const PROFILE_FILTER_REL_PATH: &str = "blocker/aurexalis-filters.txt";
+
 #[derive(Debug)]
 pub enum BlockerError {
     EmptyFilterList,
@@ -303,5 +306,13 @@ mod tests {
         let result = BlockerEngine::from_filter_lists(&["! only a comment".to_owned()]);
 
         assert!(matches!(result, Err(BlockerError::EmptyFilterList)));
+    }
+
+    #[test]
+    fn profile_filter_path_matches_gecko_uc() {
+        assert_eq!(
+            PROFILE_FILTER_REL_PATH,
+            "blocker/aurexalis-filters.txt"
+        );
     }
 }
