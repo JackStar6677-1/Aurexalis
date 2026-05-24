@@ -310,9 +310,6 @@ mod tests {
 
     #[test]
     fn profile_filter_path_matches_gecko_uc() {
-        assert_eq!(
-            PROFILE_FILTER_REL_PATH,
-            "blocker/aurexalis-filters.txt"
-        );
+        assert_eq!(PROFILE_FILTER_REL_PATH, "blocker/aurexalis-filters.txt");
     }
 }

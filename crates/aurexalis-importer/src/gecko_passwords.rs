@@ -129,7 +129,9 @@ mod tests {
         let err = stage_passwords_for_manual_import(
             &dir,
             &[],
-            PasswordStagingOptions { user_consent: false },
+            PasswordStagingOptions {
+                user_consent: false,
+            },
         )
         .expect_err("no consent");
 

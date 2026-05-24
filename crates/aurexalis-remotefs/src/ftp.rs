@@ -60,10 +60,14 @@ impl FtpStreamKind {
         let mut local = std::fs::File::open(local_path)?;
         match self {
             Self::Plain(stream) => {
-                stream.put_file(remote_path, &mut local).map_err(ftp_error)?;
+                stream
+                    .put_file(remote_path, &mut local)
+                    .map_err(ftp_error)?;
             }
             Self::Secure(stream) => {
-                stream.put_file(remote_path, &mut local).map_err(ftp_error)?;
+                stream
+                    .put_file(remote_path, &mut local)
+                    .map_err(ftp_error)?;
             }
         }
         Ok(())
@@ -118,9 +122,7 @@ impl FtpFileSystem {
             NativeTlsFtpStream::connect_secure_implicit(&addr, tls.clone()).map_err(ftp_error)?
         } else {
             let plain = NativeTlsFtpStream::connect(&addr).map_err(ftp_error)?;
-            plain
-                .into_secure(tls, &profile.host)
-                .map_err(ftp_error)?
+            plain.into_secure(tls, &profile.host).map_err(ftp_error)?
         };
 
         let mut kind = FtpStreamKind::Secure(stream);
@@ -158,10 +160,7 @@ impl FtpFileSystem {
 impl RemoteFileSystem for FtpFileSystem {
     fn list(&self, path: &str) -> Result<Vec<RemoteEntry>, RemoteFsError> {
         let normalized = normalize_remote_path(path)?;
-        let listing = self
-            .stream
-            .borrow_mut()
-            .list(Some(normalized.as_str()))?;
+        let listing = self.stream.borrow_mut().list(Some(normalized.as_str()))?;
         let mut entries = Vec::new();
         for line in listing {
             if let Some(entry) = Self::parse_list_line(&line, &normalized) {
@@ -181,9 +180,7 @@ impl RemoteFileSystem for FtpFileSystem {
 
     fn upload(&self, local_path: &str, remote_path: &str) -> Result<(), RemoteFsError> {
         let normalized = normalize_remote_path(remote_path)?;
-        self.stream
-            .borrow_mut()
-            .put_file(&normalized, local_path)
+        self.stream.borrow_mut().put_file(&normalized, local_path)
     }
 }
 
@@ -193,11 +190,9 @@ mod tests {
 
     #[test]
     fn parses_posix_list_line() {
-        let entry = FtpFileSystem::parse_list_line(
-            "-rw-rw-r-- 1 0 1 8192 Nov 5 2018 readme.txt",
-            "/pub",
-        )
-        .expect("parse line");
+        let entry =
+            FtpFileSystem::parse_list_line("-rw-rw-r-- 1 0 1 8192 Nov 5 2018 readme.txt", "/pub")
+                .expect("parse line");
         assert_eq!(entry.name, "readme.txt");
         assert!(!entry.is_dir);
         assert_eq!(entry.path.to_string_lossy(), "/pub/readme.txt");

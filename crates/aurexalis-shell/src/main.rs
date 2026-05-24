@@ -110,10 +110,7 @@ fn run_import(mut args: impl Iterator<Item = String>) -> Result<(), String> {
         Some("apply") => {
             let mut audit = None;
             let mut profile = None;
-            let mut surfaces = vec![
-                ApplySurface::Bookmarks,
-                ApplySurface::History,
-            ];
+            let mut surfaces = vec![ApplySurface::Bookmarks, ApplySurface::History];
             let mut passwords_consent = false;
             let mut iter = args.peekable();
             while let Some(arg) = iter.next() {

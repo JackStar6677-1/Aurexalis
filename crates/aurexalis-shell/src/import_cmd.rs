@@ -108,19 +108,14 @@ pub fn apply_audit(
         &profile,
         &snapshot,
         surfaces,
-        ApplyOptions {
-            passwords_consent,
-        },
+        ApplyOptions { passwords_consent },
     )
     .map_err(|e| e.to_string())?;
 
     println!("[SUCCESS] Importacion aplicada a {}", profile.display());
     println!(
         "[INFO] bookmarks={} history={} cookies={} passwords_staged={}",
-        report.bookmarks_added,
-        report.history_added,
-        report.cookies_added,
-        report.passwords_staged
+        report.bookmarks_added, report.history_added, report.cookies_added, report.passwords_staged
     );
     if report.cookies_skipped > 0 {
         println!(

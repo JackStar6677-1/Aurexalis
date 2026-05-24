@@ -68,7 +68,9 @@ pub fn get_remote(
 pub fn print_help() {
     println!("Aurexalis remotefs");
     println!("  remotefs list --host H --user U --path /remote/dir [--protocol sftp|ftp|ftps]");
-    println!("  remotefs get  --host H --user U --remote /path --local C:/dest/file [--protocol ...]");
+    println!(
+        "  remotefs get  --host H --user U --remote /path --local C:/dest/file [--protocol ...]"
+    );
     println!("  Password: --password P o env AUREXALIS_SFTP_PASS | AUREXALIS_FTP_PASS | AUREXALIS_FTPS_PASS");
 }
 
@@ -79,10 +81,9 @@ pub fn password_from_env_or_flag(
     if let Some(value) = flag {
         return Ok(value.to_owned());
     }
-  let env_name = protocol_env_var(protocol);
-    std::env::var(env_name).map_err(|_| {
-        format!("define --password o {env_name} para {:?}", protocol)
-    })
+    let env_name = protocol_env_var(protocol);
+    std::env::var(env_name)
+        .map_err(|_| format!("define --password o {env_name} para {:?}", protocol))
 }
 
 pub fn parse_port(value: Option<&str>) -> Result<Option<u16>, String> {

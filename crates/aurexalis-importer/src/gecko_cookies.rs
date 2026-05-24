@@ -9,7 +9,10 @@ use rusqlite::{params, Connection};
 use crate::{CookieRecord, ImporterError, SecretValue};
 
 /// Escribe cookies descifradas en `cookies.sqlite`. Requiere navegador cerrado.
-pub fn write_cookies(profile_dir: &Path, cookies: &[CookieRecord]) -> Result<CookieWriteReport, ImporterError> {
+pub fn write_cookies(
+    profile_dir: &Path,
+    cookies: &[CookieRecord],
+) -> Result<CookieWriteReport, ImporterError> {
     let cookies_db = profile_dir.join("cookies.sqlite");
     if !cookies_db.is_file() {
         return Err(ImporterError::Io(std::io::Error::new(
@@ -139,7 +142,12 @@ fn map_same_site(chrome: i64) -> (i64, i64) {
     }
 }
 
-fn cookie_exists(conn: &Connection, host: &str, name: &str, path: &str) -> Result<bool, ImporterError> {
+fn cookie_exists(
+    conn: &Connection,
+    host: &str,
+    name: &str,
+    path: &str,
+) -> Result<bool, ImporterError> {
     let count: i64 = conn.query_row(
         "SELECT COUNT(*) FROM moz_cookies WHERE host = ?1 AND name = ?2 AND path = ?3",
         params![host, name, path],

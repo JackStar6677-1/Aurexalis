@@ -144,7 +144,9 @@ pub fn parse_protocol(raw: &str) -> Result<RemoteProtocol, String> {
         "sftp" => Ok(RemoteProtocol::Sftp),
         "ftp" => Ok(RemoteProtocol::Ftp),
         "ftps" => Ok(RemoteProtocol::Ftps),
-        other => Err(format!("protocolo invalido: {other} (usa sftp, ftp o ftps)")),
+        other => Err(format!(
+            "protocolo invalido: {other} (usa sftp, ftp o ftps)"
+        )),
     }
 }
 

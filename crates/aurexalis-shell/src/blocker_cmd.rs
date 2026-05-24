@@ -51,8 +51,11 @@ fn default_lists_path() -> PathBuf {
     std::env::current_exe()
         .ok()
         .and_then(|exe| {
-            exe.parent()
-                .map(|p| p.join("profiles").join("default").join(PROFILE_FILTER_REL_PATH))
+            exe.parent().map(|p| {
+                p.join("profiles")
+                    .join("default")
+                    .join(PROFILE_FILTER_REL_PATH)
+            })
         })
         .unwrap_or_else(|| PathBuf::from(PROFILE_FILTER_REL_PATH))
 }
