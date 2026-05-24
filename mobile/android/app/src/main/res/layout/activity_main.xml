@@ -83,7 +83,7 @@
         android:background="@drawable/url_bar_bg"
         android:hint="@string/url_hint"
         android:imeOptions="actionGo"
-        android:inputType="textUri"
+        android:inputType="text|textNoSuggestions"
         android:padding="12dp"
         android:singleLine="true"
         android:textColor="@color/ax_text"

@@ -20,8 +20,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var session: GeckoSession
 
-    private val homeUrl = "file:///android_asset/aurexalis/home/index.html"
-    private val settingsUrl = "file:///android_asset/aurexalis/settings/index.html"
+    // GeckoView no carga file:///android_asset/ (solo WebView); usar resource://.
+    private val assetBase = "resource://android/assets/aurexalis/"
+    private val homeUrl = "${assetBase}home/index.html"
+    private val settingsUrl = "${assetBase}settings/index.html"
 
     private var canGoBack = false
 
@@ -56,18 +58,27 @@ class MainActivity : AppCompatActivity() {
                     handlePrefUri(Uri.parse(target))
                     return GeckoResult.deny()
                 }
-                if (target.startsWith("file:///android_asset/aurexalis/")) {
+                if (isEmbeddedAssetUrl(target)) {
                     return GeckoResult.allow()
                 }
-                if (target.startsWith("http://") || target.startsWith("https://")) {
+                if (
+                    target.startsWith("http://", ignoreCase = true) ||
+                    target.startsWith("https://", ignoreCase = true) ||
+                    target.startsWith("about:")
+                ) {
                     return GeckoResult.allow()
                 }
-                return try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
-                    GeckoResult.deny()
-                } catch (_: Exception) {
-                    GeckoResult.deny()
+                if (target.startsWith("mailto:", ignoreCase = true) ||
+                    target.startsWith("tel:", ignoreCase = true)
+                ) {
+                    return try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
+                        GeckoResult.deny()
+                    } catch (_: Exception) {
+                        GeckoResult.deny()
+                    }
                 }
+                return GeckoResult.deny()
             }
         }
 
@@ -217,9 +228,30 @@ class MainActivity : AppCompatActivity() {
         loadUrl(normalizeInput(raw))
     }
 
+    private fun isEmbeddedAssetUrl(url: String): Boolean {
+        return url.startsWith(assetBase) ||
+            url.startsWith("file:///android_asset/aurexalis/")
+    }
+
+    /** Convierte URIs legacy file:///android_asset/ a resource:// para GeckoView. */
+    private fun resolveLoadUrl(url: String): String {
+        if (url.startsWith("file:///android_asset/")) {
+            return url.replaceFirst(
+                "file:///android_asset/",
+                "resource://android/assets/",
+            )
+        }
+        return url
+    }
+
     private fun normalizeInput(value: String): String {
-        if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("file://")) {
-            return value
+        if (
+            value.startsWith("http://", ignoreCase = true) ||
+            value.startsWith("https://", ignoreCase = true) ||
+            value.startsWith("resource://") ||
+            value.startsWith("file://")
+        ) {
+            return resolveLoadUrl(value)
         }
         return if (value.contains(".") && !value.contains(" ")) {
             "https://$value"
@@ -229,8 +261,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadUrl(url: String) {
-        session.loadUri(url)
-        binding.urlInput.setText(url)
-        binding.urlInput.setSelection(url.length)
+        val resolved = resolveLoadUrl(url)
+        session.loadUri(resolved)
+        binding.urlInput.setText(resolved)
+        binding.urlInput.setSelection(resolved.length)
     }
 }
