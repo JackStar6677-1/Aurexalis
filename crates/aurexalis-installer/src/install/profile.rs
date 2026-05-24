@@ -108,7 +108,11 @@ fn file_uri(path: &Path) -> Result<String, String> {
 fn path_pref_value(path: &Path) -> Result<String, String> {
     let abs =
         fs::canonicalize(path).map_err(|e| format!("canonicalizar {}: {e}", path.display()))?;
-    Ok(abs.to_string_lossy().replace('\\', "\\\\"))
+    let mut normalized = abs.to_string_lossy().replace('\\', "/");
+    if let Some(stripped) = normalized.strip_prefix("//?/") {
+        normalized = stripped.to_string();
+    }
+    Ok(normalized.replace('/', "\\\\"))
 }
 
 fn path_to_file_uri(path: &Path) -> String {
@@ -226,6 +230,7 @@ mod tests {
         fs::write(&exe, b"").unwrap();
 
         let value = path_pref_value(&exe).expect("path");
+        assert!(value.contains('\\'));
         assert!(!value.contains('/'));
         assert!(!value.contains("\\\\\\"));
 
