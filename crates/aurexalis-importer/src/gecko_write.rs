@@ -90,7 +90,7 @@ fn write_bookmarks(conn: &Connection, bookmarks: &[BookmarkEntry]) -> Result<usi
         conn.execute(
             "INSERT INTO moz_bookmarks (type, fk, parent, position, title, dateAdded, lastModified, guid)
              VALUES (1, ?1, ?2, ?3, ?4, ?5, ?5, lower(hex(randomblob(8)) || hex(randomblob(4))))",
-            params![1_i32, place_id, parent, pos, bookmark.name, now],
+            params![place_id, parent, pos, bookmark.name, now],
         )?;
         added += 1;
     }
