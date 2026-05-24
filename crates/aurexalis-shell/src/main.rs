@@ -123,9 +123,15 @@ fn run_import(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     "--bookmarks-only" => {
                         surfaces = vec![ApplySurface::Bookmarks];
                     }
-                    "--history-only" => surfaces = vec![ApplySurface::History];
-                    "--cookies-only" => surfaces = vec![ApplySurface::Cookies],
-                    "--passwords-only" => surfaces = vec![ApplySurface::Passwords],
+                    "--history-only" => {
+                        surfaces = vec![ApplySurface::History];
+                    }
+                    "--cookies-only" => {
+                        surfaces = vec![ApplySurface::Cookies];
+                    }
+                    "--passwords-only" => {
+                        surfaces = vec![ApplySurface::Passwords];
+                    }
                     "--passwords-consent" => passwords_consent = true,
                     "--with-cookies" => {
                         if !surfaces.contains(&ApplySurface::Cookies) {

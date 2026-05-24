@@ -51,12 +51,7 @@ pub fn apply_snapshot_to_profile(
     snapshot: &ProfileSnapshot,
     surfaces: &[ApplySurface],
 ) -> Result<ApplyReport, ImporterError> {
-    apply_snapshot_to_profile_with_options(
-        profile_dir,
-        snapshot,
-        surfaces,
-        ApplyOptions::default(),
-    )
+    apply_snapshot_to_profile_with_options(profile_dir, snapshot, surfaces, ApplyOptions::default())
 }
 
 /// Variante con opciones (p. ej. consentimiento para contrasenas).
