@@ -21,7 +21,7 @@ pub fn decrypt_linux_encrypted_key(encrypted_key: &[u8]) -> Result<Vec<u8>, Impo
         ));
     }
 
-    let passwords = linux_keyring_passwords();
+    let mut passwords = linux_keyring_passwords();
     passwords.push("peanuts".to_owned());
 
     let mut last_err = ImporterError::UnsupportedDecryption(
