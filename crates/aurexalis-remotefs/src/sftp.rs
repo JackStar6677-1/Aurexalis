@@ -11,6 +11,13 @@ use crate::{
     RemoteProtocol,
 };
 
+fn ssh2_error(error: ssh2::Error) -> RemoteFsError {
+    RemoteFsError::Io(std::io::Error::new(
+        std::io::ErrorKind::Other,
+        error.to_string(),
+    ))
+}
+
 /// Cliente SFTP conectado a un servidor remoto.
 pub struct SftpFileSystem {
     session: Session,
@@ -38,11 +45,11 @@ impl SftpFileSystem {
             ))
         })?;
         session.set_tcp_stream(tcp);
-        session.handshake().map_err(RemoteFsError::Io)?;
+        session.handshake().map_err(ssh2_error)?;
         let user = profile.username.as_deref().unwrap_or("root");
         session
             .userauth_password(user, password)
-            .map_err(RemoteFsError::Io)?;
+            .map_err(ssh2_error)?;
         if !session.authenticated() {
             return Err(RemoteFsError::Io(std::io::Error::new(
                 std::io::ErrorKind::PermissionDenied,
@@ -53,7 +60,7 @@ impl SftpFileSystem {
     }
 
     fn sftp(&self) -> Result<Sftp, RemoteFsError> {
-        self.session.sftp().map_err(RemoteFsError::Io)
+        self.session.sftp().map_err(ssh2_error)
     }
 }
 
@@ -63,7 +70,7 @@ impl RemoteFileSystem for SftpFileSystem {
         let sftp = self.sftp()?;
         let dir = sftp
             .readdir(Path::new(&normalized))
-            .map_err(RemoteFsError::Io)?;
+            .map_err(ssh2_error)?;
         let mut entries = Vec::new();
         for (path_buf, stat) in dir {
             let name = path_buf
@@ -79,7 +86,7 @@ impl RemoteFileSystem for SftpFileSystem {
                 name,
                 path: path_buf,
                 is_dir,
-                size: if is_dir { None } else { Some(stat.size as u64) },
+                size: if is_dir { None } else { stat.size },
             });
         }
         entries.sort_by(|a, b| a.name.cmp(&b.name));
@@ -91,7 +98,7 @@ impl RemoteFileSystem for SftpFileSystem {
         let sftp = self.sftp()?;
         let mut remote = sftp
             .open(Path::new(&normalized))
-            .map_err(RemoteFsError::Io)?;
+            .map_err(ssh2_error)?;
         if let Some(parent) = Path::new(local_path).parent() {
             std::fs::create_dir_all(parent)?;
         }
@@ -115,7 +122,7 @@ impl RemoteFileSystem for SftpFileSystem {
         let mut local = std::fs::File::open(local_path)?;
         let mut remote = sftp
             .create(Path::new(&normalized))
-            .map_err(RemoteFsError::Io)?;
+            .map_err(ssh2_error)?;
         let mut buffer = [0_u8; 8192];
         loop {
             let read = local.read(&mut buffer).map_err(RemoteFsError::Io)?;
