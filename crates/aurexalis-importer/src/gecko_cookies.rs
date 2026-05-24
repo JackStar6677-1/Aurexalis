@@ -113,12 +113,11 @@ fn cookie_plain_value(cookie: &CookieRecord) -> Option<String> {
 }
 
 fn normalize_host(host_key: &str) -> String {
-    if host_key.is_empty() {
-        return host_key.to_owned();
-    }
-    if host_key.starts_with('.') {
-        host_key.to_owned()
-    } else if host_key.starts_with("http://") || host_key.starts_with("https://") {
+    if host_key.is_empty()
+        || host_key.starts_with('.')
+        || host_key.starts_with("http://")
+        || host_key.starts_with("https://")
+    {
         host_key.to_owned()
     } else {
         format!(".{host_key}")

@@ -138,6 +138,12 @@ pub fn apply_audit(
             staging.display()
         );
     }
+    if let Some(csv) = report.password_csv_path {
+        println!("[INFO] CSV de contrasenas: {}", csv.display());
+    }
+    if let Some(manifest) = report.password_manifest_path {
+        println!("[INFO] manifest de contrasenas: {}", manifest.display());
+    }
     Ok(())
 }
 

@@ -37,6 +37,8 @@ pub struct ApplyReport {
     pub passwords_skipped: usize,
     pub backup_dir: Option<PathBuf>,
     pub password_staging_dir: Option<PathBuf>,
+    pub password_csv_path: Option<PathBuf>,
+    pub password_manifest_path: Option<PathBuf>,
 }
 
 /// Carga un snapshot JSON exportado con `export_audit_snapshot`.
@@ -108,6 +110,8 @@ pub fn apply_snapshot_to_profile_with_options(
         report.passwords_staged = password_report.logins_staged;
         report.passwords_skipped = password_report.logins_skipped;
         report.password_staging_dir = password_report.staging_dir;
+        report.password_csv_path = password_report.csv_path;
+        report.password_manifest_path = password_report.manifest_path;
     }
 
     Ok(report)
