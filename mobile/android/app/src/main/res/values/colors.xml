@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ax_bg">#08050F</color>
+    <color name="ax_surface">#120A1E</color>
+    <color name="ax_purple">#6F38FF</color>
+    <color name="ax_red">#FF1F55</color>
+    <color name="ax_gold">#FFD166</color>
+    <color name="ax_text">#F7F2FF</color>
+    <color name="ax_muted">#B8A9CC</color>
+</resources>

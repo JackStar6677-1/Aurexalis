@@ -206,3 +206,54 @@ toolbarbutton:active {
   border: 0 !important;
   font-weight: 800 !important;
 }
+
+.ax-panel-actions {
+  gap: 8px !important;
+}
+
+.ax-panel-action-secondary {
+  color: var(--ax-text) !important;
+  background: rgba(255, 31, 85, 0.18) !important;
+  border: 1px solid rgba(255, 31, 85, 0.45) !important;
+}
+
+.ax-settings-host {
+  gap: 8px !important;
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  padding-right: 4px !important;
+  scrollbar-color: rgba(255, 31, 85, 0.45) transparent !important;
+}
+
+.ax-settings-host checkbox,
+.ax-settings-host label {
+  color: var(--ax-text) !important;
+}
+
+.ax-settings-host scale {
+  min-width: 120px !important;
+}
+
+.ax-settings-row {
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 4px 0 !important;
+}
+
+.ax-settings-sep {
+  margin: 10px 0 !important;
+  border-top: 1px solid rgba(255, 31, 85, 0.2) !important;
+}
+
+:root.ax-animations-off *,
+:root.ax-animations-off *::before,
+:root.ax-animations-off *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+#floorp-start,
+.floorp-start,
+[data-l10n-id*="floorp"] {
+  display: none !important;
+}

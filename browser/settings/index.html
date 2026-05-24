@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ajustes — Aurexalis</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <div class="ax-bg" aria-hidden="true"></div>
+    <main class="wrap">
+      <header class="head">
+        <a class="back" href="../home/index.html">← Inicio</a>
+        <h1>Ajustes Aurexalis</h1>
+        <p class="lead">
+          Personaliza sonidos, bloqueador, animaciones e importacion. Los cambios se guardan en las
+          preferencias del navegador y se sincronizan con el panel <strong>ST</strong> del sidebar.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Bloqueador de anuncios</h2>
+        <p class="hint">
+          Proteccion contra rastreadores y anuncios (Gecko ETP en PC, ContentBlocking en Android).
+        </p>
+        <div class="field-row">
+          <label class="switch">
+            <input type="checkbox" id="pref-blocker-enabled" />
+            <span>Bloqueador activo</span>
+          </label>
+        </div>
+        <div class="field-row">
+          <label for="pref-blocker-level">Nivel</label>
+          <select id="pref-blocker-level" class="select">
+            <option value="standard">Estándar</option>
+            <option value="strict">Estricto</option>
+            <option value="off">Apagado</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label class="switch">
+            <input type="checkbox" id="pref-blocker-cosmetic" />
+            <span>Filtros cosmeticos (ocultar placeholders)</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Sonido y ambiente</h2>
+        <div class="field-row">
+          <label class="switch">
+            <input type="checkbox" id="pref-sounds-enabled" />
+            <span>Sonidos activos</span>
+          </label>
+        </div>
+        <div class="field-row range-row">
+          <label for="pref-sounds-master">Volumen general</label>
+          <input type="range" id="pref-sounds-master" min="0" max="100" />
+          <span class="range-val" id="val-sounds-master">22%</span>
+        </div>
+        <div class="grid-2">
+          <label class="switch"><input type="checkbox" id="pref-sounds-click" /><span>Clicks</span></label>
+          <div class="range-row compact">
+            <input type="range" id="pref-vol-click" min="0" max="100" />
+            <span id="val-vol-click">85%</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="pref-sounds-hover" /><span>Hover</span></label>
+          <div class="range-row compact">
+            <input type="range" id="pref-vol-hover" min="0" max="100" />
+            <span id="val-vol-hover">55%</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="pref-sounds-key" /><span>Teclado</span></label>
+          <div class="range-row compact">
+            <input type="range" id="pref-vol-key" min="0" max="100" />
+            <span id="val-vol-key">40%</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="pref-sounds-ambient" /><span>Ambiente</span></label>
+          <div class="range-row compact">
+            <input type="range" id="pref-vol-ambient" min="0" max="100" />
+            <span id="val-vol-ambient">12%</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="pref-sounds-panel" /><span>Panel lateral</span></label>
+          <div class="range-row compact">
+            <input type="range" id="pref-vol-panel" min="0" max="100" />
+            <span id="val-vol-panel">70%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Interfaz</h2>
+        <div class="field-row">
+          <label class="switch">
+            <input type="checkbox" id="pref-ui-animations" />
+            <span>Animaciones UI</span>
+          </label>
+        </div>
+        <p class="hint">
+          Tema morado / rojo / dorado en <code>userChrome.css</code>. Coloca OGG propios en
+          <code>chrome/sounds/</code> en escritorio.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Importacion de navegadores</h2>
+        <p class="hint">Exportacion local desde Chrome, Brave u Opera (escritorio).</p>
+        <div class="actions">
+          <button type="button" id="btn-import-data" class="btn primary">
+            Exportar marcadores e historial
+          </button>
+          <button type="button" id="btn-import-passwords" class="btn danger">
+            Exportar con contrasenas
+          </button>
+        </div>
+        <pre id="import-log" class="log" hidden></pre>
+      </section>
+    </main>
+    <script src="settings.js" defer></script>
+  </body>
+</html>

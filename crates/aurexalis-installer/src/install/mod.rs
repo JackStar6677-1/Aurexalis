@@ -19,6 +19,7 @@ const FLOORP_INSTALLER: &str = "floorp-installer.exe";
 pub struct InstallConfig {
     pub version: String,
     pub install_root: String,
+    pub launcher: String,
     pub browser: String,
     pub profile: String,
     pub chromium_audit: Option<String>,
@@ -30,6 +31,7 @@ pub fn run_full_install(
     version: &str,
     download_floorp: bool,
     import_chromium: bool,
+    import_passwords: bool,
     progress: &dyn Fn(f32, &str),
 ) -> Result<InstallConfig, String> {
     let client = reqwest::blocking::Client::builder()
@@ -61,14 +63,14 @@ pub fn run_full_install(
 
     let engine_dir = install_root.join("Engine");
     let browser = if download_floorp {
-        progress(0.48, "Descargando motor Floorp...");
+        progress(0.48, "Descargando nucleo Gecko...");
         let floorp_url = github::floorp_installer_url(&client)?;
         let floorp_path = temp.join(FLOORP_INSTALLER);
         github::download_file(&client, &floorp_url, &floorp_path, &|ratio, msg| {
             progress(0.48 + ratio * 0.28, msg)
         })?;
 
-        progress(0.78, "Instalando motor Gecko (Floorp)...");
+        progress(0.78, "Instalando nucleo Gecko (Aurexalis)...");
         floorp::run_floorp_installer(&floorp_path, &engine_dir)?;
         let _ = fs::remove_file(&floorp_path);
 
@@ -85,14 +87,16 @@ pub fn run_full_install(
     if import_chromium {
         progress(0.88, "Exportando snapshot Chromium local...");
         chromium_audit = Some(
-            chromium::export_staging_snapshot(&profile_dir)
+            chromium::export_staging_snapshot(&profile_dir, import_passwords)
                 .unwrap_or_else(|error| format!("AVISO: {error}")),
         );
     }
 
+    let launcher = install_root.join("aurexalis.exe");
     let config = InstallConfig {
         version: version.to_string(),
         install_root: install_root.to_string_lossy().into_owned(),
+        launcher: launcher.to_string_lossy().into_owned(),
         browser: browser.to_string_lossy().into_owned(),
         profile: profile_dir.to_string_lossy().into_owned(),
         chromium_audit,
@@ -124,6 +128,7 @@ pub fn run_full_install(
     )?;
 
     let _ = fs::remove_dir_all(&temp);
+    profile::refresh_runtime_prefs(install_root, &profile_dir)?;
     progress(1.0, "Instalacion completa");
     Ok(config)
 }

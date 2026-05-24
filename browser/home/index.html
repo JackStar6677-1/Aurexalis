@@ -10,9 +10,19 @@
   <body>
     <div class="ax-background" aria-hidden="true"></div>
 
-    <header class="clock" aria-live="polite">
-      <time id="ax-time">00:00</time>
-      <span id="ax-date">---</span>
+    <header class="top-bar">
+      <a class="settings-link" href="../settings/index.html" title="Ajustes Aurexalis" aria-label="Ajustes">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.04 7.04 0 0 0-1.63-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.49.49 0 0 0-.49.42l-.36 2.54c-.59.24-1.13.57-1.63.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.04.71 1.63.94l.36 2.54c.05.24.24.41.49.41h4c.25 0 .44-.17.49-.42l.36-2.54c.59-.24 1.13-.56 1.63-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"
+          />
+        </svg>
+      </a>
+      <div class="clock" aria-live="polite">
+        <time id="ax-time">00:00</time>
+        <span id="ax-date">---</span>
+      </div>
     </header>
 
     <main class="stage">

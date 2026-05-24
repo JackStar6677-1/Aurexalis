@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Aurexalis" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ax_purple</item>
+        <item name="colorPrimaryVariant">@color/ax_surface</item>
+        <item name="colorSecondary">@color/ax_red</item>
+        <item name="android:statusBarColor">@color/ax_bg</item>
+        <item name="android:navigationBarColor">@color/ax_bg</item>
+        <item name="android:windowBackground">@color/ax_bg</item>
+    </style>
+</resources>

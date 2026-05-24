@@ -49,6 +49,10 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      - name: Verify browser pack integration
+        shell: pwsh
+        run: ./tools/verify-browser-pack.ps1 -RepoRoot .
+
       - name: Check workspace (sin instalador GUI)
         run: cargo check --workspace --exclude aurexalis-installer --all-features
 
@@ -73,6 +77,10 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
+
+      - name: Verify browser pack integration
+        shell: pwsh
+        run: ./tools/verify-browser-pack.ps1 -RepoRoot .
 
       - name: Check workspace
         run: cargo check --workspace --all-features

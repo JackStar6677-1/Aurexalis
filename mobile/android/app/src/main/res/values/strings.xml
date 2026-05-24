@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aurexalis</string>
+    <string name="url_hint">Buscar o escribir URL</string>
+    <string name="hint_empty_url">Escribe una URL o busqueda</string>
+    <string name="action_back">Atras</string>
+    <string name="action_forward">Adelante</string>
+    <string name="action_reload">Recargar</string>
+    <string name="action_home">Inicio Aurexalis</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_go">Ir</string>
+    <string name="mobile_tagline">Navegador Aurexalis · Android · GeckoView</string>
+    <string name="blocker_updated">Bloqueador actualizado</string>
+</resources>

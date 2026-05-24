@@ -43,3 +43,11 @@ History
 Local State
 key4.db
 logins.json
+
+# Android / Gradle
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/local.properties
+mobile/android/keystore/
+mobile/android/app/src/main/assets/

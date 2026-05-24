@@ -34,6 +34,7 @@ struct InstallerApp {
     install_path: String,
     download_floorp: bool,
     import_chromium: bool,
+    import_passwords: bool,
     license_accepted: bool,
     free_disk_mb: Option<u64>,
     progress: f32,
@@ -58,6 +59,7 @@ impl Default for InstallerApp {
             install_path,
             download_floorp: true,
             import_chromium: true,
+            import_passwords: false,
             license_accepted: false,
             free_disk_mb,
             progress: 0.0,
@@ -189,8 +191,8 @@ impl InstallerApp {
                     );
                 }
                 ui.add_space(6.0);
-                ui.checkbox(&mut self.download_floorp, t.download_floorp);
-                ui.label(RichText::new(t.floorp_hint).small().color(theme::MUTED));
+                ui.checkbox(&mut self.download_floorp, t.download_engine);
+                ui.label(RichText::new(t.engine_hint).small().color(theme::MUTED));
                 ui.add_space(6.0);
                 ui.checkbox(&mut self.import_chromium, t.import_chromium);
                 ui.label(
@@ -198,6 +200,14 @@ impl InstallerApp {
                         .small()
                         .color(theme::MUTED),
                 );
+                if self.import_chromium {
+                    ui.checkbox(&mut self.import_passwords, t.import_passwords);
+                    ui.label(
+                        RichText::new(t.import_passwords_hint)
+                            .small()
+                            .color(theme::MUTED),
+                    );
+                }
             });
 
         ui.add_space(14.0);
@@ -396,6 +406,7 @@ impl InstallerApp {
 
         let download_floorp = self.download_floorp;
         let import_chromium = self.import_chromium;
+        let import_passwords = self.import_passwords;
         let version = APP_VERSION.to_string();
 
         thread::spawn(move || {
@@ -408,6 +419,7 @@ impl InstallerApp {
                 &version,
                 download_floorp,
                 import_chromium,
+                import_passwords,
                 &progress,
             ) {
                 Ok(config) => {

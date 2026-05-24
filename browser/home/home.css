@@ -41,10 +41,6 @@ body {
 }
 
 .clock {
-  position: fixed;
-  top: 28px;
-  right: 36px;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -55,6 +51,83 @@ body {
   border: 1px solid var(--ax-glass-border);
   backdrop-filter: blur(16px);
   box-shadow: var(--ax-shadow);
+}
+
+.top-bar {
+  position: fixed;
+  top: 28px;
+  right: 36px;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.settings-link {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  color: var(--ax-gold);
+  background: var(--ax-glass);
+  border: 1px solid var(--ax-glass-border);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--ax-shadow);
+  transition: transform 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.settings-link:hover {
+  color: var(--ax-red);
+  border-color: rgba(255, 209, 102, 0.45);
+  transform: translateY(-1px);
+}
+
+.hero {
+  animation: ax-float 6s ease-in-out infinite;
+}
+
+.logo {
+  animation: ax-glow 4s ease-in-out infinite;
+}
+
+@keyframes ax-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes ax-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 209, 102, 0.35),
+      0 12px 40px rgba(255, 31, 85, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 209, 102, 0.55),
+      0 16px 48px rgba(111, 56, 255, 0.45);
+  }
+}
+
+body.ax-animations-off .hero,
+body.ax-animations-off .logo,
+body.ax-animations-off .settings-link {
+  animation: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .logo,
+  .settings-link {
+    animation: none;
+  }
 }
 
 #ax-time {
@@ -331,7 +404,7 @@ body {
 }
 
 @media (max-width: 640px) {
-  .clock {
+  .top-bar {
     top: 16px;
     right: 16px;
   }
