@@ -18,7 +18,10 @@ pub struct SftpFileSystem {
 
 impl SftpFileSystem {
     /// Abre sesion SFTP con usuario y contrasena.
-    pub fn connect(profile: &RemoteConnectionProfile, password: &str) -> Result<Self, RemoteFsError> {
+    pub fn connect(
+        profile: &RemoteConnectionProfile,
+        password: &str,
+    ) -> Result<Self, RemoteFsError> {
         if profile.protocol != RemoteProtocol::Sftp {
             return Err(RemoteFsError::UnsupportedProtocol(format!(
                 "{:?}",
@@ -58,7 +61,9 @@ impl RemoteFileSystem for SftpFileSystem {
     fn list(&self, path: &str) -> Result<Vec<RemoteEntry>, RemoteFsError> {
         let normalized = normalize_remote_path(path)?;
         let sftp = self.sftp()?;
-        let dir = sftp.readdir(Path::new(&normalized)).map_err(RemoteFsError::Io)?;
+        let dir = sftp
+            .readdir(Path::new(&normalized))
+            .map_err(RemoteFsError::Io)?;
         let mut entries = Vec::new();
         for (path_buf, stat) in dir {
             let name = path_buf
@@ -84,7 +89,9 @@ impl RemoteFileSystem for SftpFileSystem {
     fn download(&self, remote_path: &str, local_path: &str) -> Result<(), RemoteFsError> {
         let normalized = normalize_remote_path(remote_path)?;
         let sftp = self.sftp()?;
-        let mut remote = sftp.open(Path::new(&normalized)).map_err(RemoteFsError::Io)?;
+        let mut remote = sftp
+            .open(Path::new(&normalized))
+            .map_err(RemoteFsError::Io)?;
         if let Some(parent) = Path::new(local_path).parent() {
             std::fs::create_dir_all(parent)?;
         }
@@ -95,7 +102,9 @@ impl RemoteFileSystem for SftpFileSystem {
             if read == 0 {
                 break;
             }
-            local.write_all(&buffer[..read]).map_err(RemoteFsError::Io)?;
+            local
+                .write_all(&buffer[..read])
+                .map_err(RemoteFsError::Io)?;
         }
         Ok(())
     }
@@ -113,7 +122,9 @@ impl RemoteFileSystem for SftpFileSystem {
             if read == 0 {
                 break;
             }
-            remote.write_all(&buffer[..read]).map_err(RemoteFsError::Io)?;
+            remote
+                .write_all(&buffer[..read])
+                .map_err(RemoteFsError::Io)?;
         }
         Ok(())
     }

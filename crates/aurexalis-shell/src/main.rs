@@ -144,9 +144,7 @@ fn run_blocker(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                 match arg.as_str() {
                     "--source" => source = iter.next().as_deref(),
                     "--type" => {
-                        let value = iter
-                            .next()
-                            .ok_or("falta valor para --type")?;
+                        let value = iter.next().ok_or("falta valor para --type")?;
                         kind = blocker_cmd::parse_resource_kind(&value)?;
                     }
                     other => return Err(format!("flag blocker check desconocido: {other}")),
@@ -214,7 +212,9 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     "--remote" => {
                         remote = Some(remotefs_cmd::require(iter.next().as_deref(), "remote")?)
                     }
-                    "--local" => local = Some(remotefs_cmd::require(iter.next().as_deref(), "local")?),
+                    "--local" => {
+                        local = Some(remotefs_cmd::require(iter.next().as_deref(), "local")?)
+                    }
                     other => return Err(format!("flag remotefs get desconocido: {other}")),
                 }
             }

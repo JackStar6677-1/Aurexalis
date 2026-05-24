@@ -13,13 +13,9 @@ pub fn list_remote(
     password: &str,
     remote_path: &str,
 ) -> Result<(), String> {
-    let profile = RemoteConnectionProfile::new(
-        "cli",
-        host,
-        RemoteProtocol::Sftp,
-        Some(username.to_owned()),
-    )
-    .with_port(port.unwrap_or_else(|| default_port(RemoteProtocol::Sftp)));
+    let profile =
+        RemoteConnectionProfile::new("cli", host, RemoteProtocol::Sftp, Some(username.to_owned()))
+            .with_port(port.unwrap_or_else(|| default_port(RemoteProtocol::Sftp)));
     let fs = SftpFileSystem::connect(&profile, password).map_err(|e| e.to_string())?;
     for entry in fs.list(remote_path).map_err(|e| e.to_string())? {
         let kind = if entry.is_dir { "DIR" } else { "FILE" };
@@ -41,13 +37,9 @@ pub fn get_remote(
     remote_path: &str,
     local_path: &str,
 ) -> Result<(), String> {
-    let profile = RemoteConnectionProfile::new(
-        "cli",
-        host,
-        RemoteProtocol::Sftp,
-        Some(username.to_owned()),
-    )
-    .with_port(port.unwrap_or_else(|| default_port(RemoteProtocol::Sftp)));
+    let profile =
+        RemoteConnectionProfile::new("cli", host, RemoteProtocol::Sftp, Some(username.to_owned()))
+            .with_port(port.unwrap_or_else(|| default_port(RemoteProtocol::Sftp)));
     let fs = SftpFileSystem::connect(&profile, password).map_err(|e| e.to_string())?;
     fs.download(remote_path, local_path)
         .map_err(|e| e.to_string())?;

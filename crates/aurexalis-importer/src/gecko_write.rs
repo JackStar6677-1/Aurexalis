@@ -138,11 +138,9 @@ fn upsert_place(
     visit_count: i64,
     last_visit: Option<i64>,
 ) -> Result<i64, ImporterError> {
-    if let Ok(id) = conn.query_row(
-        "SELECT id FROM moz_places WHERE url = ?1",
-        [url],
-        |row| row.get(0),
-    ) {
+    if let Ok(id) = conn.query_row("SELECT id FROM moz_places WHERE url = ?1", [url], |row| {
+        row.get(0)
+    }) {
         conn.execute(
             "UPDATE moz_places SET title = ?2, visit_count = MAX(visit_count, ?3),
              last_visit_date = COALESCE(?4, last_visit_date) WHERE id = ?1",

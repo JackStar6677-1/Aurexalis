@@ -96,7 +96,8 @@ pub fn apply_audit(
     }
 
     let snapshot = load_audit_snapshot(&audit).map_err(|e| e.to_string())?;
-    let report = apply_snapshot_to_profile(&profile, &snapshot, surfaces).map_err(|e| e.to_string())?;
+    let report =
+        apply_snapshot_to_profile(&profile, &snapshot, surfaces).map_err(|e| e.to_string())?;
 
     println!("[SUCCESS] Importacion aplicada a {}", profile.display());
     println!(
