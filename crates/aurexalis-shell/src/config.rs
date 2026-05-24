@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 pub struct InstallConfig {
     pub browser: PathBuf,
     pub profile: PathBuf,
+    #[allow(dead_code)]
     pub launcher: Option<PathBuf>,
 }
 

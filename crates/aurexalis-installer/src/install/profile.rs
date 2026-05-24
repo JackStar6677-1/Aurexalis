@@ -48,7 +48,9 @@ fn write_aurexalis_prefs(install_root: &Path, profile_dir: &Path) -> Result<(), 
             contents.push_str("\n// Aurexalis custom home (generated at install)\n");
             contents.push_str("user_pref(\"browser.newtabpage.enabled\", false);\n");
             contents.push_str(&format!("user_pref(\"browser.newtab.url\", \"{uri}\");\n"));
-            contents.push_str(&format!("user_pref(\"browser.startup.homepage\", \"{uri}\");\n"));
+            contents.push_str(&format!(
+                "user_pref(\"browser.startup.homepage\", \"{uri}\");\n"
+            ));
             contents.push_str("user_pref(\"browser.startup.page\", 1);\n");
             contents.push_str("user_pref(\"browser.startup.firstrunSkipsHomepage\", false);\n");
             contents.push_str("user_pref(\"browser.aboutHomeSnippets.updateUrl\", \"\");\n");
@@ -64,7 +66,9 @@ fn write_aurexalis_prefs(install_root: &Path, profile_dir: &Path) -> Result<(), 
         let launcher = install_root.join("aurexalis.exe");
         if launcher.is_file() {
             let launcher_uri = path_pref_value(&launcher)?;
-            contents.push_str(&format!("user_pref(\"aurexalis.shell.path\", \"{launcher_uri}\");\n"));
+            contents.push_str(&format!(
+                "user_pref(\"aurexalis.shell.path\", \"{launcher_uri}\");\n"
+            ));
         }
 
         if let Ok(settings_uri) = file_uri(&profile_dir.join("settings").join("index.html")) {
@@ -95,13 +99,15 @@ fn file_uri(path: &Path) -> Result<String, String> {
     if !path.is_file() {
         return Err(format!("archivo inexistente: {}", path.display()));
     }
-    let abs = fs::canonicalize(path).map_err(|e| format!("canonicalizar {}: {e}", path.display()))?;
+    let abs =
+        fs::canonicalize(path).map_err(|e| format!("canonicalizar {}: {e}", path.display()))?;
     Ok(path_to_file_uri(&abs))
 }
 
 /// Escapa una ruta Windows para user_pref (barras y comillas).
 fn path_pref_value(path: &Path) -> Result<String, String> {
-    let abs = fs::canonicalize(path).map_err(|e| format!("canonicalizar {}: {e}", path.display()))?;
+    let abs =
+        fs::canonicalize(path).map_err(|e| format!("canonicalizar {}: {e}", path.display()))?;
     Ok(abs.to_string_lossy().replace('\\', "\\\\"))
 }
 
@@ -130,7 +136,9 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{apply_browser_pack, file_uri, path_pref_value, path_to_file_uri, refresh_runtime_prefs};
+    use super::{
+        apply_browser_pack, file_uri, path_pref_value, path_to_file_uri, refresh_runtime_prefs,
+    };
     use std::fs;
     use std::path::Path;
 
@@ -164,7 +172,10 @@ mod tests {
 
         apply_browser_pack(&root, &profile).expect("apply pack");
 
-        assert!(profile.join("chrome").join("aurexalis-00-core.uc.js").is_file());
+        assert!(profile
+            .join("chrome")
+            .join("aurexalis-00-core.uc.js")
+            .is_file());
         assert!(profile.join("home").join("index.html").is_file());
         assert!(profile.join("settings").join("index.html").is_file());
 
