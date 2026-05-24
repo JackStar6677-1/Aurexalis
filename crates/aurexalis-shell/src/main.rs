@@ -137,12 +137,12 @@ fn run_blocker(mut args: impl Iterator<Item = String>) -> Result<(), String> {
             let url = args
                 .next()
                 .ok_or("uso: blocker check <url> [--source URL] [--type script]")?;
-            let mut source = None;
+            let mut source_url = None;
             let mut kind = aurexalis_core::ResourceKind::Script;
             let mut iter = args;
             while let Some(arg) = iter.next() {
                 match arg.as_str() {
-                    "--source" => source = iter.next().as_deref(),
+                    "--source" => source_url = iter.next(),
                     "--type" => {
                         let value = iter.next().ok_or("falta valor para --type")?;
                         kind = blocker_cmd::parse_resource_kind(&value)?;
@@ -150,7 +150,7 @@ fn run_blocker(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     other => return Err(format!("flag blocker check desconocido: {other}")),
                 }
             }
-            blocker_cmd::check_url(&url, source, kind)
+            blocker_cmd::check_url(&url, source_url.as_deref(), kind)
         }
         Some("sync-lists") => blocker_cmd::sync_lists(&default_profile_dir()),
         Some("help") | None => {
