@@ -146,6 +146,19 @@
   bindSelect("pref-blocker-level", "blocker.level", "standard");
   bindToggle("pref-blocker-cosmetic", "blocker.cosmetic", true);
 
+  bindToggle("pref-cws-enabled", "cws.enabled", true);
+  bindToggle("pref-cws-brand", "cws.brandPrompts", true);
+
+  document.getElementById("btn-open-addons")?.addEventListener("click", () => {
+    showLog("Abre about:addons en una pestaña nueva, o usa el boton EX del sidebar.");
+  });
+  document.getElementById("btn-open-cws")?.addEventListener("click", () => {
+    withBridge((bridge) => {
+      const url = bridge.getString("cws.storeUrl", "https://chromewebstore.google.com/");
+      showLog("Abre Chrome Web Store:\n\n  " + url + "\n\nSidebar EX abre gestor + tienda.");
+    });
+  });
+
   document.getElementById("btn-import-data")?.addEventListener("click", () => importHint(false));
   document.getElementById("btn-import-passwords")?.addEventListener("click", () => {
     if (window.confirm("Se exportaran contrasenas a un JSON local. ¿Continuar?")) {

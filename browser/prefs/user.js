@@ -40,3 +40,17 @@ user_pref("app.feedback.baseURL", "");
 user_pref("browser.preferences.moreFromMozilla", false);
 user_pref("browser.shell.checkDefaultBrowser", true);
 user_pref("floorp.design.configs", "{\"uiCustomization\":{\"disableFloorpStart\":true}}");
+
+// Chrome Web Store — capa perfil Aurexalis (motor Floorp para instalacion real).
+user_pref("aurexalis.cws.enabled", true);
+user_pref("aurexalis.cws.brandPrompts", true);
+user_pref("aurexalis.cws.storeUrl", "https://chromewebstore.google.com/");
+user_pref("extensions.htmlaboutaddons.recommendations.enabled", false);
+user_pref("extensions.getAddons.showPane", false);
+
+// Chrome Web Store — capa perfil Aurexalis (motor Floorp para instalacion real).
+user_pref("aurexalis.cws.enabled", true);
+user_pref("aurexalis.cws.brandPrompts", true);
+user_pref("aurexalis.cws.storeUrl", "https://chromewebstore.google.com/");
+user_pref("extensions.htmlaboutaddons.recommendations.enabled", false);
+user_pref("extensions.getAddons.showPane", false);

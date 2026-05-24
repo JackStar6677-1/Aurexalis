@@ -108,6 +108,7 @@ artefactos locales o de CI sin firma oficial.
 - Crear adaptador `aurexalis-extensions` con branding propio sobre el modelo de
   Floorp.
 - Hacer smoke test manual de instalacion CWS en perfil aislado.
+- Ver plan detallado en `docs/CWS_PORT.md` (v0.5: prefs + `aurexalis-07-cws-brand.uc.js`).
 - Definir wrapper de build `tools/aurexalis-build.ps1` que invoque Floorp sin
   tocar credenciales ni publicar builds.
 - Separar parches Aurexalis en una carpeta propia antes de tocar archivos del

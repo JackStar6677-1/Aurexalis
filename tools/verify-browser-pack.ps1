@@ -38,6 +38,7 @@ $required = @(
     "browser/chrome/aurexalis-04-settings-panel.uc.js",
     "browser/chrome/aurexalis-05-sidebar.uc.js",
     "browser/chrome/aurexalis-06-settings-inject.uc.js",
+    "browser/chrome/aurexalis-07-cws-brand.uc.js",
     "browser/home/index.html",
     "browser/settings/index.html",
     "browser/prefs/user.js"
@@ -53,6 +54,8 @@ Assert-Contains (Join-Path $RepoRoot "browser/chrome/aurexalis-02-blocker.uc.js"
 Assert-Contains (Join-Path $RepoRoot "browser/chrome/aurexalis-02-blocker.uc.js") "aurexalis-filters.txt" "aurexalis-02-blocker.uc.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "disableFloorpStart" "user.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "app.feedback.baseURL" "user.js"
+Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.cws.enabled" "user.js"
+Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.cws.brandPrompts" "user.js"
 Assert-File (Join-Path $RepoRoot "assets/branding/aurexalis.ico") "assets/branding/aurexalis.ico"
 Assert-Contains (Join-Path $RepoRoot "browser/chrome/userChrome.js") "aurexalis-02-blocker.uc.js" "userChrome.js"
 

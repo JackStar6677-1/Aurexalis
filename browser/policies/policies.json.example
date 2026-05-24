@@ -1,0 +1,15 @@
+{
+  "policies": {
+    "ExtensionSettings": {},
+    "Preferences": {
+      "extensions.htmlaboutaddons.recommendations.enabled": {
+        "Value": false,
+        "Status": "default"
+      },
+      "extensions.getAddons.showPane": {
+        "Value": false,
+        "Status": "default"
+      }
+    }
+  }
+}

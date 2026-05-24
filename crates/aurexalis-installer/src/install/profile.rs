@@ -89,6 +89,19 @@ fn write_aurexalis_prefs(install_root: &Path, profile_dir: &Path) -> Result<(), 
         );
     }
 
+    if !contents.contains("Aurexalis CWS prefs") {
+        contents.push_str("\n// Aurexalis CWS prefs (generated at install)\n");
+        contents.push_str("user_pref(\"aurexalis.cws.enabled\", true);\n");
+        contents.push_str("user_pref(\"aurexalis.cws.brandPrompts\", true);\n");
+        contents.push_str(
+            "user_pref(\"aurexalis.cws.storeUrl\", \"https://chromewebstore.google.com/\");\n",
+        );
+        contents.push_str(
+            "user_pref(\"extensions.htmlaboutaddons.recommendations.enabled\", false);\n",
+        );
+        contents.push_str("user_pref(\"extensions.getAddons.showPane\", false);\n");
+    }
+
     fs::write(&prefs_path, contents).map_err(|e| format!("escribir user.js: {e}"))
 }
 
@@ -191,6 +204,7 @@ mod tests {
         assert!(user_js.contains("aurexalis.settings.url"));
         assert!(user_js.contains("browser.newtab.url"));
         assert!(user_js.contains("disableFloorpStart"));
+        assert!(user_js.contains("aurexalis.cws.enabled"));
 
         let _ = fs::remove_dir_all(root);
     }

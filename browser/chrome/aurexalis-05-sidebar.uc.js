@@ -16,6 +16,7 @@
     { id: "downloads", label: "DL", title: "Descargas", action: openDownloads },
     { id: "importer", label: "IM", title: "Importador", panel: importerPanel },
     { id: "blocker", label: "BL", title: "Bloqueador on/off", action: toggleBlocker },
+    { id: "extensions", label: "EX", title: "Extensiones y Chrome Web Store", action: openExtensions },
     { id: "passwords", label: "PW", title: "Contrasenas", action: () => openTab("about:logins") },
     { id: "settings", label: "ST", title: "Ajustes Aurexalis", panel: settingsPanel },
   ];
@@ -80,6 +81,22 @@
     }
   }
 
+  /** Abre gestor de extensiones y enlace a Chrome Web Store (motor Floorp). */
+  function openExtensions() {
+    openTab("about:addons");
+    try {
+      const store = AurexalisCore
+        ? AurexalisCore.getString("cws.storeUrl", "https://chromewebstore.google.com/")
+        : "https://chromewebstore.google.com/";
+      if (AurexalisCore && !AurexalisCore.getBool("cws.enabled", true)) {
+        return;
+      }
+      openTab(store);
+    } catch (error) {
+      console.warn("[AurexalisSidebar] Cannot open CWS", error);
+    }
+  }
+
   function runImport(includePasswords) {
     if (!window.AurexalisCore) {
       Services.prompt.alert(null, "Aurexalis", "Nucleo Aurexalis no cargado.");
@@ -103,26 +120,168 @@
   function remoteFilesPanel() {
     return {
       title: "Archivos remotos",
-      rows: [
-        ["Backend", "aurexalis-remotefs (SFTP activo)"],
-        ["CLI", "aurexalis remotefs list|get"],
-        ["Credenciales", "AUREXALIS_SFTP_PASS o --password"],
-      ],
-      action: "Abrir descargas",
-      command: openDownloads,
-      extraActions: [
-        {
-          label: "Info SFTP en consola",
-          command: () => {
-            Services.prompt.alert(
-              null,
-              "Aurexalis — RemoteFS",
-              "Ejemplo:\n  aurexalis remotefs list --host servidor --user jack --path /\n  aurexalis remotefs get --host H --user U --remote /ruta --local C:\\tmp\\f"
-            );
-          },
-        },
-      ],
+      explorer: true,
     };
+  }
+
+  /** Construye el explorador RemoteFS en el panel lateral RF. */
+  function buildRemoteExplorer(panel, body, button) {
+    const rows = panel.querySelector(".ax-panel-rows");
+    const actions = panel.querySelector(".ax-panel-actions");
+    rows.hidden = true;
+    actions.hidden = false;
+
+    let host = panel.querySelector(".ax-rf-explorer");
+    if (!host) {
+      host = xul("vbox");
+      host.className = "ax-rf-explorer";
+      body.insertBefore(host, rows);
+    }
+    host.hidden = false;
+    while (host.firstChild) {
+      host.firstChild.remove();
+    }
+
+    const settingsHost = panel.querySelector(".ax-settings-host");
+    if (settingsHost) {
+      settingsHost.hidden = true;
+    }
+
+    function pref(name, fallback) {
+      if (!window.AurexalisCore) {
+        return fallback;
+      }
+      return AurexalisCore.getString(`remotefs.${name}`, fallback);
+    }
+
+    function savePref(name, value) {
+      if (!window.AurexalisCore) {
+        return;
+      }
+      AurexalisCore.setString(`remotefs.${name}`, value);
+    }
+
+    function addField(labelText, value, onInput) {
+      const row = xul("hbox");
+      row.className = "ax-rf-field";
+      const label = xul("label");
+      label.className = "ax-rf-field-label";
+      label.textContent = labelText;
+      const input = xul("textbox");
+      input.className = "ax-rf-field-input";
+      input.setAttribute("flex", "1");
+      input.value = value;
+      input.addEventListener("input", () => onInput(input.value));
+      row.appendChild(label);
+      row.appendChild(input);
+      host.appendChild(row);
+      return input;
+    }
+
+    const protocolRow = xul("hbox");
+    protocolRow.className = "ax-rf-field";
+    const protocolLabel = xul("label");
+    protocolLabel.className = "ax-rf-field-label";
+    protocolLabel.textContent = "Protocolo";
+    const protocolList = xul("menulist");
+    protocolList.className = "ax-rf-field-input";
+    const popup = xul("menupopup");
+    for (const option of [
+      ["sftp", "SFTP (22)"],
+      ["ftp", "FTP (21)"],
+      ["ftps", "FTPS (990 impl.)"],
+    ]) {
+      const item = xul("menuitem");
+      item.setAttribute("label", option[1]);
+      item.setAttribute("value", option[0]);
+      popup.appendChild(item);
+    }
+    protocolList.appendChild(popup);
+    protocolList.value = pref("protocol", "sftp");
+    protocolList.addEventListener("command", () => savePref("protocol", protocolList.value));
+    protocolRow.appendChild(protocolLabel);
+    protocolRow.appendChild(protocolList);
+    host.appendChild(protocolRow);
+
+    const hostInput = addField("Host", pref("host", ""), (v) => savePref("host", v));
+    const userInput = addField("Usuario", pref("user", ""), (v) => savePref("user", v));
+    const pathInput = addField("Ruta", pref("path", "/"), (v) => savePref("path", v));
+
+    const hint = xul("description");
+    hint.className = "ax-rf-hint";
+    hint.textContent =
+      "Contrasena via env: AUREXALIS_SFTP_PASS, AUREXALIS_FTP_PASS o AUREXALIS_FTPS_PASS";
+    host.appendChild(hint);
+
+    function runRemoteList() {
+      if (!window.AurexalisCore) {
+        Services.prompt.alert(null, "Aurexalis", "Nucleo Aurexalis no cargado.");
+        return;
+      }
+      const hostValue = hostInput.value.trim();
+      const userValue = userInput.value.trim();
+      const pathValue = pathInput.value.trim() || "/";
+      if (!hostValue || !userValue) {
+        Services.prompt.alert(null, "Aurexalis — RemoteFS", "Completa host y usuario.");
+        return;
+      }
+      savePref("host", hostValue);
+      savePref("user", userValue);
+      savePref("path", pathValue);
+      savePref("protocol", protocolList.value);
+      try {
+        AurexalisCore.runShell([
+          "remotefs",
+          "list",
+          "--protocol",
+          protocolList.value,
+          "--host",
+          hostValue,
+          "--user",
+          userValue,
+          "--path",
+          pathValue,
+        ]);
+        if (window.AurexalisSound) {
+          AurexalisSound.play("panel");
+        }
+      } catch (error) {
+        Services.prompt.alert(null, "Aurexalis", String(error));
+      }
+    }
+
+    while (actions.firstChild) {
+      actions.firstChild.remove();
+    }
+
+    const listBtn = xul("button");
+    listBtn.className = "ax-panel-action";
+    listBtn.textContent = "Listar directorio (CLI)";
+    listBtn.onclick = runRemoteList;
+    actions.appendChild(listBtn);
+
+    const downloadsBtn = xul("button");
+    downloadsBtn.className = "ax-panel-action ax-panel-action-secondary";
+    downloadsBtn.textContent = "Abrir descargas";
+    downloadsBtn.onclick = openDownloads;
+    actions.appendChild(downloadsBtn);
+
+    const helpBtn = xul("button");
+    helpBtn.className = "ax-panel-action ax-panel-action-secondary";
+    helpBtn.textContent = "Ayuda CLI";
+    helpBtn.onclick = () => {
+      Services.prompt.alert(
+        null,
+        "Aurexalis — RemoteFS",
+        "Listar:\n  aurexalis remotefs list --protocol ftp --host H --user U --path /\n\n" +
+          "Descargar:\n  aurexalis remotefs get --protocol sftp --host H --user U --remote /f --local C:\\tmp\\f\n\n" +
+          "Credenciales: AUREXALIS_SFTP_PASS | AUREXALIS_FTP_PASS | AUREXALIS_FTPS_PASS"
+      );
+    };
+    actions.appendChild(helpBtn);
+
+    panel.hidden = false;
+    setActive(button);
   }
 
   function importerPanel() {
@@ -227,6 +386,11 @@
       actions.firstChild.remove();
     }
 
+    if (content.explorer) {
+      buildRemoteExplorer(panel, body, button);
+      return;
+    }
+
     if (content.settings && window.AurexalisSettingsPanel) {
       rows.hidden = true;
       actions.hidden = true;
@@ -244,6 +408,10 @@
       const settingsHost = panel.querySelector(".ax-settings-host");
       if (settingsHost) {
         settingsHost.hidden = true;
+      }
+      const rfHost = panel.querySelector(".ax-rf-explorer");
+      if (rfHost) {
+        rfHost.hidden = true;
       }
 
       for (const row of content.rows) {

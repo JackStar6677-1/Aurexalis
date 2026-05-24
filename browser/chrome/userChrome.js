@@ -16,6 +16,7 @@
     "aurexalis-04-settings-panel.uc.js",
     "aurexalis-05-sidebar.uc.js",
     "aurexalis-06-settings-inject.uc.js",
+    "aurexalis-07-cws-brand.uc.js",
   ];
 
   try {
