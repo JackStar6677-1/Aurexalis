@@ -1,55 +1,74 @@
 # Roadmap Profesional
 
-Este roadmap reemplaza la idea de MVP suelto por fases de producto.
+Roadmap de producto alineado con **v0.3.0**. Para descargas y estado rapido ver el [README](../README.md).
 
-## Fase 0: Base De Ingenieria
+## Fase 0: Base De Ingenieria — Hecho
 
-- Workspace Rust estable.
-- CI con check, clippy, fmt y tests.
-- Documentacion de arquitectura, seguridad y calidad.
-- UI chrome experimental aislada.
+- [x] Workspace Rust estable (`aurexalis-shell`, `-installer`, `-importer`, `-blocker`, `-remotefs`, `-core`).
+- [x] CI: `rust.yml` (test/clippy/fmt + verify pack), `android-build.yml`, `release.yml`.
+- [x] Documentacion de arquitectura, seguridad, build y calidad.
+- [x] Identidad visual Aurexalis (banner, paleta, `userChrome.css`).
+- [x] Submodulo Floorp en `vendor/floorp` con revision fijada.
 
-## Fase 1: Shell Aurexalis
+## Fase 1: Shell Y UI Aurexalis — Hecho
 
-- Perfil dedicado Firefox/Floorp.
-- Tema `userChrome.css` mantenible.
-- Barra lateral funcional con paneles internos.
-- Sonido reactivo con assets locales.
-- Preferencias reproducibles.
+- [x] Perfil dedicado con `browser/prefs/user.js` y chrome copiado al instalar.
+- [x] Tema `userChrome.css` morado / rojo / dorado.
+- [x] Modulos `.uc.js` `00`–`06` cargados por `userChrome.js`.
+- [x] Barra lateral (AX, GX, RF, BM, DL, IM, BL, PW, ST).
+- [x] Sonido reactivo (`aurexalis-03-sound.uc.js`) con prefs `aurexalis.sounds.*`.
+- [x] Home Aurexalis (`browser/home/`).
+- [x] Panel **ST** + pagina `browser/settings/` interactiva.
+- [x] Bloqueador UI: prefs `aurexalis.blocker.*`, boton **BL**, ETP desktop.
 
-## Fase 2: Importador Local
+## Fase 1b: Multi-Plataforma — v0.3.0
 
-- Deteccion robusta de Chrome, Brave y Opera.
-- Lectura de Bookmarks, Preferences, Secure Preferences y Local State.
-- Lectura de Cookies, Login Data, History y Favicons con SQLite.
-- Descifrado Windows DPAPI.
-- Descifrado AES-GCM Chromium con llave local.
-- Descifrado Linux Secret Service/KWallet cuando este disponible.
-- Exportacion hacia formato intermedio auditable.
+- [x] **Windows:** `Aurexalis-Setup-x86_64.exe`, CLI, runtime zip.
+- [x] **Android:** APK GeckoView (`mobile/android/`), ContentBlocking, ajustes embebidos.
+- [x] **Linux:** `.deb`, `.rpm`, `.pkg.tar.zst`, tarball (`tools/package-linux.sh`).
+- [x] GitHub Release automatico en tag `v*` con los tres targets.
 
-## Fase 3: Bloqueador Nativo
+## Fase 2: Importador Local — Parcial
 
-- Integracion real de `adblock-rust` en crate aislado.
-- Benchmarks de matching.
-- Listas configurables.
-- Politica de bloqueo antes del render.
-- Adaptador Gecko/Floorp.
+- [x] Deteccion de perfiles Chrome, Brave y Opera (Windows).
+- [x] Lectura SQLite/JSON Chromium en crate `aurexalis-importer`.
+- [x] Exportacion auditable (`aurexalis import audit`) desde shell, sidebar e instalador.
+- [x] Opcion de contrasenas con consentimiento (`--passwords`).
+- [ ] Escritura directa al perfil Gecko/Floorp (marcadores, historial, cookies).
+- [ ] Descifrado Linux: Secret Service / KWallet.
+- [ ] Importacion nativa Android (JNI / UniFFI).
 
-## Fase 4: RemoteFS
+## Fase 3: Bloqueador — Parcial
 
-- Cliente SFTP.
-- Cliente FTP/FTPS.
-- Explorador de archivos integrado.
-- Cola de transferencias.
-- Confirmaciones para operaciones destructivas.
-- Credenciales en almacen seguro.
+- [x] Crate `aurexalis-blocker` con `adblock-rust` (tests y PoC aislado).
+- [x] Integracion UI: Gecko ETP en desktop, ContentBlocking en Android.
+- [x] Niveles standard / strict / off desde ajustes y panel **ST**.
+- [ ] Hook al pipeline de requests Gecko antes del render.
+- [ ] Listas uBlock/ABP configurables desde ajustes.
+- [ ] Benchmarks de matching en CI.
 
-## Fase 5: Gecko/Floorp Core
+## Fase 4: RemoteFS — Diseno + backend
 
-- Submodulo Floorp fijado en `vendor/floorp`.
-- Analisis de parches Floorp documentado.
-- Mapa inicial de soporte Chrome Web Store.
-- Mapa inicial de build system y empaquetado.
-- Port Aurexalis de soporte Chrome Web Store.
-- Empaquetado reproducible.
-- Canal de builds propio.
+- [x] Crate `aurexalis-remotefs` con cola y backend local testeable.
+- [x] Panel **RF** en sidebar (placeholder con acciones hacia descargas).
+- [ ] Cliente SFTP operativo en UI.
+- [ ] Cliente FTP/FTPS.
+- [ ] Explorador integrado estilo gestor de archivos.
+- [ ] Credenciales en almacen seguro del SO.
+
+## Fase 5: Gecko / Floorp Core — Parcial
+
+- [x] Submodulo Floorp fijado y documentado (`docs/FLOORP_INTEGRATION.md`).
+- [x] Mapa de build system y empaquetado (`docs/BUILD_AND_RELEASE.md`).
+- [x] Shell Rust que lanza Floorp/Firefox con perfil Aurexalis.
+- [ ] Port de soporte **Chrome Web Store** con branding Aurexalis.
+- [ ] Build reproducible del nucleo Gecko propio (sin depender de instalador externo).
+- [ ] Canal de actualizaciones propio.
+
+## Proximas versiones (orientativo)
+
+| Version | Objetivo principal |
+|---|---|
+| **v0.4** | Hook `adblock-rust` + importador escribe en perfil Gecko |
+| **v0.5** | RemoteFS explorador + port CWS Floorp |
+| **v1.0** | Nucleo empaquetado end-to-end sin Floorp externo obligatorio |

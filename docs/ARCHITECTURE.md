@@ -7,7 +7,8 @@ Aurexalis se construye como un navegador basado en Gecko/Floorp, con modulos Rus
 ```mermaid
 flowchart TB
   Shell["Aurexalis Browser Shell"] --> Gecko["Gecko / Floorp"]
-  Shell --> ChromeUI["Chrome UI<br/>CSS + JS + assets"]
+  Shell --> ChromeUI["Chrome UI<br/>userChrome + .uc.js + settings"]
+  Shell --> Mobile["Android APK<br/>GeckoView"]
   Shell --> Services["Aurexalis Services"]
 
   Services --> Blocker["aurexalis-blocker"]
@@ -34,18 +35,20 @@ Esto evita mezclar pruebas de UI, red, perfiles y motor al mismo tiempo.
 
 ## Modulos Iniciales
 
-| Modulo | Rol | Estado |
+| Modulo | Rol | Estado v0.3 |
 |---|---|---|
-| `aurexalis-core` | Tipos compartidos, errores, politicas base | Scaffold |
-| `aurexalis-blocker` | Motor de decision para bloqueo de requests | Scaffold |
-| `aurexalis-importer` | Deteccion y lectura local de perfiles Chromium | SQLite/JSON inicial |
-| `aurexalis-remotefs` | Navegador de archivos remoto SFTP/FTP integrado | Cola y backend local |
-| `aurexalis-shell` | CLI arrancable para perfiles, Floorp y launch externo | Inicial |
-| `browser/chrome` | Tema, userChrome y sonido reactivo | Scaffold |
+| `aurexalis-core` | Tipos compartidos, errores, politicas base | Estable |
+| `aurexalis-blocker` | `adblock-rust` + prefs ETP/ContentBlocking en UI | Parcial |
+| `aurexalis-importer` | Lectura Chromium + export audit JSON | Parcial |
+| `aurexalis-remotefs` | Cola SFTP/FTP/FTPS | Backend Rust |
+| `aurexalis-shell` | CLI, perfiles, launch, import audit | Release |
+| `aurexalis-installer` | Instalador GUI Windows | Release |
+| `browser/chrome` | Tema, sidebar, sonido, bloqueador, ST | Integrado |
+| `mobile/android` | APK GeckoView | Release |
 
 ## Decisiones Iniciales
 
-- La base pesada sera Floorp/Firefox, no un motor propio.
+- La base en escritorio es Floorp/Firefox; en Android, GeckoView embebido.
 - Floorp queda integrado como submodulo auditable en `vendor/floorp`.
 - El repositorio empieza como monorepo de integracion para mantener orden.
 - Los datos sensibles no se versionan y todo flujo de importacion debe ser local, explicito y auditable.

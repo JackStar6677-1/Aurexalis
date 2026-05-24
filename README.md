@@ -24,9 +24,9 @@
 
 **Aurexalis** es un proyecto personal para construir un navegador propio mediante kitbashing serio: tomar componentes open-source maduros, integrarlos con criterio y evitar cargar con la pesadez de una base Chromium completa.
 
-La base prevista es **Floorp/Firefox sobre Gecko**, con una interfaz personalizada tipo gaming, bloqueo nativo de red, compatibilidad fuerte con WebExtensions y herramientas locales de migracion desde navegadores Chromium.
+La base es **Floorp/Firefox sobre Gecko** en escritorio y **GeckoView** en Android, con interfaz gaming, bloqueo integrado, WebExtensions y migracion local desde Chromium.
 
-No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y modular.
+No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y modular, publicada en **Windows, Android y Linux** desde v0.3.0.
 
 ## Estado
 
@@ -52,6 +52,8 @@ Cada tag `v*` publica un [GitHub Release](https://github.com/JackStar6677-1/Aure
 
 En Linux necesitas **Firefox o Floorp** instalado como motor Gecko; el paquete Aurexalis aporta shell, tema, chrome y prefs.
 
+**Ultima release:** [v0.3.0](https://github.com/JackStar6677-1/Aurexalis/releases/tag/v0.3.0) (pre-release).
+
 Detalle de build y empaquetado: [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
 
 ## Principios
@@ -72,41 +74,45 @@ Detalle de build y empaquetado: [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_REL
 ```mermaid
 flowchart TB
   User["Usuario"] --> UI["Aurexalis UI Layer"]
-  UI --> Theme["Theme Engine<br/>userChrome.css + UI modules"]
-  UI --> Sound["Reactive Sound Engine<br/>AudioContext + local assets"]
+  UI --> Theme["userChrome.css + modulos .uc.js"]
+  UI --> Sound["Sonido reactivo<br/>03-sound.uc.js"]
+  UI --> Settings["Ajustes ST + browser/settings"]
 
-  UI --> Gecko["Gecko / Floorp Core"]
+  UI --> Desktop["Gecko / Floorp — escritorio"]
+  UI --> Mobile["GeckoView — Android APK"]
 
-  Gecko --> Net["Network Policy Layer"]
-  Net --> Adblock["adblock-rust<br/>filter lists + matching"]
-  Net --> Web["HTTP / HTTPS Requests"]
+  Desktop --> BlockETP["Bloqueador v0.3<br/>Gecko ETP + prefs aurexalis.blocker.*"]
+  Mobile --> BlockCB["ContentBlocking<br/>GeckoRuntime Android"]
 
-  Gecko --> Ext["WebExtensions Layer"]
-  Ext --> FloorpCWS["Floorp Chrome Web Store support"]
-  Ext --> FirefoxAPI["Firefox browser.* / chrome.* APIs"]
+  BlockETP --> Web["HTTP / HTTPS"]
+  BlockCB --> Web
 
-  Gecko --> Profile["Aurexalis Profile"]
-  Profile --> Importer["Rust Profile Importer"]
-  Importer --> Chrome["Chrome"]
-  Importer --> Brave["Brave"]
-  Importer --> Opera["Opera"]
+  Desktop --> Ext["WebExtensions"]
+  Ext --> FloorpCWS["Floorp CWS — pendiente port Aurexalis"]
 
-  UI --> RemoteFiles["Remote Files"]
-  RemoteFiles --> SFTP["SFTP"]
-  RemoteFiles --> FTP["FTP / FTPS"]
+  Desktop --> Profile["Perfil Aurexalis"]
+  Profile --> Importer["aurexalis-importer<br/>export audit local"]
+  Importer --> Chrome["Chrome / Brave / Opera"]
+
+  UI --> RemoteFiles["RemoteFS — cola Rust"]
+  RemoteFiles --> SFTP["SFTP / FTP / FTPS"]
+
+  BlockETP -.-> BlockRust["adblock-rust crate<br/>hook de red — proximo"]
 ```
 
 ## Modulos
 
-| Modulo | Objetivo | Base tecnica |
+| Modulo / crate | Objetivo | Estado v0.3 |
 |---|---|---|
-| `aurexalis-ui` | Interfaz morado/rojo/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
-| `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
-| `aurexalis-blocker` | Bloqueo de anuncios y rastreadores (Gecko ETP en desktop, ContentBlocking en Android; crate `adblock-rust` listo para hook de red) | Rust, prefs Gecko, `adblock-rust` |
-| `aurexalis-importer` | Migracion local de cookies, historial, marcadores, favicons, preferencias, claves y contrasenas | Rust, SQLite, JSON, DPAPI, Secret Service/KWallet |
-| `aurexalis-remotefs` | Explorador integrado para SFTP, FTP y FTPS estilo gestor de archivos | Rust, credenciales del SO, UI interna |
-| `aurexalis-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
-| `aurexalis-profile` | Perfil local endurecido, preferencias y defaults | Firefox prefs, policies, profile templates |
+| `browser/chrome/*.uc.js` | UI morado/rojo/dorado, sidebar, sonidos, bloqueador, panel ST | **Integrado** |
+| `browser/settings/` | Pagina de ajustes interactiva (desktop + Android) | **Integrado** |
+| `aurexalis-shell` | Launcher CLI, perfiles, import audit | **Release** |
+| `aurexalis-installer` | Instalador GUI Windows | **Release** |
+| `mobile/android/` | APK GeckoView | **Release** |
+| `aurexalis-blocker` | Crate `adblock-rust`; hoy UI aplica Gecko ETP / ContentBlocking | **Parcial** |
+| `aurexalis-importer` | Lectura Chromium + export JSON auditable (+ contrasenas opcional) | **Parcial** |
+| `aurexalis-remotefs` | Cola SFTP/FTP/FTPS | **Backend Rust** |
+| Floorp CWS | Chrome Web Store sobre Gecko | **Pendiente** |
 
 ## Stack
 
@@ -122,57 +128,51 @@ flowchart TB
 ![SQLite](https://img.shields.io/badge/SQLite-profile%20data-003B57?style=flat-square&logo=sqlite)
 ![DPAPI](https://img.shields.io/badge/Windows-DPAPI-0078D4?style=flat-square&logo=windows)
 ![Secret Service](https://img.shields.io/badge/Linux-Secret%20Service-FCC624?style=flat-square&logo=linux&logoColor=111111)
-![SFTP](https://img.shields.io/badge/SFTP%20%2F%20FTP-remote%20files-FFD166?style=flat-square)
+![GeckoView](https://img.shields.io/badge/GeckoView-Android%20APK-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)
+![Release](https://img.shields.io/badge/release-v0.3.0-FFD166?style=flat-square)
 
 </div>
 
 ## Flujo De Red
 
+**Hoy (v0.3):** el bloqueador usa las APIs nativas de Gecko — **ETP** en escritorio (`aurexalis-02-blocker.uc.js`) y **ContentBlocking** en Android (`AurexalisPrefs` + `GeckoRuntime`). Las prefs `aurexalis.blocker.*` se editan desde **ST** o la pagina de ajustes.
+
+**Proximo:** enganchar el crate `aurexalis-blocker` (`adblock-rust`) al pipeline de requests antes del render.
+
 ```mermaid
 sequenceDiagram
-  participant Page as Page / Document
-  participant Gecko as Gecko Request Pipeline
-  participant Policy as Aurexalis Network Policy
-  participant Blocker as adblock-rust Engine
-  participant Net as Network
+  participant Page as Pagina
+  participant Gecko as Gecko / GeckoView
+  participant Prefs as prefs aurexalis.blocker.*
+  participant ETP as ETP / ContentBlocking
+  participant Rust as adblock-rust (proximo)
+  participant Net as Red
 
   Page->>Gecko: solicita recurso
-  Gecko->>Policy: consulta politica de request
-  Policy->>Blocker: match(url, source, type)
-  alt bloqueado
-    Blocker-->>Policy: block
-    Policy-->>Gecko: cancelar antes de render
-  else permitido
-    Blocker-->>Policy: allow / redirect / modify
-    Policy->>Net: continuar request
-    Net-->>Gecko: respuesta
-    Gecko-->>Page: render
+  Gecko->>Prefs: nivel standard / strict / off
+  Prefs->>ETP: politica activa
+  alt v0.3 actual
+    ETP-->>Gecko: bloquear rastreadores / ads conocidos
+  else hook futuro
+    Gecko->>Rust: match(url, tipo)
+    Rust-->>Gecko: block / allow
   end
+  Gecko->>Net: request permitido
+  Net-->>Page: respuesta
 ```
 
 ## Migracion De Perfil
 
-El importador sera una herramienta local y explicita. No inicia sesion en cuentas por ti ni envia datos fuera del equipo.
+El importador es **local-first**: no inicia sesion en cuentas ni envia datos fuera del equipo.
 
-```mermaid
-flowchart LR
-  Detect["Detectar perfiles"] --> Copy["Copiar SQLite a staging seguro"]
-  Copy --> Read["Leer Cookies / History / Login Data"]
-  Read --> Decrypt["Descifrar con API local del sistema"]
-  Decrypt --> Transform["Normalizar formato Aurexalis"]
-  Transform --> Write["Escribir en perfil Aurexalis"]
+**Implementado hoy:**
 
-  Decrypt --> Win["Windows<br/>DPAPI + Local State"]
-  Decrypt --> Linux["Linux<br/>Secret Service / KWallet"]
-```
+- Deteccion de perfiles Chrome, Brave y Opera en Windows.
+- Exportacion auditable a JSON en el perfil (`aurexalis import audit`).
+- Opcion de incluir contrasenas con consentimiento explicito (`--passwords`).
+- Acceso desde panel **IM** / **ST** del sidebar y pagina `browser/settings/`.
 
-Alcance previsto:
-
-- Cookies de Chrome, Brave y Opera.
-- Historial, marcadores/bookmarks y favicons.
-- Preferencias basicas del perfil cuando sea seguro migrarlas.
-- Claves y contrasenas guardadas cuando el sistema permita descifrado local.
-- Importacion controlada hacia el perfil Aurexalis.
+**Pendiente:** escritura directa al perfil Gecko, descifrado Linux (Secret Service/KWallet) e importacion nativa Android.
 
 ## Archivos Remotos
 
@@ -250,60 +250,67 @@ Mas detalle en [docs/UI.md](./docs/UI.md).
 
 ## Roadmap
 
+Resumen por fases (detalle en [docs/ROADMAP.md](./docs/ROADMAP.md)):
+
+| Fase | Alcance | Estado |
+|---|---|---|
+| **0 — Ingenieria** | Workspace Rust, CI, docs, identidad | Hecho |
+| **1 — Shell y UI** | `userChrome`, sidebar, sonidos, home, ajustes ST + HTML | Hecho |
+| **1b — Multi-plataforma** | Windows installer, APK Android, Linux deb/rpm/arch | **v0.3.0** |
+| **2 — Importador** | Export audit Chromium (+ contrasenas opcional) | Parcial |
+| **3 — Bloqueador** | ETP desktop + ContentBlocking Android; hook `adblock-rust` | Parcial |
+| **4 — RemoteFS** | SFTP/FTP/FTPS integrado en navegador | Diseno + cola Rust |
+| **5 — Gecko/Floorp** | Submodulo, build map, port Chrome Web Store | Parcial |
+
 ```mermaid
 gantt
-  title Roadmap inicial Aurexalis
+  title Roadmap Aurexalis (actualizado v0.3.0)
   dateFormat  YYYY-MM-DD
   axisFormat  %d/%m
 
-  section Base
-  Repo, README e identidad       :done,    r1, 2026-05-23, 1d
-  Submodulo y analisis Floorp    :done,    r2, 2026-05-23, 1d
+  section Hecho
+  Base repo + CI + Floorp submodule     :done, r1, 2026-05-23, 2d
+  UI chrome sidebar sonidos home          :done, u1, 2026-05-23, 3d
+  Panel ST + settings + bloqueador UI     :done, u2, 2026-05-24, 1d
+  Release Windows Android Linux           :done, p1, 2026-05-24, 1d
 
-  section UI
-  userChrome.css Aurexalis       :done,    u1, 2026-05-25, 3d
-  Motor de sonido reactivo       :done,    u2, after u1, 3d
-  Sidebar + panel ST + ajustes   :done,    u3, after u2, 2d
+  section En curso
+  Importador escritura perfil Gecko       :active, m1, 2026-05-25, 7d
+  Hook adblock-rust en pipeline red       :active, b1, 2026-05-28, 10d
 
-  section Plataformas
-  Release Windows                :done,    p1, 2026-05-23, 2d
-  APK Android GeckoView          :done,    p2, 2026-05-24, 2d
-  Paquetes Linux deb/rpm/arch    :done,    p3, after p2, 1d
-
-  section Rust
-  Importador Brave cookies       :         m1, 2026-05-27, 4d
-  Importador claves/login data   :         m2, after m1, 5d
-  Integracion adblock-rust PoC   :         b1, 2026-06-03, 7d
-  RemoteFS SFTP/FTP PoC          :         f1, 2026-06-08, 5d
-
-  section Gecko
-  Capa CWS de Floorp             :         e1, 2026-06-08, 7d
-  Hook de red Gecko              :         e2, after b1, 8d
+  section Proximo
+  RemoteFS explorador UI                  :         f1, 2026-06-10, 8d
+  Port Chrome Web Store Floorp            :         e1, 2026-06-12, 10d
+  Importador Android nativo               :         m2, 2026-06-15, 7d
 ```
 
-## Primeros Entregables
+## Entregables
 
-- [x] Crear repo base.
-- [x] Definir identidad visual Aurexalis.
-- [x] Documentar arquitectura modular.
-- [x] Crear `userChrome.css` inicial.
-- [x] Crear `aurexalis-sound` PoC.
-- [x] Integrar barra lateral vertical tipo GX.
-- [x] Crear workspace Rust modular.
-- [x] Disenar `aurexalis-remotefs` para SFTP/FTP.
-- [x] Agregar tests unitarios y CI.
-- [x] Clonar Floorp como submodulo auditable.
-- [x] Mapear build system, empaquetado y soporte Chrome Web Store de Floorp.
-- [x] Crear `aurexalis-importer` Rust para leer SQLite/JSON Chromium.
-- [x] Probar `adblock-rust` fuera del navegador.
-- [x] Agregar shell ejecutable inicial.
-- [x] Agregar cola RemoteFS y backend local testeable.
+### v0.3.0 (publicado)
+
+- [x] Release Windows: instalador, CLI y runtime zip.
+- [x] Release Android: APK GeckoView con home, ajustes y bloqueador.
+- [x] Release Linux: `.deb`, `.rpm`, `.pkg.tar.zst` y tarball portable.
+- [x] Modulos chrome numerados `00`–`06` con loader `userChrome.js`.
+- [x] Bloqueador: Gecko ETP (desktop) + ContentBlocking (Android).
+- [x] Ajustes unificados: panel **ST**, `browser/settings/`, prefs `aurexalis.*`.
+- [x] Boton **BL** en sidebar (toggle rapido del bloqueador).
+
+### Base previa
+
+- [x] Workspace Rust modular, tests y CI (`rust.yml`, `android-build.yml`, `release.yml`).
+- [x] `userChrome.css`, sidebar GX, sonido reactivo, home Aurexalis.
+- [x] `aurexalis-importer` + export audit Chromium (con opcion contrasenas).
+- [x] Crate `aurexalis-blocker` con `adblock-rust` (PoC fuera del navegador).
+- [x] Shell `aurexalis-shell` e instalador GUI Windows.
+- [x] Submodulo Floorp auditable en `vendor/floorp`.
+
+### Pendiente
+
 - [ ] Portar capa Chrome Web Store de Floorp con branding Aurexalis.
-- [x] Integrar bloqueador (Gecko ETP desktop + ContentBlocking Android).
-- [x] Pagina de ajustes interactiva y panel **ST** unificado.
-- [x] Release multi-plataforma v0.3.0 (Windows, Android, Linux).
 - [ ] Hook de red Gecko con `adblock-rust` en el pipeline de requests.
-- [ ] Importacion Chromium nativa en Android.
+- [ ] Importacion Chromium: escritura directa al perfil + Linux + Android nativo.
+- [ ] RemoteFS: explorador integrado en UI (hoy solo backend/cola Rust).
 
 ## Shell Ejecutable
 
@@ -344,7 +351,13 @@ La documentacion de build y empaquetado esta en
 
 ## Pruebas
 
-La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows y `verify-browser-pack.ps1` en el workflow Rust.
+La suite esta documentada en [docs/TESTING.md](./docs/TESTING.md).
+
+| Workflow | Que valida |
+|---|---|
+| [`rust.yml`](./.github/workflows/rust.yml) | `cargo test`, clippy, `verify-browser-pack.ps1` |
+| [`android-build.yml`](./.github/workflows/android-build.yml) | APK release en push a `main` |
+| [`release.yml`](./.github/workflows/release.yml) | Windows + Android + Linux en tag `v*` |
 
 ## Profesionalizacion
 
@@ -356,7 +369,7 @@ La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI
 
 ## Licencia Y Uso
 
-Proyecto personal en etapa temprana. La base publica documenta arquitectura e identidad. Assets propietarios de terceros, como sonidos comerciales o temas cerrados, no se incluyen en este repositorio.
+Proyecto personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases como **pre-release**. Assets propietarios de terceros (sonidos comerciales, temas cerrados) no se incluyen; usa tus propios OGG en `browser/chrome/sounds/`.
 
 ---
 
