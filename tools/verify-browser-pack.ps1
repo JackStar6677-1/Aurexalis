@@ -50,6 +50,8 @@ foreach ($rel in $required) {
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.sounds.enabled" "user.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "aurexalis.blocker.enabled" "user.js"
 Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "disableFloorpStart" "user.js"
+Assert-Contains (Join-Path $RepoRoot "browser/prefs/user.js") "app.feedback.baseURL" "user.js"
+Assert-File (Join-Path $RepoRoot "assets/branding/aurexalis.ico") "assets/branding/aurexalis.ico"
 Assert-Contains (Join-Path $RepoRoot "browser/chrome/userChrome.js") "aurexalis-02-blocker.uc.js" "userChrome.js"
 
 $ucGlob = Join-Path $RepoRoot "browser/chrome/aurexalis-*.uc.js"

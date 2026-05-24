@@ -254,6 +254,17 @@ toolbarbutton:active {
 
 #floorp-start,
 .floorp-start,
-[data-l10n-id*="floorp"] {
+[data-l10n-id*="floorp"],
+[data-l10n-id*="Floorp"],
+moz-message-bar[type="floorp"],
+.floorp-branding {
   display: none !important;
+}
+
+/* Texto sustituido por aurexalis-01-brand.uc.js; refuerzo en about:preferences */
+#preferences-root [data-l10n-id*="floorp"],
+#preferences-root [data-l10n-id*="Floorp"] {
+  visibility: hidden !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
 }

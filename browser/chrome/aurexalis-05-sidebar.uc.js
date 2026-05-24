@@ -156,7 +156,7 @@
             const ok = Services.prompt.confirm(
               null,
               "Aurexalis — import apply",
-              "Cierra Aurexalis/Floorp antes de importar. ¿Aplicar marcadores e historial?"
+              "Cierra Aurexalis antes de importar. ¿Aplicar marcadores e historial?"
             );
             if (ok) {
               runShellApply();

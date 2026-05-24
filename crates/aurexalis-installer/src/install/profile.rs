@@ -81,6 +81,9 @@ fn write_aurexalis_prefs(install_root: &Path, profile_dir: &Path) -> Result<(), 
     if !contents.contains("Aurexalis identity prefs") {
         contents.push_str("\n// Aurexalis identity prefs (generated at install)\n");
         contents.push_str("user_pref(\"svg.context-properties.content.enabled\", true);\n");
+        contents.push_str("user_pref(\"app.feedback.baseURL\", \"\");\n");
+        contents.push_str("user_pref(\"browser.preferences.moreFromMozilla\", false);\n");
+        contents.push_str("user_pref(\"browser.shell.checkDefaultBrowser\", true);\n");
         contents.push_str(
             "user_pref(\"floorp.design.configs\", \"{\\\"uiCustomization\\\":{\\\"disableFloorpStart\\\":true}}\");\n",
         );

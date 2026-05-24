@@ -35,4 +35,7 @@ user_pref("aurexalis.blocker.cosmetic", true);
 
 // Identidad Aurexalis sobre nucleo Gecko.
 user_pref("svg.context-properties.content.enabled", true);
+user_pref("app.feedback.baseURL", "");
+user_pref("browser.preferences.moreFromMozilla", false);
+user_pref("browser.shell.checkDefaultBrowser", true);
 user_pref("floorp.design.configs", "{\"uiCustomization\":{\"disableFloorpStart\":true}}");

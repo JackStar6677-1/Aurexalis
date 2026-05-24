@@ -39,7 +39,7 @@ pub fn apply_snapshot_to_profile(
     if !places.is_file() {
         return Err(ImporterError::Io(std::io::Error::new(
             std::io::ErrorKind::NotFound,
-            "places.sqlite no existe: abre Aurexalis/Floorp una vez antes de import apply",
+            "places.sqlite no existe: abre Aurexalis una vez antes de import apply",
         )));
     }
 

@@ -1,6 +1,7 @@
 //! Orquestacion de la instalacion completa de Aurexalis.
 
 mod chromium;
+mod engine_brand;
 mod floorp;
 mod github;
 mod profile;
@@ -75,12 +76,18 @@ pub fn run_full_install(
         let _ = fs::remove_file(&floorp_path);
 
         floorp::resolve_floorp_binary(&engine_dir)
-            .ok_or("Floorp se instalo pero no se encontro floorp.exe".to_string())?
+            .ok_or("El motor Gecko se instalo pero no se encontro floorp.exe".to_string())?
     } else {
         floorp::resolve_floorp_binary(&engine_dir).ok_or(
-            "No se encontro Floorp. Activa la descarga del motor o instala Floorp manualmente.",
+            "No se encontro el motor Gecko. Activa la descarga del motor o instalalo manualmente.",
         )?
     };
+
+    progress(0.82, "Aplicando marca Aurexalis al motor...");
+    copy_branding_icon(install_root)?;
+    let icon = install_root.join("aurexalis.ico");
+    let branded = engine_brand::brand_engine_binary(&browser, &engine_dir, &icon)?;
+    let browser = engine_brand::resolve_engine_binary(&engine_dir, &branded);
 
     progress(0.86, "Guardando configuracion...");
     let mut chromium_audit = None;
@@ -103,9 +110,8 @@ pub fn run_full_install(
     };
     write_config(install_root, &config)?;
 
-    progress(0.90, "Copiando licencia e icono...");
+    progress(0.90, "Copiando licencia...");
     copy_license(install_root)?;
-    copy_branding_icon(install_root)?;
 
     progress(0.92, "Creando accesos directos y registro Windows...");
     let launcher = install_root.join("aurexalis.exe");

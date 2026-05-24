@@ -34,6 +34,13 @@ try {
 
     Copy-Item $exe (Join-Path $stage "aurexalis.exe")
     Copy-Item (Join-Path $RepoRoot "browser") (Join-Path $stage "browser") -Recurse
+    $ico = Join-Path $RepoRoot "assets\branding\aurexalis.ico"
+    if (-not (Test-Path $ico)) {
+        python (Join-Path $RepoRoot "tools\gen_installer_icon.py")
+    }
+    if (Test-Path $ico) {
+        Copy-Item $ico (Join-Path $stage "aurexalis.ico")
+    }
     New-Item -ItemType Directory -Force -Path (Join-Path $stage "profiles\default") | Out-Null
 
     @"
