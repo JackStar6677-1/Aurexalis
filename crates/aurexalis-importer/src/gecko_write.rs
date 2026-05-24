@@ -1,4 +1,4 @@
-//! Escritura de snapshot Chromium en perfil Gecko (places.sqlite).
+//! Escritura de snapshot Chromium en perfil Gecko (places.sqlite, cookies.sqlite).
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -6,6 +6,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use rusqlite::{params, Connection};
 
+use crate::gecko_cookies::write_cookies;
+use crate::gecko_passwords::{stage_passwords_for_manual_import, PasswordStagingOptions};
 use crate::{BookmarkEntry, HistoryEntry, ImporterError, ProfileSnapshot};
 
 /// Superficies aplicables al perfil Gecko.
@@ -13,6 +15,15 @@ use crate::{BookmarkEntry, HistoryEntry, ImporterError, ProfileSnapshot};
 pub enum ApplySurface {
     Bookmarks,
     History,
+    Cookies,
+    Passwords,
+}
+
+/// Opciones adicionales para `apply_snapshot_to_profile`.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ApplyOptions {
+    /// Requerido para `ApplySurface::Passwords` (escritura local en CSV).
+    pub passwords_consent: bool,
 }
 
 /// Resultado de una aplicacion al perfil.
@@ -20,7 +31,12 @@ pub enum ApplySurface {
 pub struct ApplyReport {
     pub bookmarks_added: usize,
     pub history_added: usize,
+    pub cookies_added: usize,
+    pub cookies_skipped: usize,
+    pub passwords_staged: usize,
+    pub passwords_skipped: usize,
     pub backup_dir: Option<PathBuf>,
+    pub password_staging_dir: Option<PathBuf>,
 }
 
 /// Carga un snapshot JSON exportado con `export_audit_snapshot`.
@@ -29,33 +45,74 @@ pub fn load_audit_snapshot(path: &Path) -> Result<ProfileSnapshot, ImporterError
     Ok(serde_json::from_str(&raw)?)
 }
 
-/// Aplica marcadores e historial al perfil Gecko. Requiere navegador cerrado.
+/// Aplica datos del snapshot al perfil Gecko. Requiere navegador cerrado.
 pub fn apply_snapshot_to_profile(
     profile_dir: &Path,
     snapshot: &ProfileSnapshot,
     surfaces: &[ApplySurface],
 ) -> Result<ApplyReport, ImporterError> {
-    let places = profile_dir.join("places.sqlite");
-    if !places.is_file() {
-        return Err(ImporterError::Io(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "places.sqlite no existe: abre Aurexalis una vez antes de import apply",
-        )));
+    apply_snapshot_to_profile_with_options(
+        profile_dir,
+        snapshot,
+        surfaces,
+        ApplyOptions::default(),
+    )
+}
+
+/// Variante con opciones (p. ej. consentimiento para contrasenas).
+pub fn apply_snapshot_to_profile_with_options(
+    profile_dir: &Path,
+    snapshot: &ProfileSnapshot,
+    surfaces: &[ApplySurface],
+    options: ApplyOptions,
+) -> Result<ApplyReport, ImporterError> {
+    let needs_places = surfaces
+        .iter()
+        .any(|s| matches!(s, ApplySurface::Bookmarks | ApplySurface::History));
+
+    let mut report = ApplyReport::default();
+
+    if needs_places {
+        let places = profile_dir.join("places.sqlite");
+        if !places.is_file() {
+            return Err(ImporterError::Io(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "places.sqlite no existe: abre Aurexalis una vez antes de import apply",
+            )));
+        }
+
+        let backup_dir = backup_places(&places)?;
+        report.backup_dir = Some(backup_dir);
+        let conn = Connection::open(&places)?;
+
+        if surfaces.contains(&ApplySurface::Bookmarks) {
+            report.bookmarks_added = write_bookmarks(&conn, &snapshot.bookmarks)?;
+        }
+        if surfaces.contains(&ApplySurface::History) {
+            report.history_added = write_history(&conn, &snapshot.history)?;
+        }
     }
 
-    let backup_dir = backup_places(&places)?;
-    let conn = Connection::open(&places)?;
-
-    let mut report = ApplyReport {
-        backup_dir: Some(backup_dir),
-        ..ApplyReport::default()
-    };
-
-    if surfaces.contains(&ApplySurface::Bookmarks) {
-        report.bookmarks_added = write_bookmarks(&conn, &snapshot.bookmarks)?;
+    if surfaces.contains(&ApplySurface::Cookies) {
+        let cookie_report = write_cookies(profile_dir, &snapshot.cookies)?;
+        report.cookies_added = cookie_report.cookies_added;
+        report.cookies_skipped = cookie_report.cookies_skipped;
+        if report.backup_dir.is_none() {
+            report.backup_dir = cookie_report.backup_dir;
+        }
     }
-    if surfaces.contains(&ApplySurface::History) {
-        report.history_added = write_history(&conn, &snapshot.history)?;
+
+    if surfaces.contains(&ApplySurface::Passwords) {
+        let password_report = stage_passwords_for_manual_import(
+            profile_dir,
+            &snapshot.logins,
+            PasswordStagingOptions {
+                user_consent: options.passwords_consent,
+            },
+        )?;
+        report.passwords_staged = password_report.logins_staged;
+        report.passwords_skipped = password_report.logins_skipped;
+        report.password_staging_dir = password_report.staging_dir;
     }
 
     Ok(report)
@@ -260,6 +317,55 @@ mod tests {
             .query_row("SELECT COUNT(*) FROM moz_places", [], |r| r.get(0))
             .expect("count");
         assert_eq!(count, 1);
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn applies_cookies_surface() {
+        let dir = std::env::temp_dir().join("aurexalis-gecko-write-cookies");
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("dir");
+
+        let conn = Connection::open(dir.join("cookies.sqlite")).expect("open");
+        conn.execute_batch(
+            "CREATE TABLE moz_cookies (
+                id INTEGER PRIMARY KEY,
+                originAttributes TEXT NOT NULL DEFAULT '',
+                name TEXT, value TEXT, host TEXT, path TEXT,
+                expiry INTEGER, lastAccessed INTEGER, creationTime INTEGER,
+                isSecure INTEGER, isHttpOnly INTEGER,
+                inBrowserElement INTEGER DEFAULT 0,
+                sameSite INTEGER DEFAULT 0, rawSameSite INTEGER DEFAULT 0,
+                schemeMap INTEGER DEFAULT 2
+            );",
+        )
+        .expect("schema");
+        drop(conn);
+
+        let snapshot = ProfileSnapshot {
+            cookies: vec![crate::CookieRecord {
+                host_key: "test.local".to_owned(),
+                name: "a".to_owned(),
+                path: "/".to_owned(),
+                expires_utc: 0,
+                is_secure: false,
+                is_httponly: false,
+                same_site: 0,
+                value: crate::SecretValue::Decrypted("v".to_owned()),
+            }],
+            logins: vec![],
+            history: vec![],
+            favicons: vec![],
+            bookmarks: vec![],
+            preferences: None,
+            secure_preferences: None,
+            local_state: None,
+        };
+
+        let report = apply_snapshot_to_profile(&dir, &snapshot, &[ApplySurface::Cookies])
+            .expect("apply cookies");
+        assert_eq!(report.cookies_added, 1);
 
         let _ = fs::remove_dir_all(dir);
     }

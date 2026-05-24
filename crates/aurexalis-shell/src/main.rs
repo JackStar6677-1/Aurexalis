@@ -110,18 +110,32 @@ fn run_import(mut args: impl Iterator<Item = String>) -> Result<(), String> {
         Some("apply") => {
             let mut audit = None;
             let mut profile = None;
-            let mut surfaces = vec![ApplySurface::Bookmarks, ApplySurface::History];
+            let mut surfaces = vec![
+                ApplySurface::Bookmarks,
+                ApplySurface::History,
+            ];
+            let mut passwords_consent = false;
             let mut iter = args.peekable();
             while let Some(arg) = iter.next() {
                 match arg.as_str() {
                     "--from" => audit = iter.next().map(PathBuf::from),
                     "--profile" => profile = iter.next().map(PathBuf::from),
-                    "--bookmarks-only" => surfaces = vec![ApplySurface::Bookmarks],
-                    "--history-only" => surfaces = vec![ApplySurface::History],
+                    "--bookmarks-only" => {
+                        surfaces = vec![ApplySurface::Bookmarks];
+                    }
+                    "--history-only" => surfaces = vec![ApplySurface::History];
+                    "--cookies-only" => surfaces = vec![ApplySurface::Cookies],
+                    "--passwords-only" => surfaces = vec![ApplySurface::Passwords],
+                    "--passwords-consent" => passwords_consent = true,
+                    "--with-cookies" => {
+                        if !surfaces.contains(&ApplySurface::Cookies) {
+                            surfaces.push(ApplySurface::Cookies);
+                        }
+                    }
                     other => return Err(format!("flag import apply desconocido: {other}")),
                 }
             }
-            import_cmd::apply_audit(audit, profile, &surfaces)
+            import_cmd::apply_audit(audit, profile, &surfaces, passwords_consent)
         }
         Some("help") | None => {
             print_import_help();
@@ -171,6 +185,7 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
             let mut password = None;
             let mut port = None;
             let mut path = Some("/".to_owned());
+            let mut protocol = None;
             let mut iter = args;
             while let Some(arg) = iter.next() {
                 match arg.as_str() {
@@ -181,11 +196,16 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     }
                     "--port" => port = remotefs_cmd::parse_port(iter.next().as_deref())?,
                     "--path" => path = Some(remotefs_cmd::require(iter.next().as_deref(), "path")?),
+                    "--protocol" => {
+                        protocol = Some(remotefs_cmd::parse_protocol_flag(iter.next().as_deref())?)
+                    }
                     other => return Err(format!("flag remotefs list desconocido: {other}")),
                 }
             }
-            let pass = remotefs_cmd::password_from_env_or_flag(password.as_deref())?;
+            let proto = protocol.unwrap_or(aurexalis_remotefs::RemoteProtocol::Sftp);
+            let pass = remotefs_cmd::password_from_env_or_flag(proto, password.as_deref())?;
             remotefs_cmd::list_remote(
+                proto,
                 &host.ok_or("falta --host")?,
                 port,
                 &user.ok_or("falta --user")?,
@@ -200,6 +220,7 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
             let mut port = None;
             let mut remote = None;
             let mut local = None;
+            let mut protocol = None;
             let mut iter = args;
             while let Some(arg) = iter.next() {
                 match arg.as_str() {
@@ -215,10 +236,14 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     "--local" => {
                         local = Some(remotefs_cmd::require(iter.next().as_deref(), "local")?)
                     }
+                    "--protocol" => {
+                        protocol = Some(remotefs_cmd::parse_protocol_flag(iter.next().as_deref())?)
+                    }
                     other => return Err(format!("flag remotefs get desconocido: {other}")),
                 }
             }
-            let pass = remotefs_cmd::password_from_env_or_flag(password.as_deref())?;
+            let proto = protocol.unwrap_or(aurexalis_remotefs::RemoteProtocol::Sftp);
+            let pass = remotefs_cmd::password_from_env_or_flag(proto, password.as_deref())?;
             let local_path = local.unwrap_or_else(|| {
                 remotefs_cmd::local_download_dir()
                     .join("remote-download.bin")
@@ -226,6 +251,7 @@ fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
                     .into_owned()
             });
             remotefs_cmd::get_remote(
+                proto,
                 &host.ok_or("falta --host")?,
                 port,
                 &user.ok_or("falta --user")?,
@@ -291,5 +317,8 @@ fn print_import_help() {
     println!("Aurexalis import");
     println!("  import list                         inventario Chromium local");
     println!("  import audit [--passwords]          exporta JSON auditable");
-    println!("  import apply [--from PATH]          escribe marcadores/historial en perfil Gecko");
+    println!("  import apply [--from PATH] [--profile DIR]");
+    println!("              [--bookmarks-only|--history-only|--cookies-only]");
+    println!("              [--passwords-only --passwords-consent]");
+    println!("              [--with-cookies]  anade cookies al apply por defecto");
 }

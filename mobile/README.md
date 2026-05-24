@@ -39,6 +39,6 @@ cd mobile/android && ./gradlew assembleRelease
 ## Notas
 
 - GeckoView carga assets embebidos con `resource://android/assets/...` (no `file:///android_asset/`, que es solo WebView).
-- La importacion Chromium nativa en movil llega en una fase posterior (JNI/UniFFI).
+- La importacion Chromium nativa en movil llega en una fase posterior (JNI/UniFFI). Ver [docs/ANDROID_IMPORT.md](docs/ANDROID_IMPORT.md).
 - Al cambiar prefs del bloqueador, la app recrea el `GeckoRuntime` para aplicar ContentBlocking.
 - El keystore de CI se genera en cada build de release; para Play Store usar secretos propios.

@@ -1,9 +1,9 @@
 //! Comandos `aurexalis import` para inventario, exportacion y aplicacion al perfil Gecko.
 
 use aurexalis_importer::{
-    apply_snapshot_to_profile, default_profile_roots, discover_profiles, export_audit_snapshot,
-    find_first_chromium_profile, load_audit_snapshot, ApplySurface, AuditExportOptions,
-    ChromiumBrowser,
+    apply_snapshot_to_profile_with_options, default_profile_roots, discover_profiles,
+    export_audit_snapshot, find_first_chromium_profile, load_audit_snapshot, ApplyOptions,
+    ApplySurface, AuditExportOptions, ChromiumBrowser,
 };
 use std::env;
 use std::path::{Path, PathBuf};
@@ -79,11 +79,12 @@ pub fn export_audit(output: Option<PathBuf>, include_passwords: bool) -> Result<
     Ok(())
 }
 
-/// Aplica JSON auditable al perfil Gecko (marcadores + historial). Navegador cerrado.
+/// Aplica JSON auditable al perfil Gecko. Navegador cerrado.
 pub fn apply_audit(
     audit_path: Option<PathBuf>,
     profile_dir: Option<PathBuf>,
     surfaces: &[ApplySurface],
+    passwords_consent: bool,
 ) -> Result<(), String> {
     let audit = audit_path.unwrap_or_else(default_audit_path);
     let profile = profile_dir.unwrap_or_else(default_profile_path);
@@ -95,17 +96,52 @@ pub fn apply_audit(
         ));
     }
 
+    if surfaces.contains(&ApplySurface::Passwords) && !passwords_consent {
+        return Err(
+            "importacion de contrasenas requiere --passwords-consent (CSV local en profile/import/)"
+                .to_string(),
+        );
+    }
+
     let snapshot = load_audit_snapshot(&audit).map_err(|e| e.to_string())?;
-    let report =
-        apply_snapshot_to_profile(&profile, &snapshot, surfaces).map_err(|e| e.to_string())?;
+    let report = apply_snapshot_to_profile_with_options(
+        &profile,
+        &snapshot,
+        surfaces,
+        ApplyOptions {
+            passwords_consent,
+        },
+    )
+    .map_err(|e| e.to_string())?;
 
     println!("[SUCCESS] Importacion aplicada a {}", profile.display());
     println!(
-        "[INFO] bookmarks={} history={}",
-        report.bookmarks_added, report.history_added
+        "[INFO] bookmarks={} history={} cookies={} passwords_staged={}",
+        report.bookmarks_added,
+        report.history_added,
+        report.cookies_added,
+        report.passwords_staged
     );
+    if report.cookies_skipped > 0 {
+        println!(
+            "[WARN] cookies omitidas (sin descifrar): {}",
+            report.cookies_skipped
+        );
+    }
+    if report.passwords_skipped > 0 {
+        println!(
+            "[WARN] logins omitidos (sin descifrar): {}",
+            report.passwords_skipped
+        );
+    }
     if let Some(backup) = report.backup_dir {
-        println!("[INFO] backup places.sqlite en {}", backup.display());
+        println!("[INFO] backups SQLite en {}", backup.display());
+    }
+    if let Some(staging) = report.password_staging_dir {
+        println!(
+            "[INFO] contrasenas en staging local {} (import manual en about:logins)",
+            staging.display()
+        );
     }
     Ok(())
 }

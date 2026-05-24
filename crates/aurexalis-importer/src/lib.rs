@@ -5,9 +5,17 @@
 
 #![forbid(unsafe_code)]
 
+mod gecko_cookies;
+mod gecko_passwords;
 mod gecko_write;
 
-pub use gecko_write::{apply_snapshot_to_profile, load_audit_snapshot, ApplyReport, ApplySurface};
+#[cfg(target_os = "linux")]
+mod linux_crypt;
+
+pub use gecko_write::{
+    apply_snapshot_to_profile, apply_snapshot_to_profile_with_options, load_audit_snapshot,
+    ApplyOptions, ApplyReport, ApplySurface,
+};
 
 use std::fmt;
 use std::fs;
@@ -485,9 +493,22 @@ pub fn decryption_context_from_local_state(
         .decode(encoded_key)
         .map_err(|error| ImporterError::Crypto(error.to_string()))?;
 
+    #[cfg(windows)]
     if key.starts_with(b"DPAPI") {
         key.drain(..5);
         key = decrypt_platform_key(&key)?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        key = decrypt_platform_key(&key)?;
+    }
+
+    #[cfg(all(not(windows), not(target_os = "linux")))]
+    if !key.is_empty() && key.len() != 32 {
+        return Err(ImporterError::UnsupportedDecryption(
+            "descifrado de clave Chromium no implementado en esta plataforma",
+        ));
     }
 
     Ok(Some(DecryptionContext {
@@ -566,10 +587,15 @@ fn decrypt_platform_key(encrypted_key: &[u8]) -> Result<Vec<u8>, ImporterError> 
         .map_err(|error| ImporterError::Crypto(error.to_string()))
 }
 
-#[cfg(not(windows))]
+#[cfg(target_os = "linux")]
+fn decrypt_platform_key(encrypted_key: &[u8]) -> Result<Vec<u8>, ImporterError> {
+    linux_crypt::decrypt_linux_encrypted_key(encrypted_key)
+}
+
+#[cfg(all(not(windows), not(target_os = "linux")))]
 fn decrypt_platform_key(_encrypted_key: &[u8]) -> Result<Vec<u8>, ImporterError> {
     Err(ImporterError::UnsupportedDecryption(
-        "Linux Secret Service/KWallet adapter pending",
+        "Secret Service/KWallet/Keychain adapter pending",
     ))
 }
 
