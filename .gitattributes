@@ -1,0 +1,3 @@
+# Scripts shell siempre LF (CI Linux/Android).
+*.sh text eol=lf
+gradlew text eol=lf
