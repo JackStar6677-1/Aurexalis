@@ -49,10 +49,12 @@ El pipeline profesional queda dividido en cuatro artefactos:
 Los builds del navegador completo no deben firmarse hasta tener certificados
 propios. El **shell Rust** (`aurexalis.exe`) si se publica en GitHub Releases.
 
-## GitHub Releases (Windows)
+## GitHub Releases (multi-plataforma)
 
 Cada tag `v*` dispara [`.github/workflows/release.yml`](../.github/workflows/release.yml)
-y publica tres artefactos:
+y publica artefactos para **Windows**, **Android** y **Linux**.
+
+### Windows
 
 | Archivo | Uso |
 |---|---|
@@ -60,9 +62,34 @@ y publica tres artefactos:
 | `aurexalis-runtime-windows-x86_64.zip` | Runtime (shell + chrome + prefs) |
 | `aurexalis-windows-x86_64.exe` | CLI portable para desarrolladores |
 
+### Android
+
+| Archivo | Uso |
+|---|---|
+| `Aurexalis-android-{version}-gecko.apk` | APK GeckoView (home, ajustes, bloqueador) |
+
+Build local: [mobile/README.md](../mobile/README.md). Sincronizar assets: `tools/sync-mobile-assets.ps1`.
+
+### Linux
+
+| Archivo | Uso |
+|---|---|
+| `aurexalis_{version}_amd64.deb` | Ubuntu / Debian |
+| `aurexalis-{version}-1.x86_64.rpm` | Fedora / RHEL |
+| `aurexalis-{version}-x86_64.pkg.tar.zst` | Arch Linux |
+| `aurexalis-runtime-linux-x86_64.tar.gz` | Portable sin gestor de paquetes |
+
+Empaquetado local:
+
+```bash
+./tools/package-linux.sh
+```
+
+Requiere Firefox o Floorp como motor Gecko en el sistema.
+
 ```powershell
-git tag v0.2.2
-git push origin v0.2.2
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
 ### Instalador grafico

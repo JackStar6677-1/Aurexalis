@@ -10,11 +10,12 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FF1F55&center=true&vCenter=true&width=940&height=86&lines=Aurexalis%3A+navegacion+modular+y+afilada.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+rojo+neon+y+dorado+reactivo." alt="Typing SVG" />
 
-[![Status](https://img.shields.io/badge/status-arquitectura%20inicial-FFD166?style=for-the-badge)](#estado)
+[![Status](https://img.shields.io/badge/status-v0.3.0%20multi--plataforma-FFD166?style=for-the-badge)](#estado)
 [![Engine](https://img.shields.io/badge/engine-Gecko%20%2F%20Floorp-7C3AED?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](#arquitectura)
 [![Rust](https://img.shields.io/badge/rust-core%20modules-CE412B?style=for-the-badge&logo=rust&logoColor=white)](#stack)
 [![Privacy](https://img.shields.io/badge/privacy-local%20first-101018?style=for-the-badge)](#principios)
 [![Rust](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml/badge.svg)](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/rust.yml)
+[![Android](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/android-build.yml/badge.svg)](https://github.com/JackStar6677-1/Aurexalis/actions/workflows/android-build.yml)
 [![Release](https://img.shields.io/github/v/release/JackStar6677-1/Aurexalis?include_prereleases&label=release&style=for-the-badge)](https://github.com/JackStar6677-1/Aurexalis/releases)
 
 </div>
@@ -29,9 +30,29 @@ No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y
 
 ## Estado
 
-> Fase actual: **base profesional de ingenieria, Floorp auditado y arquitectura modular**.
+> Fase actual: **v0.3.0 — shell ejecutable, UI Aurexalis integrada, bloqueador, ajustes y releases multi-plataforma**.
 
-Este repositorio comienza como base publica del proyecto: documentacion, roadmap, identidad visual, diagramas, decisiones tecnicas y modulos Rust aislados. Floorp ya queda enlazado como submodulo para estudiar parches, build system, empaquetado y soporte de Chrome Web Store con una revision fija.
+Disponible hoy:
+
+- **Windows:** instalador GUI, CLI portable y runtime zip.
+- **Android:** APK GeckoView con home, ajustes y bloqueador ContentBlocking.
+- **Linux:** `.deb` (Ubuntu/Debian), `.rpm` (Fedora/RHEL), `.pkg.tar.zst` (Arch) y tarball portable.
+
+El chrome del navegador (`browser/chrome/*.uc.js`) carga sidebar, sonidos, bloqueador, panel **ST** y pagina de ajustes interactiva. Floorp sigue como submodulo auditable en `vendor/floorp` para build Gecko y capa Chrome Web Store.
+
+## Descargas
+
+Cada tag `v*` publica un [GitHub Release](https://github.com/JackStar6677-1/Aurexalis/releases) con:
+
+| Plataforma | Artefactos |
+|---|---|
+| **Windows** | `Aurexalis-Setup-x86_64.exe`, `aurexalis-windows-x86_64.exe`, `aurexalis-runtime-windows-x86_64.zip` |
+| **Android** | `Aurexalis-android-{version}-gecko.apk` |
+| **Linux** | `aurexalis_{version}_amd64.deb`, `aurexalis-{version}-1.x86_64.rpm`, `aurexalis-{version}-x86_64.pkg.tar.zst`, `aurexalis-runtime-linux-x86_64.tar.gz` |
+
+En Linux necesitas **Firefox o Floorp** instalado como motor Gecko; el paquete Aurexalis aporta shell, tema, chrome y prefs.
+
+Detalle de build y empaquetado: [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
 
 ## Principios
 
@@ -81,7 +102,7 @@ flowchart TB
 |---|---|---|
 | `aurexalis-ui` | Interfaz morado/rojo/dorado, sidebar, tabs, animaciones y estilo propio | Firefox chrome UI, CSS, JS |
 | `aurexalis-sound` | Sonidos reactivos de click, hover, tipeo y acciones de UI | JavaScript, AudioContext, assets locales |
-| `aurexalis-blocker` | Bloqueo nativo antes del renderizado | Rust, `adblock-rust`, filtros uBlock/ABP |
+| `aurexalis-blocker` | Bloqueo de anuncios y rastreadores (Gecko ETP en desktop, ContentBlocking en Android; crate `adblock-rust` listo para hook de red) | Rust, prefs Gecko, `adblock-rust` |
 | `aurexalis-importer` | Migracion local de cookies, historial, marcadores, favicons, preferencias, claves y contrasenas | Rust, SQLite, JSON, DPAPI, Secret Service/KWallet |
 | `aurexalis-remotefs` | Explorador integrado para SFTP, FTP y FTPS estilo gestor de archivos | Rust, credenciales del SO, UI interna |
 | `aurexalis-extensions` | Compatibilidad con Chrome Web Store sobre Gecko | Floorp, WebExtensions, manifests |
@@ -91,7 +112,7 @@ flowchart TB
 
 <div align="center">
 
-<img src="https://skillicons.dev/icons?i=rust,cpp,js,html,css,firefox,sqlite,linux,windows,git,github&perline=11" alt="Stack" />
+<img src="https://skillicons.dev/icons?i=rust,cpp,js,html,css,firefox,sqlite,linux,windows,android,git,github&perline=11" alt="Stack" />
 
 <br />
 
@@ -186,7 +207,46 @@ Paleta inicial:
 | `--ax-gold` | `#FFD166` | foco, premium y acciones destacadas |
 | `--ax-text` | `#F7F2FF` | texto principal |
 
-La barra lateral y los archivos de UI estan documentados en [docs/UI.md](./docs/UI.md).
+### Barra lateral
+
+Accesos del dock vertical (`browser/chrome/aurexalis-05-sidebar.uc.js`):
+
+| Boton | Funcion |
+|---|---|
+| **AX** | Home Aurexalis |
+| **GX** | GX Corner |
+| **RF** | Archivos remotos (panel + backend Rust) |
+| **BM** | Marcadores |
+| **DL** | Descargas |
+| **IM** | Importador Chromium local |
+| **BL** | Bloqueador on/off rapido |
+| **PW** | Contrasenas (`about:logins`) |
+| **ST** | Panel de ajustes integrado |
+
+### Modulos chrome (orden de carga)
+
+`userChrome.js` carga en serie:
+
+1. `aurexalis-00-core.uc.js` — prefs y launcher
+2. `aurexalis-01-brand.uc.js` — identidad visual
+3. `aurexalis-02-blocker.uc.js` — bloqueador Gecko ETP
+4. `aurexalis-03-sound.uc.js` — sonidos reactivos
+5. `aurexalis-04-settings-panel.uc.js` — panel **ST**
+6. `aurexalis-05-sidebar.uc.js` — sidebar
+7. `aurexalis-06-settings-inject.uc.js` — puente prefs en pagina de ajustes
+
+### Ajustes y bloqueador
+
+Preferencias bajo el prefijo `aurexalis.*` (editables desde **ST** o desde `browser/settings/`):
+
+- **Sonidos:** master, click, hover, teclado, ambiente, panel
+- **UI:** animaciones on/off
+- **Bloqueador:** activo, nivel (`standard` / `strict` / `off`), filtros cosmeticos
+- **Importacion:** exportacion local Chromium (con opcion de contrasenas bajo consentimiento)
+
+En desktop la pagina `browser/settings/index.html` recibe `AurexalisPrefsBridge` al abrirse en una pestaña. En Android los mismos controles hablan con la app via `aurexalis://pref/set`.
+
+Mas detalle en [docs/UI.md](./docs/UI.md).
 
 ## Roadmap
 
@@ -201,8 +261,14 @@ gantt
   Submodulo y analisis Floorp    :done,    r2, 2026-05-23, 1d
 
   section UI
-  userChrome.css Aurexalis       :         u1, 2026-05-25, 3d
-  Motor de sonido reactivo       :         u2, after u1, 3d
+  userChrome.css Aurexalis       :done,    u1, 2026-05-25, 3d
+  Motor de sonido reactivo       :done,    u2, after u1, 3d
+  Sidebar + panel ST + ajustes   :done,    u3, after u2, 2d
+
+  section Plataformas
+  Release Windows                :done,    p1, 2026-05-23, 2d
+  APK Android GeckoView          :done,    p2, 2026-05-24, 2d
+  Paquetes Linux deb/rpm/arch    :done,    p3, after p2, 1d
 
   section Rust
   Importador Brave cookies       :         m1, 2026-05-27, 4d
@@ -233,12 +299,15 @@ gantt
 - [x] Agregar shell ejecutable inicial.
 - [x] Agregar cola RemoteFS y backend local testeable.
 - [ ] Portar capa Chrome Web Store de Floorp con branding Aurexalis.
-
-## Pruebas
+- [x] Integrar bloqueador (Gecko ETP desktop + ContentBlocking Android).
+- [x] Pagina de ajustes interactiva y panel **ST** unificado.
+- [x] Release multi-plataforma v0.3.0 (Windows, Android, Linux).
+- [ ] Hook de red Gecko con `adblock-rust` en el pipeline de requests.
+- [ ] Importacion Chromium nativa en Android.
 
 ## Shell Ejecutable
 
-El primer binario arrancable vive en `aurexalis-shell` y expone:
+El binario arrancable vive en `aurexalis-shell`:
 
 ```powershell
 .\tools\aurexalis-build.ps1 -Mode build
@@ -246,14 +315,36 @@ El primer binario arrancable vive en `aurexalis-shell` y expone:
 .\target\debug\aurexalis.exe launch "C:\Ruta\A\floorp.exe"
 ```
 
-Descarga el instalador Windows en
-[GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases)
-(`Aurexalis-Setup-x86_64.exe`). Tambien hay CLI portable (`aurexalis-windows-x86_64.exe`).
+**Windows:** descarga en [GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases) — `Aurexalis-Setup-x86_64.exe` (recomendado), `aurexalis-windows-x86_64.exe` (CLI) o runtime zip.
+
+**Linux:**
+
+```bash
+./tools/package-linux.sh          # genera .deb, .rpm, .pkg.tar.zst y tarball
+sudo dpkg -i dist/aurexalis_*_amd64.deb   # Ubuntu/Debian
+# o rpm -i / pacman -U segun tu distro
+aurexalis --launch-installed
+```
+
+**Android:** ver [mobile/README.md](./mobile/README.md). Sincroniza assets web antes del build:
+
+```powershell
+.\tools\sync-mobile-assets.ps1
+.\tools\bootstrap-android.ps1
+```
+
+Verificacion del pack de chrome:
+
+```powershell
+.\tools\verify-browser-pack.ps1
+```
 
 La documentacion de build y empaquetado esta en
 [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
 
-La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows.
+## Pruebas
+
+La suite inicial esta documentada en [docs/TESTING.md](./docs/TESTING.md). El CI corre `cargo test` en Linux y Windows y `verify-browser-pack.ps1` en el workflow Rust.
 
 ## Profesionalizacion
 
