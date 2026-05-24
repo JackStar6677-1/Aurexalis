@@ -215,7 +215,13 @@ jobs:
           draft: false
           prerelease: true
           body: |
-            ## Aurexalis v0.3.0
+            ## Aurexalis v0.4.0
+
+            ### Novedades
+            - **`aurexalis import apply`** — escribe marcadores e historial del audit JSON en `places.sqlite` (navegador cerrado).
+            - **`aurexalis blocker check|sync-lists`** — comprobacion adblock-rust y listas embebidas en el perfil.
+            - **`aurexalis remotefs list|get`** — cliente SFTP (credencial via `AUREXALIS_SFTP_PASS` o `--password`).
+            - UI: panel **IM** / **ST** con apply y sync-lists; panel **RF** con ayuda SFTP.
 
             ### Windows (PC)
             - `Aurexalis-Setup-x86_64.exe` — instalador GUI

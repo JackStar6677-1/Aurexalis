@@ -1,9 +1,11 @@
 #![forbid(unsafe_code)]
 
+mod blocker_cmd;
 mod config;
 mod import_cmd;
+mod remotefs_cmd;
 
-use aurexalis_importer::{default_profile_roots, discover_profiles, ChromiumBrowser};
+use aurexalis_importer::{default_profile_roots, discover_profiles, ApplySurface, ChromiumBrowser};
 use std::env;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
@@ -25,6 +27,8 @@ fn run() -> Result<(), String> {
         Some("--launch-installed") => launch_installed(),
         Some("profiles") => list_profiles(),
         Some("import") => run_import(args),
+        Some("blocker") => run_blocker(args),
+        Some("remotefs") => run_remotefs(args),
         Some("floorp") => print_floorp_hint(),
         Some("help") | None => {
             print_help();
@@ -40,6 +44,12 @@ fn install_root_from_exe() -> Result<PathBuf, String> {
         .parent()
         .map(Path::to_path_buf)
         .ok_or_else(|| "no se pudo resolver el directorio del ejecutable".to_string())
+}
+
+fn default_profile_dir() -> PathBuf {
+    install_root_from_exe()
+        .map(|root| root.join("profiles").join("default"))
+        .unwrap_or_else(|_| PathBuf::from("profiles/default"))
 }
 
 fn launch_installed() -> Result<(), String> {
@@ -97,11 +107,138 @@ fn run_import(mut args: impl Iterator<Item = String>) -> Result<(), String> {
             let include_passwords = args.any(|arg| arg == "--passwords");
             import_cmd::export_audit(None, include_passwords)
         }
+        Some("apply") => {
+            let mut audit = None;
+            let mut profile = None;
+            let mut surfaces = vec![ApplySurface::Bookmarks, ApplySurface::History];
+            let mut iter = args.peekable();
+            while let Some(arg) = iter.next() {
+                match arg.as_str() {
+                    "--from" => audit = iter.next().map(PathBuf::from),
+                    "--profile" => profile = iter.next().map(PathBuf::from),
+                    "--bookmarks-only" => surfaces = vec![ApplySurface::Bookmarks],
+                    "--history-only" => surfaces = vec![ApplySurface::History],
+                    other => return Err(format!("flag import apply desconocido: {other}")),
+                }
+            }
+            import_cmd::apply_audit(audit, profile, &surfaces)
+        }
         Some("help") | None => {
             print_import_help();
             Ok(())
         }
         Some(other) => Err(format!("subcomando import desconocido: {other}")),
+    }
+}
+
+fn run_blocker(mut args: impl Iterator<Item = String>) -> Result<(), String> {
+    match args.next().as_deref() {
+        Some("check") => {
+            let url = args
+                .next()
+                .ok_or("uso: blocker check <url> [--source URL] [--type script]")?;
+            let mut source = None;
+            let mut kind = aurexalis_core::ResourceKind::Script;
+            let mut iter = args;
+            while let Some(arg) = iter.next() {
+                match arg.as_str() {
+                    "--source" => source = iter.next().as_deref(),
+                    "--type" => {
+                        let value = iter
+                            .next()
+                            .ok_or("falta valor para --type")?;
+                        kind = blocker_cmd::parse_resource_kind(&value)?;
+                    }
+                    other => return Err(format!("flag blocker check desconocido: {other}")),
+                }
+            }
+            blocker_cmd::check_url(&url, source, kind)
+        }
+        Some("sync-lists") => blocker_cmd::sync_lists(&default_profile_dir()),
+        Some("help") | None => {
+            println!("Aurexalis blocker");
+            println!("  blocker check <url> [--source URL] [--type script]");
+            println!("  blocker sync-lists");
+            Ok(())
+        }
+        Some(other) => Err(format!("subcomando blocker desconocido: {other}")),
+    }
+}
+
+fn run_remotefs(mut args: impl Iterator<Item = String>) -> Result<(), String> {
+    match args.next().as_deref() {
+        Some("list") => {
+            let mut host = None;
+            let mut user = None;
+            let mut password = None;
+            let mut port = None;
+            let mut path = Some("/".to_owned());
+            let mut iter = args;
+            while let Some(arg) = iter.next() {
+                match arg.as_str() {
+                    "--host" => host = Some(remotefs_cmd::require(iter.next().as_deref(), "host")?),
+                    "--user" => user = Some(remotefs_cmd::require(iter.next().as_deref(), "user")?),
+                    "--password" => {
+                        password = Some(remotefs_cmd::require(iter.next().as_deref(), "password")?)
+                    }
+                    "--port" => port = remotefs_cmd::parse_port(iter.next().as_deref())?,
+                    "--path" => path = Some(remotefs_cmd::require(iter.next().as_deref(), "path")?),
+                    other => return Err(format!("flag remotefs list desconocido: {other}")),
+                }
+            }
+            let pass = remotefs_cmd::password_from_env_or_flag(password.as_deref())?;
+            remotefs_cmd::list_remote(
+                &host.ok_or("falta --host")?,
+                port,
+                &user.ok_or("falta --user")?,
+                &pass,
+                path.as_deref().unwrap_or("/"),
+            )
+        }
+        Some("get") => {
+            let mut host = None;
+            let mut user = None;
+            let mut password = None;
+            let mut port = None;
+            let mut remote = None;
+            let mut local = None;
+            let mut iter = args;
+            while let Some(arg) = iter.next() {
+                match arg.as_str() {
+                    "--host" => host = Some(remotefs_cmd::require(iter.next().as_deref(), "host")?),
+                    "--user" => user = Some(remotefs_cmd::require(iter.next().as_deref(), "user")?),
+                    "--password" => {
+                        password = Some(remotefs_cmd::require(iter.next().as_deref(), "password")?)
+                    }
+                    "--port" => port = remotefs_cmd::parse_port(iter.next().as_deref())?,
+                    "--remote" => {
+                        remote = Some(remotefs_cmd::require(iter.next().as_deref(), "remote")?)
+                    }
+                    "--local" => local = Some(remotefs_cmd::require(iter.next().as_deref(), "local")?),
+                    other => return Err(format!("flag remotefs get desconocido: {other}")),
+                }
+            }
+            let pass = remotefs_cmd::password_from_env_or_flag(password.as_deref())?;
+            let local_path = local.unwrap_or_else(|| {
+                remotefs_cmd::local_download_dir()
+                    .join("remote-download.bin")
+                    .to_string_lossy()
+                    .into_owned()
+            });
+            remotefs_cmd::get_remote(
+                &host.ok_or("falta --host")?,
+                port,
+                &user.ok_or("falta --user")?,
+                &pass,
+                &remote.ok_or("falta --remote")?,
+                &local_path,
+            )
+        }
+        Some("help") | None => {
+            remotefs_cmd::print_help();
+            Ok(())
+        }
+        Some(other) => Err(format!("subcomando remotefs desconocido: {other}")),
     }
 }
 
@@ -144,12 +281,15 @@ fn print_help() {
     println!("  aurexalis launch [ruta-firefox-floorp]");
     println!("  aurexalis --launch-installed");
     println!("  aurexalis profiles");
-    println!("  aurexalis import list|audit [--passwords]");
+    println!("  aurexalis import list|audit|apply");
+    println!("  aurexalis blocker check|sync-lists");
+    println!("  aurexalis remotefs list|get");
     println!("  aurexalis floorp");
 }
 
 fn print_import_help() {
     println!("Aurexalis import");
-    println!("  import list              inventario Chromium local");
-    println!("  import audit [--passwords] exporta JSON auditable");
+    println!("  import list                         inventario Chromium local");
+    println!("  import audit [--passwords]          exporta JSON auditable");
+    println!("  import apply [--from PATH]          escribe marcadores/historial en perfil Gecko");
 }

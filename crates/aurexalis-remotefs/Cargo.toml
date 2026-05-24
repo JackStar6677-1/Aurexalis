@@ -7,6 +7,6 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-
+ssh2 = { version = "0.9.4", features = ["vendored-openssl"] }
 [lints]
 workspace = true

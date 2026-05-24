@@ -10,7 +10,7 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=22&pause=1200&color=FF1F55&center=true&vCenter=true&width=940&height=86&lines=Aurexalis%3A+navegacion+modular+y+afilada.;Gecko+por+compatibilidad.+Rust+por+rendimiento.;Morado+profundo%2C+rojo+neon+y+dorado+reactivo." alt="Typing SVG" />
 
-[![Status](https://img.shields.io/badge/status-v0.3.0%20multi--plataforma-FFD166?style=for-the-badge)](#estado)
+[![Status](https://img.shields.io/badge/status-v0.4.0%20import%2Bblocker%2BSFTP-FFD166?style=for-the-badge)](#estado)
 [![Engine](https://img.shields.io/badge/engine-Gecko%20%2F%20Floorp-7C3AED?style=for-the-badge&logo=firefoxbrowser&logoColor=white)](#arquitectura)
 [![Rust](https://img.shields.io/badge/rust-core%20modules-CE412B?style=for-the-badge&logo=rust&logoColor=white)](#stack)
 [![Privacy](https://img.shields.io/badge/privacy-local%20first-101018?style=for-the-badge)](#principios)
@@ -30,13 +30,16 @@ No busca ser un fork cosmetico. La idea es una plataforma personal, optimizada y
 
 ## Estado
 
-> Fase actual: **v0.3.0 — shell ejecutable, UI Aurexalis integrada, bloqueador, ajustes y releases multi-plataforma**.
+> Fase actual: **v0.4.0 — import apply al perfil Gecko, blocker CLI (adblock-rust) y RemoteFS SFTP**.
 
 Disponible hoy:
 
 - **Windows:** instalador GUI, CLI portable y runtime zip.
 - **Android:** APK GeckoView con home, ajustes y bloqueador ContentBlocking.
-- **Linux:** `.deb` (Ubuntu/Debian), `.rpm` (Fedora/RHEL), `.pkg.tar.zst` (Arch) y tarball portable.
+- **Linux:** `.deb`, `.rpm`, `.pkg.tar.zst` y tarball portable.
+- **Import:** `import apply` escribe marcadores e historial en `places.sqlite`.
+- **Blocker:** `blocker check` y `blocker sync-lists` desde CLI o panel **ST**.
+- **RemoteFS:** `remotefs list|get` (SFTP) desde CLI; panel **RF** con ayuda.
 
 El chrome del navegador (`browser/chrome/*.uc.js`) carga sidebar, sonidos, bloqueador, panel **ST** y pagina de ajustes interactiva. Floorp sigue como submodulo auditable en `vendor/floorp` para build Gecko y capa Chrome Web Store.
 
@@ -52,7 +55,7 @@ Cada tag `v*` publica un [GitHub Release](https://github.com/JackStar6677-1/Aure
 
 En Linux necesitas **Firefox o Floorp** instalado como motor Gecko; el paquete Aurexalis aporta shell, tema, chrome y prefs.
 
-**Ultima release:** [v0.3.0](https://github.com/JackStar6677-1/Aurexalis/releases/tag/v0.3.0) (pre-release).
+**Ultima release:** [v0.4.0](https://github.com/JackStar6677-1/Aurexalis/releases/tag/v0.4.0) (pre-release).
 
 Detalle de build y empaquetado: [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_RELEASE.md).
 
@@ -102,16 +105,16 @@ flowchart TB
 
 ## Modulos
 
-| Modulo / crate | Objetivo | Estado v0.3 |
+| Modulo / crate | Objetivo | Estado v0.4 |
 |---|---|---|
 | `browser/chrome/*.uc.js` | UI morado/rojo/dorado, sidebar, sonidos, bloqueador, panel ST | **Integrado** |
 | `browser/settings/` | Pagina de ajustes interactiva (desktop + Android) | **Integrado** |
-| `aurexalis-shell` | Launcher CLI, perfiles, import audit | **Release** |
+| `aurexalis-shell` | Launcher CLI, perfiles, import audit/apply, blocker, remotefs | **Release** |
 | `aurexalis-installer` | Instalador GUI Windows | **Release** |
 | `mobile/android/` | APK GeckoView | **Release** |
-| `aurexalis-blocker` | Crate `adblock-rust`; hoy UI aplica Gecko ETP / ContentBlocking | **Parcial** |
-| `aurexalis-importer` | Lectura Chromium + export JSON auditable (+ contrasenas opcional) | **Parcial** |
-| `aurexalis-remotefs` | Cola SFTP/FTP/FTPS | **Backend Rust** |
+| `aurexalis-blocker` | Crate `adblock-rust`; CLI check/sync-lists; UI usa Gecko ETP | **Parcial** |
+| `aurexalis-importer` | Lectura Chromium + export audit + apply marcadores/historial | **Parcial** |
+| `aurexalis-remotefs` | SFTP via CLI; cola Rust para FTP/FTPS | **Parcial** |
 | Floorp CWS | Chrome Web Store sobre Gecko | **Pendiente** |
 
 ## Stack
@@ -129,7 +132,7 @@ flowchart TB
 ![DPAPI](https://img.shields.io/badge/Windows-DPAPI-0078D4?style=flat-square&logo=windows)
 ![Secret Service](https://img.shields.io/badge/Linux-Secret%20Service-FCC624?style=flat-square&logo=linux&logoColor=111111)
 ![GeckoView](https://img.shields.io/badge/GeckoView-Android%20APK-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)
-![Release](https://img.shields.io/badge/release-v0.3.0-FFD166?style=flat-square)
+![Release](https://img.shields.io/badge/release-v0.4.0-FFD166?style=flat-square)
 
 </div>
 
@@ -286,6 +289,13 @@ gantt
 
 ## Entregables
 
+### v0.4.0 (publicado)
+
+- [x] `aurexalis import apply` — marcadores e historial en `places.sqlite` (backup automatico).
+- [x] `aurexalis blocker check|sync-lists` — adblock-rust + listas embebidas en perfil.
+- [x] `aurexalis remotefs list|get` — cliente SFTP (`AUREXALIS_SFTP_PASS`).
+- [x] UI: panel **IM** / **ST** (apply, sync-lists); panel **RF** con ayuda SFTP.
+
 ### v0.3.0 (publicado)
 
 - [x] Release Windows: instalador, CLI y runtime zip.
@@ -309,8 +319,8 @@ gantt
 
 - [ ] Portar capa Chrome Web Store de Floorp con branding Aurexalis.
 - [ ] Hook de red Gecko con `adblock-rust` en el pipeline de requests.
-- [ ] Importacion Chromium: escritura directa al perfil + Linux + Android nativo.
-- [ ] RemoteFS: explorador integrado en UI (hoy solo backend/cola Rust).
+- [ ] Importacion: cookies/contrasenas al perfil + Linux decrypt + Android nativo.
+- [ ] RemoteFS: explorador integrado en UI y FTP/FTPS.
 
 ## Shell Ejecutable
 

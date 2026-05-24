@@ -153,6 +153,22 @@
     }
   });
 
+  document.getElementById("btn-import-apply")?.addEventListener("click", () => {
+    if (
+      window.confirm(
+        "Cierra el navegador antes de aplicar. ¿Ejecutar import apply (marcadores + historial)?"
+      )
+    ) {
+      showLog(
+        "Ejecuta desde la carpeta de instalacion:\n\n  aurexalis import apply\n\nO usa el panel IM/ST."
+      );
+    }
+  });
+
+  document.getElementById("btn-blocker-sync")?.addEventListener("click", () => {
+    showLog("Ejecuta:\n\n  aurexalis blocker sync-lists\n\nO boton ST → Sincronizar listas bloqueador.");
+  });
+
   if (params.get("import") === "passwords") importHint(true);
   else if (params.get("import") === "data") importHint(false);
 })();

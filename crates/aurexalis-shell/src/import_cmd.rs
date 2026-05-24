@@ -1,11 +1,12 @@
-//! Comandos `aurexalis import` para inventario y exportacion local.
+//! Comandos `aurexalis import` para inventario, exportacion y aplicacion al perfil Gecko.
 
 use aurexalis_importer::{
-    default_profile_roots, discover_profiles, export_audit_snapshot, find_first_chromium_profile,
-    AuditExportOptions, ChromiumBrowser,
+    apply_snapshot_to_profile, default_profile_roots, discover_profiles, export_audit_snapshot,
+    find_first_chromium_profile, load_audit_snapshot, ApplySurface, AuditExportOptions,
+    ChromiumBrowser,
 };
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Lista perfiles Chromium detectados en el sistema.
 pub fn list_profiles() -> Result<(), String> {
@@ -78,15 +79,60 @@ pub fn export_audit(output: Option<PathBuf>, include_passwords: bool) -> Result<
     Ok(())
 }
 
+/// Aplica JSON auditable al perfil Gecko (marcadores + historial). Navegador cerrado.
+pub fn apply_audit(
+    audit_path: Option<PathBuf>,
+    profile_dir: Option<PathBuf>,
+    surfaces: &[ApplySurface],
+) -> Result<(), String> {
+    let audit = audit_path.unwrap_or_else(default_audit_path);
+    let profile = profile_dir.unwrap_or_else(default_profile_path);
+
+    if !profile.is_dir() {
+        return Err(format!(
+            "perfil Gecko inexistente: {} (usa --profile o instala Aurexalis)",
+            profile.display()
+        ));
+    }
+
+    let snapshot = load_audit_snapshot(&audit).map_err(|e| e.to_string())?;
+    let report = apply_snapshot_to_profile(&profile, &snapshot, surfaces).map_err(|e| e.to_string())?;
+
+    println!("[SUCCESS] Importacion aplicada a {}", profile.display());
+    println!(
+        "[INFO] bookmarks={} history={}",
+        report.bookmarks_added, report.history_added
+    );
+    if let Some(backup) = report.backup_dir {
+        println!("[INFO] backup places.sqlite en {}", backup.display());
+    }
+    Ok(())
+}
+
 fn default_audit_path() -> PathBuf {
-    if let Ok(exe) = env::current_exe() {
-        if let Some(root) = exe.parent() {
-            return root
-                .join("profiles")
+    install_root()
+        .map(|root| {
+            root.join("profiles")
                 .join("default")
                 .join("import")
-                .join("chromium-audit.json");
-        }
-    }
-    PathBuf::from("chromium-audit.json")
+                .join("chromium-audit.json")
+        })
+        .unwrap_or_else(|| PathBuf::from("chromium-audit.json"))
+}
+
+fn default_profile_path() -> PathBuf {
+    install_root()
+        .map(|root| root.join("profiles").join("default"))
+        .unwrap_or_else(|| {
+            env::current_dir()
+                .unwrap_or_else(|_| PathBuf::from("."))
+                .join("profiles")
+                .join("default")
+        })
+}
+
+fn install_root() -> Option<PathBuf> {
+    env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
 }

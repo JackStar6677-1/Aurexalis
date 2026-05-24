@@ -187,6 +187,33 @@
       );
 
       container.appendChild(
+        actionButton("Aplicar al perfil (cerrar navegador)", () => {
+          const ok = Services.prompt.confirm(
+            null,
+            "Aurexalis — import apply",
+            "Cierra el navegador antes de escribir en places.sqlite. ¿Continuar?"
+          );
+          if (ok) {
+            try {
+              AurexalisCore.runShell(["import", "apply"]);
+            } catch (error) {
+              Services.prompt.alert(null, "Aurexalis", String(error));
+            }
+          }
+        })
+      );
+
+      container.appendChild(
+        actionButton("Sincronizar listas bloqueador", () => {
+          try {
+            AurexalisCore.runShell(["blocker", "sync-lists"]);
+          } catch (error) {
+            Services.prompt.alert(null, "Aurexalis", String(error));
+          }
+        })
+      );
+
+      container.appendChild(
         actionButton("Abrir pagina de ajustes", () => {
           try {
             AurexalisCore.openSettingsPage();

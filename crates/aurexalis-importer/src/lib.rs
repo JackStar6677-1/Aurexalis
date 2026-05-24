@@ -5,6 +5,10 @@
 
 #![forbid(unsafe_code)]
 
+mod gecko_write;
+
+pub use gecko_write::{apply_snapshot_to_profile, load_audit_snapshot, ApplyReport, ApplySurface};
+
 use std::fmt;
 use std::fs;
 use std::path::{Path, PathBuf};

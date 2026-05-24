@@ -1,6 +1,6 @@
 # Roadmap Profesional
 
-Roadmap de producto alineado con **v0.3.0**. Para descargas y estado rapido ver el [README](../README.md).
+Roadmap de producto alineado con **v0.4.0**. Para descargas y estado rapido ver el [README](../README.md).
 
 ## Fase 0: Base De Ingenieria — Hecho
 
@@ -34,7 +34,8 @@ Roadmap de producto alineado con **v0.3.0**. Para descargas y estado rapido ver 
 - [x] Lectura SQLite/JSON Chromium en crate `aurexalis-importer`.
 - [x] Exportacion auditable (`aurexalis import audit`) desde shell, sidebar e instalador.
 - [x] Opcion de contrasenas con consentimiento (`--passwords`).
-- [ ] Escritura directa al perfil Gecko/Floorp (marcadores, historial, cookies).
+- [x] Escritura directa al perfil Gecko/Floorp (marcadores e historial via `import apply`).
+- [ ] Cookies y contrasenas en perfil Gecko.
 - [ ] Descifrado Linux: Secret Service / KWallet.
 - [ ] Importacion nativa Android (JNI / UniFFI).
 
@@ -43,15 +44,16 @@ Roadmap de producto alineado con **v0.3.0**. Para descargas y estado rapido ver 
 - [x] Crate `aurexalis-blocker` con `adblock-rust` (tests y PoC aislado).
 - [x] Integracion UI: Gecko ETP en desktop, ContentBlocking en Android.
 - [x] Niveles standard / strict / off desde ajustes y panel **ST**.
+- [x] CLI `blocker check` y `blocker sync-lists` (adblock-rust + listas embebidas).
 - [ ] Hook al pipeline de requests Gecko antes del render.
-- [ ] Listas uBlock/ABP configurables desde ajustes.
+- [ ] Listas uBlock/ABP descargables desde URLs.
 - [ ] Benchmarks de matching en CI.
 
 ## Fase 4: RemoteFS — Diseno + backend
 
 - [x] Crate `aurexalis-remotefs` con cola y backend local testeable.
-- [x] Panel **RF** en sidebar (placeholder con acciones hacia descargas).
-- [ ] Cliente SFTP operativo en UI.
+- [x] Cliente SFTP operativo via CLI (`aurexalis remotefs list|get`).
+- [x] Panel **RF** con ayuda SFTP y acceso a descargas.
 - [ ] Cliente FTP/FTPS.
 - [ ] Explorador integrado estilo gestor de archivos.
 - [ ] Credenciales en almacen seguro del SO.
@@ -69,6 +71,6 @@ Roadmap de producto alineado con **v0.3.0**. Para descargas y estado rapido ver 
 
 | Version | Objetivo principal |
 |---|---|
-| **v0.4** | Hook `adblock-rust` + importador escribe en perfil Gecko |
-| **v0.5** | RemoteFS explorador + port CWS Floorp |
+| **v0.4** | `import apply`, blocker CLI, RemoteFS SFTP — **publicado** |
+| **v0.5** | Hook adblock Gecko + listas remotas + explorador RemoteFS |
 | **v1.0** | Nucleo empaquetado end-to-end sin Floorp externo obligatorio |

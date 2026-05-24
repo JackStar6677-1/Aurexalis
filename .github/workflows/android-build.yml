@@ -12,8 +12,6 @@ on:
       - "browser/settings/**"
       - "tools/sync-mobile-assets.*"
       - ".github/workflows/android-build.yml"
-    paths-ignore:
-      - "**.md"
   pull_request:
     branches: [main]
     paths:
@@ -22,8 +20,6 @@ on:
       - "browser/settings/**"
       - "tools/sync-mobile-assets.*"
       - ".github/workflows/android-build.yml"
-    paths-ignore:
-      - "**.md"
 
 concurrency:
   group: android-${{ github.workflow }}-${{ github.ref }}

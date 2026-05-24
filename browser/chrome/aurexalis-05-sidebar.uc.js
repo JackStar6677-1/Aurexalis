@@ -104,12 +104,24 @@
     return {
       title: "Archivos remotos",
       rows: [
-        ["Backend", "aurexalis-remotefs"],
-        ["Protocolos", "SFTP / FTP / FTPS"],
-        ["Estado", "Cola de transferencias y credenciales en Rust"],
+        ["Backend", "aurexalis-remotefs (SFTP activo)"],
+        ["CLI", "aurexalis remotefs list|get"],
+        ["Credenciales", "AUREXALIS_SFTP_PASS o --password"],
       ],
       action: "Abrir descargas",
       command: openDownloads,
+      extraActions: [
+        {
+          label: "Info SFTP en consola",
+          command: () => {
+            Services.prompt.alert(
+              null,
+              "Aurexalis — RemoteFS",
+              "Ejemplo:\n  aurexalis remotefs list --host servidor --user jack --path /\n  aurexalis remotefs get --host H --user U --remote /ruta --local C:\\tmp\\f"
+            );
+          },
+        },
+      ],
     };
   }
 
@@ -119,7 +131,7 @@
       rows: [
         ["Datos", "Marcadores, historial, cookies"],
         ["Origen", "Chrome, Brave u Opera instalados"],
-        ["Contrasenas", "Solo con consentimiento explicito"],
+        ["Apply", "import apply → places.sqlite (navegador cerrado)"],
       ],
       action: "Exportar sin contrasenas",
       command: () => runImport(false),
@@ -138,8 +150,35 @@
             }
           },
         },
+        {
+          label: "Aplicar al perfil Gecko",
+          command: () => {
+            const ok = Services.prompt.confirm(
+              null,
+              "Aurexalis — import apply",
+              "Cierra Aurexalis/Floorp antes de importar. ¿Aplicar marcadores e historial?"
+            );
+            if (ok) {
+              runShellApply();
+            }
+          },
+        },
       ],
     };
+  }
+
+  function runShellApply() {
+    if (!window.AurexalisCore) {
+      return;
+    }
+    try {
+      AurexalisCore.runShell(["import", "apply"]);
+      if (window.AurexalisSound) {
+        AurexalisSound.play("panel");
+      }
+    } catch (error) {
+      Services.prompt.alert(null, "Aurexalis", String(error));
+    }
   }
 
   function settingsPanel() {

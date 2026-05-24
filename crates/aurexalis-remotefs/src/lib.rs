@@ -5,6 +5,10 @@
 
 #![forbid(unsafe_code)]
 
+mod sftp;
+
+pub use sftp::SftpFileSystem;
+
 use std::fmt;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
