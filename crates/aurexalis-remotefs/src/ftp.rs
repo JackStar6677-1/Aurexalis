@@ -19,10 +19,9 @@ fn ftp_error(error: FtpError) -> RemoteFsError {
 }
 
 fn make_tls_connector() -> Result<NativeTlsConnector, RemoteFsError> {
-    Ok(NativeTlsConnector::from(
-        TlsConnector::new()
-            .map_err(|e| RemoteFsError::Io(std::io::Error::other(e.to_string())))?,
-    ))
+    Ok(NativeTlsConnector::from(TlsConnector::new().map_err(
+        |e| RemoteFsError::Io(std::io::Error::other(e.to_string())),
+    )?))
 }
 
 /// Stream FTP plano o FTPS envuelto para mutabilidad interior.
