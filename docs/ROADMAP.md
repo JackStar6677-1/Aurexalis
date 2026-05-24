@@ -54,9 +54,9 @@ Roadmap de producto alineado con **v0.4.0**. Para descargas y estado rapido ver 
 
 - [x] Crate `aurexalis-remotefs` con cola y backend local testeable.
 - [x] Cliente SFTP operativo via CLI (`aurexalis remotefs list|get`).
-- [x] Panel **RF** con ayuda SFTP y acceso a descargas.
-- [ ] Cliente FTP/FTPS.
-- [ ] Explorador integrado estilo gestor de archivos.
+- [x] Cliente FTP/FTPS via CLI (`--protocol ftp|ftps`, credenciales `AUREXALIS_FTP_PASS` / `AUREXALIS_FTPS_PASS`).
+- [x] Panel **RF** con formulario de conexion, listado via CLI y acceso a descargas.
+- [ ] Explorador integrado estilo gestor de archivos (arbol + preview).
 - [ ] Credenciales en almacen seguro del SO.
 
 ## Fase 5: Gecko / Floorp Core — Parcial
@@ -73,5 +73,5 @@ Roadmap de producto alineado con **v0.4.0**. Para descargas y estado rapido ver 
 | Version | Objetivo principal |
 |---|---|
 | **v0.4** | `import apply`, blocker CLI, RemoteFS SFTP — **publicado** |
-| **v0.5** | Hook adblock Gecko + listas remotas + explorador RemoteFS |
+| **v0.5** | Hook adblock Gecko + listas remotas + explorador RemoteFS (FTP/FTPS + panel RF) |
 | **v1.0** | Nucleo empaquetado end-to-end sin Floorp externo obligatorio |

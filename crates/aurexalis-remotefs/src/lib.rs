@@ -5,8 +5,10 @@
 
 #![forbid(unsafe_code)]
 
+mod ftp;
 mod sftp;
 
+pub use ftp::FtpFileSystem;
 pub use sftp::SftpFileSystem;
 
 use std::fmt;
@@ -115,6 +117,35 @@ pub trait RemoteFileSystem {
 #[derive(Debug, Clone)]
 pub struct LocalMirrorFileSystem {
     root: PathBuf,
+}
+
+pub fn connect_remote(
+    profile: &RemoteConnectionProfile,
+    password: &str,
+) -> Result<Box<dyn RemoteFileSystem>, RemoteFsError> {
+    match profile.protocol {
+        RemoteProtocol::Sftp => Ok(Box::new(SftpFileSystem::connect(profile, password)?)),
+        RemoteProtocol::Ftp | RemoteProtocol::Ftps => {
+            Ok(Box::new(FtpFileSystem::connect(profile, password)?))
+        }
+    }
+}
+
+pub fn protocol_env_var(protocol: RemoteProtocol) -> &'static str {
+    match protocol {
+        RemoteProtocol::Sftp => "AUREXALIS_SFTP_PASS",
+        RemoteProtocol::Ftp => "AUREXALIS_FTP_PASS",
+        RemoteProtocol::Ftps => "AUREXALIS_FTPS_PASS",
+    }
+}
+
+pub fn parse_protocol(raw: &str) -> Result<RemoteProtocol, String> {
+    match raw.to_ascii_lowercase().as_str() {
+        "sftp" => Ok(RemoteProtocol::Sftp),
+        "ftp" => Ok(RemoteProtocol::Ftp),
+        "ftps" => Ok(RemoteProtocol::Ftps),
+        other => Err(format!("protocolo invalido: {other} (usa sftp, ftp o ftps)")),
+    }
 }
 
 pub fn default_port(protocol: RemoteProtocol) -> u16 {
@@ -303,6 +334,14 @@ impl RemoteFileSystem for LocalMirrorFileSystem {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn parses_protocol_names() {
+        assert_eq!(parse_protocol("sftp").expect("sftp"), RemoteProtocol::Sftp);
+        assert_eq!(parse_protocol("FTP").expect("ftp"), RemoteProtocol::Ftp);
+        assert_eq!(parse_protocol("Ftps").expect("ftps"), RemoteProtocol::Ftps);
+        assert!(parse_protocol("webdav").is_err());
+    }
 
     #[test]
     fn maps_default_ports() {
