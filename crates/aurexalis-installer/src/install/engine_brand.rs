@@ -14,7 +14,7 @@ pub fn branded_binary_name() -> &'static str {
 
 /// Ruta preferida del motor: copia marcada si existe, si no el binario Floorp original.
 pub fn resolve_engine_binary(engine_dir: &Path, floorp_source: &Path) -> PathBuf {
-    let branded = engine_dir.join(BRANDED_EXE);
+    let branded = engine_dir.join(branded_binary_name());
     if branded.is_file() {
         return branded;
     }
@@ -27,7 +27,7 @@ pub fn brand_engine_binary(
     engine_dir: &Path,
     icon_path: &Path,
 ) -> Result<PathBuf, String> {
-    let dest = engine_dir.join(BRANDED_EXE);
+    let dest = engine_dir.join(branded_binary_name());
     if dest.is_file() {
         return Ok(dest);
     }
