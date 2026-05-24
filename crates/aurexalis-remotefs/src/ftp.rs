@@ -1,7 +1,7 @@
 //! Cliente FTP/FTPS minimo para Aurexalis RemoteFS.
 
 use std::cell::RefCell;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
@@ -16,6 +16,13 @@ use crate::{
 
 fn ftp_error(error: FtpError) -> RemoteFsError {
     RemoteFsError::Io(std::io::Error::other(error.to_string()))
+}
+
+fn make_tls_connector() -> Result<NativeTlsConnector, RemoteFsError> {
+    Ok(NativeTlsConnector::from(
+        TlsConnector::new()
+            .map_err(|e| RemoteFsError::Io(std::io::Error::other(e.to_string())))?,
+    ))
 }
 
 /// Stream FTP plano o FTPS envuelto para mutabilidad interior.
@@ -113,14 +120,12 @@ impl FtpFileSystem {
     ) -> Result<Self, RemoteFsError> {
         let addr = format!("{}:{}", profile.host, profile.port);
         let user = profile.username.as_deref().unwrap_or("anonymous");
-        let tls = NativeTlsConnector::from(
-            TlsConnector::new()
-                .map_err(|e| RemoteFsError::Io(std::io::Error::other(e.to_string())))?,
-        );
-
         let stream = if profile.port == default_port(RemoteProtocol::Ftps) {
-            NativeTlsFtpStream::connect_secure_implicit(&addr, tls.clone()).map_err(ftp_error)?
+            let tls = make_tls_connector()?;
+            NativeTlsFtpStream::connect_secure_implicit(&addr, tls, &profile.host)
+                .map_err(ftp_error)?
         } else {
+            let tls = make_tls_connector()?;
             let plain = NativeTlsFtpStream::connect(&addr).map_err(ftp_error)?;
             plain.into_secure(tls, &profile.host).map_err(ftp_error)?
         };
