@@ -35,7 +35,8 @@ impl SftpFileSystem {
 
         let addr = format!("{}:{}", profile.host, profile.port);
         let tcp = TcpStream::connect(&addr).map_err(RemoteFsError::Io)?;
-        let mut session = Session::new().map_err(|e| RemoteFsError::Io(std::io::Error::other(e.to_string())))?;
+        let mut session =
+            Session::new().map_err(|e| RemoteFsError::Io(std::io::Error::other(e.to_string())))?;
         session.set_tcp_stream(tcp);
         session.handshake().map_err(ssh2_error)?;
         let user = profile.username.as_deref().unwrap_or("root");
