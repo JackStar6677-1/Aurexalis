@@ -11,7 +11,9 @@ on:
 
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: true
+  # No cancelar builds en curso: Windows tarda ~12 min y un retag del tag
+  # interrumpia el job antes de subir artefactos (solo quedaban zip/tar.gz).
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -215,13 +217,7 @@ jobs:
           draft: false
           prerelease: true
           body: |
-            ## Aurexalis v0.4.0
-
-            ### Novedades
-            - **`aurexalis import apply`** — escribe marcadores e historial del audit JSON en `places.sqlite` (navegador cerrado).
-            - **`aurexalis blocker check|sync-lists`** — comprobacion adblock-rust y listas embebidas en el perfil.
-            - **`aurexalis remotefs list|get`** — cliente SFTP (credencial via `AUREXALIS_SFTP_PASS` o `--password`).
-            - UI: panel **IM** / **ST** con apply y sync-lists; panel **RF** con ayuda SFTP.
+            ## Aurexalis ${{ github.ref_name }}
 
             ### Windows (PC)
             - `Aurexalis-Setup-x86_64.exe` — instalador GUI
