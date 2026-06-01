@@ -189,19 +189,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Windows assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release-windows
           path: dist/windows
 
       - name: Download Android assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release-android
           path: dist/android
 
       - name: Download Linux assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release-linux
           path: dist/linux
