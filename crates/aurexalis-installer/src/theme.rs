@@ -32,10 +32,10 @@ pub fn apply(ctx: &egui::Context) {
     visuals.menu_corner_radius = CornerRadius::same(8);
     ctx.set_visuals(visuals);
 
-    let mut style = (*ctx.style()).clone();
+    let mut style = (*ctx.global_style()).clone();
     style.spacing.button_padding = egui::vec2(14.0, 8.0);
     style.spacing.item_spacing = egui::vec2(10.0, 8.0);
-    ctx.set_style(style);
+    ctx.set_global_style(style);
 }
 
 /// Boton principal con acento rojo/morado.
