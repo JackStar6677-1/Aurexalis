@@ -81,7 +81,7 @@ jobs:
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: aurexalis-android-apk
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
