@@ -8,6 +8,6 @@ authors.workspace = true
 
 [dependencies]
 ssh2 = { version = "0.9.4", features = ["vendored-openssl"] }
-suppaftp = { version = "8.0.2", default-features = false, features = ["native-tls-vendored", "secure", "deprecated"] }
+suppaftp = { version = "9.0.0", default-features = false, features = ["native-tls-vendored", "secure", "deprecated"] }
 [lints]
 workspace = true
