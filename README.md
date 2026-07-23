@@ -387,3 +387,5 @@ Proyecto personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases 
   <strong>Aurexalis</strong><br />
   Morado profundo. Rojo neon. Dorado reactivo. Control local.
 </p>
+
+<!-- Updated for 2026 active baseline maintenance -->
