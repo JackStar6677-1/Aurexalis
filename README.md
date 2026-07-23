@@ -329,7 +329,7 @@ El binario arrancable vive en `aurexalis-shell`:
 ```powershell
 .\tools\aurexalis-build.ps1 -Mode build
 .\target\debug\aurexalis.exe profiles
-.\target\debug\aurexalis.exe launch "C:\Ruta\A\floorp.exe"
+.\target\debug\aurexalis.exe launch "C:\Path\A\floorp.exe"
 ```
 
 **Windows:** descarga en [GitHub Releases](https://github.com/JackStar6677-1/Aurexalis/releases) — `Aurexalis-Setup-x86_64.exe` (recomendado), `aurexalis-windows-x86_64.exe` (CLI) o runtime zip.
@@ -377,9 +377,9 @@ La suite esta documentada en [docs/TESTING.md](./docs/TESTING.md).
 - [SECURITY.md](./SECURITY.md): politica de datos sensibles.
 - [docs/adr](./docs/adr): decisiones arquitectonicas.
 
-## Licencia Y Uso
+## License Y Uso
 
-Proyecto personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases como **pre-release**. Assets propietarios de terceros (sonidos comerciales, temas cerrados) no se incluyen; usa tus propios OGG en `browser/chrome/sounds/`.
+Project personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases como **pre-release**. Assets propietarios de terceros (sonidos comerciales, temas cerrados) no se incluyen; usa tus propios OGG en `browser/chrome/sounds/`.
 
 ---
 
