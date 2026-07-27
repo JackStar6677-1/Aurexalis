@@ -7,7 +7,7 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-adblock = "0.12.5"
+adblock = "0.13.2"
 aurexalis-core = { path = "../aurexalis-core" }
 
 [lints]
