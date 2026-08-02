@@ -72,7 +72,7 @@ Detalle de build y empaquetado: [docs/BUILD_AND_RELEASE.md](./docs/BUILD_AND_REL
 
 **Aurexalis** mezcla la raiz aurea/dorada de `AureonVault` con el cierre astronomico de `Coronalis` y `AuroralisStar`. La intencion es que suene a una pieza del mismo universo de repositorios, pero con identidad propia para un navegador.
 
-## Arquitectura
+## Architecture
 
 ```mermaid
 flowchart TB
@@ -377,7 +377,7 @@ La suite esta documentada en [docs/TESTING.md](./docs/TESTING.md).
 - [SECURITY.md](./SECURITY.md): politica de datos sensibles.
 - [docs/adr](./docs/adr): decisiones arquitectonicas.
 
-## Licencia Y Uso
+## License Y Uso
 
 Proyecto personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases como **pre-release**. Assets propietarios de terceros (sonidos comerciales, temas cerrados) no se incluyen; usa tus propios OGG en `browser/chrome/sounds/`.
 
@@ -387,3 +387,5 @@ Proyecto personal open-source (MIT). v0.3.0 publica binarios en GitHub Releases 
   <strong>Aurexalis</strong><br />
   Morado profundo. Rojo neon. Dorado reactivo. Control local.
 </p>
+
+<!-- Updated for 2026 active baseline maintenance -->
