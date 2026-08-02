@@ -80,7 +80,7 @@ jobs:
           Copy-Item "target/${{ matrix.target }}/release/Aurexalis-Setup.exe" "dist/Aurexalis-Setup-x86_64.exe"
 
       - name: Upload Windows release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-windows
           path: dist/*
@@ -144,7 +144,7 @@ jobs:
             "dist/Aurexalis-android-${VERSION}-gecko.apk"
 
       - name: Upload Android release asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-android
           path: dist/Aurexalis-android-*.apk
@@ -174,7 +174,7 @@ jobs:
         run: bash ./tools/package-linux.sh
 
       - name: Upload Linux release assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-linux
           path: |
