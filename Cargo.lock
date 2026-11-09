@@ -13,9 +13,9 @@ dependencies = [
 
 [[package]]
 name = "adblock"
-version = "0.13.3"
+version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f44b96a666a23c12acad7c688bfe8638a7094e7eabe765b09a6864ab991c676d"
+checksum = "7a4c8558f27608dec74695c866f9a8ef897ec7a77cb826f8a5baf0b8ba461d2a"
 dependencies = [
  "addr",
  "arrayvec",
@@ -26,14 +26,12 @@ dependencies = [
  "itertools",
  "memchr",
  "percent-encoding",
- "precomputed-hash",
  "regex",
  "rustc-hash",
  "seahash",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
- "url",
 ]
 
 [[package]]
@@ -64,9 +62,9 @@ dependencies = [
 
 [[package]]
 name = "aes"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35f0f96ce78e38c3dc6d8948aa8163d06385be74000f3c7a95bf1eef35d3ea32"
+checksum = "fc0fc36d7440d015b45468ba08a21e80e056ebbd014c611c6298bb7503e04bd1"
 dependencies = [
  "cipher",
  "cpubits",
@@ -2165,9 +2163,9 @@ dependencies = [
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.38.2"
+version = "0.39.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1d20bef17f513b9b3004532233187769cd072d790971f4e4da0e346eb6401e8"
+checksum = "14a5f01b87b92705d07b433c06f96cbc764637d81a0bffb5734ce17cf0f9a2b3"
 dependencies = [
  "cc",
  "pkg-config",
@@ -2176,15 +2174,16 @@ dependencies = [
 
 [[package]]
 name = "libssh2-sys"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f5eb74291e8691cab524a01274a1b1e7742b1a94f29d8b101d8aadc8372c1cd"
+checksum = "fce5a0b125f6aeac93b304b35f7f1e9f054aad29ddac57091928e41df3ccd233"
 dependencies = [
  "cc",
  "libc",
  "libz-sys",
  "openssl-sys",
  "pkg-config",
+ "semver",
  "vcpkg",
 ]
 
@@ -2253,9 +2252,9 @@ checksum = "112b39cec0b298b6c1999fee3e31427f74f676e4cb9879ed1a121b43661a4154"
 
 [[package]]
 name = "lzma-rust2"
-version = "0.22.0"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7277c9742229dc25243236d578b6471a798c554512c6f6a04365ec2e87c2a3bb"
+checksum = "f1c46f3fcd2e888afdb01a07efc071cb21300e07c68d32c3e8b01b5c8cb1fcaa"
 dependencies = [
  "sha2",
 ]
@@ -3032,12 +3031,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd4acc8d264ea385db64ccfdcdfd5909ee9eda0975666723d59f3bfec80b3611"
 
 [[package]]
-name = "precomputed-hash"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
-
-[[package]]
 name = "prettyplease"
 version = "0.2.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3398,9 +3391,9 @@ dependencies = [
 
 [[package]]
 name = "rusqlite"
-version = "0.40.2"
+version = "0.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23f2a97da3e3873c73cb2a2e71b35c40ff95e0b1eefa8d72d8499a6928c3b5b3"
+checksum = "da9bba6f3506135e120a6586df05be18b48d18896600646a4bec8f993d91a594"
 dependencies = [
  "bitflags 2.13.0",
  "fallible-iterator",
@@ -3827,9 +3820,9 @@ dependencies = [
 
 [[package]]
 name = "ssh2"
-version = "0.9.6"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c95eb3c09e378543395a3fa9796f897861862466ee331d59140ade4ea0dcfdfc"
+checksum = "c85be00ec7fc67b19b590c6eb3cfb03c9ab663923fa8bdd18b7e1ba3a414a210"
 dependencies = [
  "bitflags 2.13.0",
  "libc",
@@ -4183,9 +4176,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "typed-path"
-version = "0.12.4"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54ec2755506471f54baf5e4bb5499d8e510cc1caf271270e778a736bd2d7336c"
+checksum = "9ce898823d8cd0f028662d2f349694b1af0a5cc9be83f1d213a00d3147445e1e"
 
 [[package]]
 name = "typenum"
@@ -5319,9 +5312,9 @@ dependencies = [
 
 [[package]]
 name = "zip"
-version = "9.0.5"
+version = "9.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e04976da629d3b04204ba8105b396a193af8ad2583b2c79bfb3ab8af580a11e"
+checksum = "ec2e3161de27091f18a831d9494e9c53378a34833af5c1dda35ad85849da18d6"
 dependencies = [
  "aes",
  "bzip2",
@@ -5340,6 +5333,7 @@ dependencies = [
  "sha1",
  "time",
  "typed-path",
+ "windows-sys 0.61.2",
  "zeroize",
  "zopfli",
  "zstd",
