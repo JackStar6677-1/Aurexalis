@@ -246,7 +246,9 @@ pub fn default_profile_roots(browser: ChromiumBrowser) -> Vec<PathBuf> {
 
     if cfg!(target_os = "linux") {
         if let Some(home) = std::env::var_os("HOME") {
-            let base = PathBuf::from(home).join(".config");
+            let base = std::env::var_os("XDG_CONFIG_HOME")
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from(home).join(".config"));
             match browser {
                 ChromiumBrowser::Brave => {
                     roots.push(base.join("BraveSoftware/Brave-Browser"));

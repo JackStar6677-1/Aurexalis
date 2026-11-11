@@ -1,6 +1,6 @@
 //! Descifrado Chromium en Linux (libsecret / keyring + fallback V10 "peanuts").
 
-use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, KeyIvInit};
+use aes::cipher::{block_padding::Pkcs7, BlockModeDecrypt, KeyIvInit};
 use pbkdf2::pbkdf2_hmac;
 use sha1::Sha1;
 
@@ -64,7 +64,7 @@ fn decrypt_with_password(
         .map_err(|error| ImporterError::Crypto(error.to_string()))?;
     let mut buffer = raw.to_vec();
     let plaintext = cipher
-        .decrypt_padded_mut::<Pkcs7>(&mut buffer)
+        .decrypt_padded::<Pkcs7>(&mut buffer)
         .map_err(|error| ImporterError::Crypto(format!("AES-CBC: {error:?}")))?;
     Ok(plaintext.to_vec())
 }
