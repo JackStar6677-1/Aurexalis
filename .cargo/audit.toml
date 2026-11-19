@@ -1,4 +1,5 @@
 [advisories]
 # quick-xml 0.39.4 solo lo usa wayland-scanner (proc-macro en tiempo de compilacion, via eframe -> smithay).
 # No procesa datos externos en ejecucion; se levanta cuando eframe suba su wayland-scanner.
-ignore = ["RUSTSEC-2026-0194", "RUSTSEC-2026-0195"]
+# chrono, zbus_names y zvariant(_derive) figuran como "sin mantenimiento" y no tienen version corregida.
+ignore = ["RUSTSEC-2026-0194", "RUSTSEC-2026-0195", "RUSTSEC-2026-0543", "RUSTSEC-2026-0370", "RUSTSEC-2026-0371", "RUSTSEC-2026-0372"]
