@@ -2,6 +2,11 @@
   <img src="./assets/aurexalis-banner.svg" width="100%" alt="Aurexalis browser banner" />
 </p>
 
+> [!WARNING]
+> ### 🛑 ESTADO: PROYECTO CONGELADO / ARCHIVADO (NO EN DESARROLLO)
+> **Este proyecto está oficialmente congelado y fuera de la hoja de ruta activa de Jack.**  
+> Ningún agente autónomo de la Tríada SRE (Antigravity, Codex, Claude) debe tomar tareas, abrir issues/PRs, ni dedicar ciclos de desarrollo a este navegador. Se mantiene únicamente como referencia histórica.
+
 <div align="center">
 
 # Aurexalis
