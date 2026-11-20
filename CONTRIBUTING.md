@@ -2,6 +2,25 @@
 
 Aurexalis se trabaja como proyecto de navegador, no como demo. Cada cambio debe dejar una pieza verificable, documentada y compatible con la arquitectura modular.
 
+---
+
+## 🏛️ Código de Conducta y Respeto Profesional
+
+Todos los participantes deben cumplir estrictamente nuestro [Código de Conducta](CODE_OF_CONDUCT.md).
+Exigimos un trato respetuoso, profesional y fundamentado técnicamente.
+**Los insultos, faltas de respeto, actitud demandante o ataques personales resultarán en el bloqueo inmediato del usuario y cierre del hilo sin debate.**
+
+---
+
+## 📋 Regla Obligatoria: Issue Previo (Issue-First)
+
+Antes de escribir código o abrir un Pull Request:
+1. Revisa los issues existentes para evitar duplicados.
+2. Abre un Issue detallando el bug o la propuesta técnica antes de implementar cambios estructurales.
+3. PRs masivos no solicitados que reescriban módulos sin aprobación previa serán cerrados sin revisión.
+
+---
+
 ## Flujo
 
 1. Crear una rama corta y descriptiva.
