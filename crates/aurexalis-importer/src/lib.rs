@@ -558,9 +558,10 @@ pub fn decrypt_chromium_secret(
 
         let cipher = Aes256Gcm::new_from_slice(key)
             .map_err(|error| ImporterError::Crypto(error.to_string()))?;
-        let nonce = Nonce::from_slice(&encrypted_value[3..15]);
+        let nonce = Nonce::try_from(&encrypted_value[3..15])
+            .map_err(|error| ImporterError::Crypto(error.to_string()))?;
         let plaintext = cipher
-            .decrypt(nonce, &encrypted_value[15..])
+            .decrypt(&nonce, &encrypted_value[15..])
             .map_err(|error| ImporterError::Crypto(format!("{error:?}")))?;
         return String::from_utf8(plaintext)
             .map_err(|error| ImporterError::Crypto(error.to_string()));

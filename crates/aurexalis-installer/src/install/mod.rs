@@ -146,13 +146,14 @@ fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), String> {
 
     for index in 0..archive.len() {
         let mut entry = archive.by_index(index).map_err(|e| e.to_string())?;
+        let entry_name = entry.name().map_err(|e| e.to_string())?.into_owned();
         let outpath = destination.join(
             entry
                 .enclosed_name()
-                .ok_or_else(|| format!("entrada zip insegura: {}", entry.name()))?,
+                .ok_or_else(|| format!("entrada zip insegura: {entry_name}"))?,
         );
 
-        if entry.name().ends_with('/') {
+        if entry_name.ends_with('/') {
             fs::create_dir_all(&outpath).map_err(|e| e.to_string())?;
             continue;
         }
